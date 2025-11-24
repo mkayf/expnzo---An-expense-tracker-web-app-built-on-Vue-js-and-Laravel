@@ -1,22 +1,26 @@
 export default [
     {
-        path: '/',
-        name: 'Auth Layout',
-        component: () => import("../views/authLayout/AuthLayout.vue"),
+        path: 'login',
+        name: 'Login',
+        component: () => import('../views/auth/Login.vue'),
         meta: {
             requiresAuth: false
-        },
-        children: [
-            {
-                path: 'register',
-                name: 'Register',
-                component: () => import("../views/auth/Register.vue")
-            },
-            {
-                path: 'login',
-                name: 'Login',
-                component: () => import("../views/auth/Login.vue")
-            }
-        ]
+        }   
+    },
+    {
+        path: 'register',
+        name: 'Register',
+        component: () => import('../views/auth/Register.vue'),
+        meta: {
+            requiresAuth: false
+        }
+    },
+    {
+        path: 'verify_email',
+        name: 'VerifyEmail',
+        component: () => import('../views/auth/VerifyEmail.vue'),
+        meta: {
+            requiresAuth: true
+        }
     }
 ]

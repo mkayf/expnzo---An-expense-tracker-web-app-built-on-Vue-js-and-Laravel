@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use PDO;
 
@@ -45,10 +46,13 @@ class AuthController extends Controller
 
             Auth::login($user);
 
+            
+            
             return response()->json([
                 'success' => true,
-                'message' => 'Your account has been created successfully',
+                'message' => 'Account created. Check your email to verify it.',
             ], 201);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
@@ -67,7 +71,7 @@ class AuthController extends Controller
         if ($credentials->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Please enter valid email and password',
                 'errors' => $credentials->errors()->toArray()
             ], 422);
         }
@@ -113,4 +117,6 @@ class AuthController extends Controller
         }
                 
     }
+
+    
 }

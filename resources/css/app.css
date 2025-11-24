@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
-@import 'tailwindcss';
+@import "tailwindcss";
+/* @import "element-plus/dist/index.css"; */
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -8,47 +9,54 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
 }
 
-:root{
-    --primary-green: #328E6E;
+:root {
+    --primary-green: #328e6e;
     --green-hover: #29755a;
     --secondary-gray: #374151;
-    --accent-sky-blue: #3B82F6;
-    --bg-light-gray: #F9FAFB;
+    --accent-sky-blue: #3b82f6;
+    --bg-light-gray: #f9fafb;
     --text-charcoal: #111827;
 }
 
-body{
+body {
     background-color: rgb(245, 245, 245);
     font-family: "Montserrat", sans-serif;
     font-style: normal;
 }
 
-h1, h2, h3, h4, h5, h6, p{
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     color: var(--text-charcoal);
 }
 
-label{
-  font-size: 0.8rem !important;
+label {
+    font-size: 0.8rem !important;
 }
 
-small{
-  font-size: 0.7rem;
+small {
+    font-size: 0.7rem;
 }
 
 .el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 1px var(--primary-green) inset !important;
+    box-shadow: 0 0 0 1px var(--primary-green) inset !important;
 }
 
-.el-form-item__error{
-  font-size: 0.7rem;
-  color: red;
-  margin-top: 4px;
+.el-form-item__error {
+    font-size: 0.7rem;
+    color: red;
+    margin-top: 4px;
 }
 
-.el-form-item__label{
-  margin-bottom: 12px !important;
+.el-form-item__label {
+    margin-bottom: 2px !important;
 }
