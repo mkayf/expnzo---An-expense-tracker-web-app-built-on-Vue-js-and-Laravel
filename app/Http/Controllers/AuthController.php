@@ -3,16 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailOTP;
+use App\Models\OTP;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use PDO;
+use App\Services\OTPService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request, OTPService $OTPService)
     {
         $credentials = Validator::make($request->all(), [
             'name' => ['required', 'string', 'min:3'],
@@ -29,7 +35,8 @@ class AuthController extends Controller
         }
 
         $validatedData = $credentials->validated();
-
+        
+        DB::beginTransaction();        
         try {
             $user = User::create([
                 'name' => $validatedData['name'],
@@ -45,8 +52,20 @@ class AuthController extends Controller
             }
 
             Auth::login($user);
-
             
+            $generatedOTP = $OTPService->generateOTP(6);
+
+            $OTP = new OTP();
+            $OTP->code = $generatedOTP;
+            $OTP->user_id = $user->id;
+            $OTP->expires_at = Carbon::now()->addMinutes(5);
+            $OTP->save(); 
+                        
+            Mail::to($user->email, $user->name)->send(new EmailOTP($generatedOTP));
+
+            Log::info('OTP verification email sent to user');
+
+            DB::commit();
             
             return response()->json([
                 'success' => true,
@@ -54,6 +73,7 @@ class AuthController extends Controller
             ], 201);
 
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create account, AuthController::register, ' . $th->getMessage()

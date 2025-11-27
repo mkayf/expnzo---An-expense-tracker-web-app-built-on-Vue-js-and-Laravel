@@ -13,14 +13,14 @@ class EmailOTP extends Mailable
 {
     use Queueable, SerializesModels;
     
-    protected $data;
+    protected $OTP_code;
     
     /**
      * Create a new message instance.
      */
-    public function __construct($emailData)
+    public function __construct($otp)
     {
-        $this->data = $emailData;
+        $this->OTP_code = $otp;
     }
 
     /**
@@ -29,7 +29,7 @@ class EmailOTP extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'User Email Verification',
+            subject: 'User Account Verification',
         );
     }
 
@@ -41,7 +41,7 @@ class EmailOTP extends Mailable
         return new Content(
             view: 'mails.email_otp',
             with: [
-                'OTP' => $this->data->otp      
+                'OTP' => $this->OTP_code      
             ]
         );
     }

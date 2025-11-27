@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('otps', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->boolean('is_used')->default(false);
-            $table->integer('attempts');
+            $table->integer('attempts')->default(0);
             $table->dateTime('expires_at');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

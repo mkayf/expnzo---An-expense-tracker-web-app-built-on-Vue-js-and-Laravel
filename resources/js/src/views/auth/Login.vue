@@ -23,7 +23,7 @@ const loginUser = async (formData) => {
         const res = await login(formData);
         if (res.data.success) {
             ElMessage({
-                message: "You are logged in.",
+                message: res.data.message,
                 type: "success",
             });
             await authStore.fetchCurrentUser();

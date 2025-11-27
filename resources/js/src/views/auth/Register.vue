@@ -9,7 +9,7 @@ import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import useAuthStore from "../../stores/auth";
 import { useRouter } from "vue-router";
-    
+
 let loading = ref(false);
 const authStore = useAuthStore();
 const router = useRouter();
@@ -20,12 +20,11 @@ const registerUser = async (formData) => {
         const res = await register(formData);
         if (res.data.success) {
             ElMessage({
-                message:
-                    "Your account has been created successfully. Welcome aboard!",
+                message: res.data.message,
                 type: "success",
             });
             await authStore.fetchCurrentUser();
-            router.push("/dashboard");
+            router.push("/auth/verify_email");
         }
     } catch (e) {
         ElMessage({
