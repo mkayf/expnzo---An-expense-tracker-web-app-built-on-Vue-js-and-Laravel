@@ -3,16 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Mail\EmailOTP;
-use App\Models\OTP;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use PDO;
 use App\Services\OTPService;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -53,15 +49,7 @@ class AuthController extends Controller
 
             Auth::login($user);
             
-            $generatedOTP = $OTPService->generateOTP(6);
-
-            $OTP = new OTP();
-            $OTP->code = $generatedOTP;
-            $OTP->user_id = $user->id;
-            $OTP->expires_at = Carbon::now()->addMinutes(5);
-            $OTP->save(); 
-                        
-            Mail::to($user->email, $user->name)->send(new EmailOTP($generatedOTP));
+            $OTPService->sendOTP($user);
 
             Log::info('OTP verification email sent to user');
 
@@ -138,5 +126,82 @@ class AuthController extends Controller
                 
     }
 
-    
+    public function userToBeVerified(Request $request, OTPService $OTPService){
+
+        $validation = Validator::make($request->all(), [
+            'email' => ['required', 'email', 'exists:users,email']
+        ]);
+
+        if($validation->fails()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to process your request at the moment. Please check your email and try again.',
+                'errors' => $validation->errors()->toArray()
+            ], 422);
+        }
+
+        $validatedData = $validation->validated();
+
+        $user = User::where('email', $validatedData['email'])->first();   
+        
+        if($user->email_verified === true){
+            return response()->json([
+                'success' => false,
+                'email_status' => 'verified',
+                'message' => 'Your email is already verified'
+            ], 403);
+        }
+
+        $OTPInfo = $OTPService->isResendOTPEnabled($user);
+        
+        if($OTPInfo['status'] === 'otp_sent'){
+            return response()->json([
+                'success' => true,
+                'timeLeft' => $OTPInfo['timeLeft'],
+                'message' => 'OTP is sent to your email'
+            ], 200);
+        }
+
+
+        if($OTPInfo['status'] === 'wait'){
+            return response()->json([
+                'success' => true,
+                'timeLeft' => $OTPInfo['timeLeft'],
+                'message' => 'Enter the OTP or wait for the timer to request a new one'
+            ], 200);
+        }
+
+        if($OTPInfo['status'] === 'can_resend'){
+            return response()->json([
+                'success' => true,
+                'timeLeft' => $OTPInfo['timeLeft'],
+                'message' => 'You can now request a new otp'
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Internal server error'
+        ], 500);
+    }
+
+    public function resendOTP(Request $request, OTPService $OTPService){
+        $validation = Validator::make($request->all(), [
+            'email' => ['required', 'email', 'exists:users,email']
+        ]);
+
+        if($validation->fails()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to process your request at the moment. Please check your email and try again.',
+                'errors' => $validation->errors()->toArray()
+            ], 422);
+        }
+
+        $validatedData = $validation->validated();
+
+        $user = User::where('email', $validatedData['email'])->first();
+        
+        $OTPInfo = $OTPService->handleResendOTP($user);        
+    }
 }

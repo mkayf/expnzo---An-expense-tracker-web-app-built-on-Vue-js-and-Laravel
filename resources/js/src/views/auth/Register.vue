@@ -3,7 +3,7 @@ import logo from "@/assets/logo/logo.png";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import { Form, Field } from "vee-validate";
 import { registerSchema } from "../../utils/validationSchema";
-import { register } from "../../services/api";
+import { register } from "../../services/auth";
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";

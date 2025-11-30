@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code');
             $table->integer('attempts')->default(0);
+            $table->dateTime('resend_allowed_at');
             $table->dateTime('expires_at');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

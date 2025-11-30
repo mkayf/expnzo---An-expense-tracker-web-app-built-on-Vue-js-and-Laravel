@@ -1,18 +1,17 @@
 <script setup>
-import logo from "../../assets/logo/logo.png";
 import { Form, Field } from "vee-validate";
 import { emailOTPSchema } from "../../utils/validationSchema";
 import { computed, onMounted, ref } from "vue";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import useAuthStore from "../../stores/auth";
+import { userToBeVerified } from "../../services/auth";
+import handleError from "../../utils/handleError";
 
 const loading = ref(false);
 const otpInput = ref(null);
 const isFocused = ref(false);
+const resendTimer = ref(60);
 
-const verifyEmail = (formData) => {
-    console.log(formData);
-};
 
 const authStore = useAuthStore();
 const userEmail = computed(() => {
@@ -33,13 +32,50 @@ const userEmail = computed(() => {
             newEmail += "x";
         }
     }
-    console.log(email);
     return newEmail;
 });
+
+
+const verifyEmail = (formData) => {
+    console.log(formData);
+};
+
+// Resend OTP and timer info:
+const canResendOTP = async () => {
+    try{
+        const res = await userToBeVerified({email: authStore.user.email});
+        if(res.data.success){
+            resendTimer.value = res.data.timeLeft;
+        }
+    }
+    catch(e){
+        handleError(e);
+        console.log(e);
+    }
+};
+
+const startCountDown = () => {
+    const countDown = setInterval(() => {
+        if(resendTimer.value > 0){
+            resendTimer.value -= 1;
+        } else{
+            clearInterval(countDown);
+        }
+    }, 1000);
+}
+
+const formattedTime = computed(() => {
+    return Math.ceil(resendTimer.value);
+});
+
+
 onMounted(() => {
+    canResendOTP();
+    startCountDown();
     otpInput.value.focus();
     isFocused.value = true;
 });
+
 </script>
 <template>
     <div class="bg-white p-6 rounded-2xl shadow-lg w-full sm:w-100">
@@ -96,7 +132,15 @@ onMounted(() => {
                 <span class="text-xs text-gray-700 inline-block mb-2">Didn’t get it? Wait for the timer.</span>
             </div>
             <div class="flex justify-between items-center">
-                <el-button :disabled="true" class="!bg-gray-200 w-full transition-all duration-500 hover:!bg-gray-300 !border-none hover:!text-[#606266]">29s</el-button>
+                <el-button :disabled="formattedTime > 0" class="w-full transition-all duration-500"
+                    :class="{
+                        '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none': formattedTime > 0,
+                        '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white' : formattedTime == 0
+                    }"
+                    >
+                    <span v-if="formattedTime > 0">{{formattedTime}}s</span>
+                    <span v-else>Resend</span>
+                </el-button>
                 <SubmitButton
                     :is-loading="loading"
                     text="Verify"

@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 return $request->user();
     });
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
 });
 
 Route::get('/products', function (){

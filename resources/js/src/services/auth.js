@@ -21,3 +21,7 @@ export const logout = () => {
 export const getUser = () => {
     return api.get('/user');
 }
+
+export const userToBeVerified = ($data) => {
+    return api.post('/user_to_be_verified', $data);
+}
