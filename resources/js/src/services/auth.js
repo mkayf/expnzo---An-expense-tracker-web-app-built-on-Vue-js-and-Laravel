@@ -22,6 +22,10 @@ export const getUser = () => {
     return api.get('/user');
 }
 
-export const userToBeVerified = ($data) => {
-    return api.post('/user_to_be_verified', $data);
+export const userToBeVerified = (data) => {
+    return api.post('/user_to_be_verified', data);
+}
+
+export const resendOTP = (data) => {
+    return api.post('/resend_otp', data);
 }

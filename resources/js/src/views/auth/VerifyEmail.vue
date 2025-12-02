@@ -4,7 +4,7 @@ import { emailOTPSchema } from "../../utils/validationSchema";
 import { computed, onMounted, ref } from "vue";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import useAuthStore from "../../stores/auth";
-import { userToBeVerified } from "../../services/auth";
+import { userToBeVerified, resendOTP } from "../../services/auth";
 import handleError from "../../utils/handleError";
 
 const loading = ref(false);
@@ -53,6 +53,20 @@ const canResendOTP = async () => {
         console.log(e);
     }
 };
+
+const handleResendOTP = async () => {
+    try{
+        const res = await resendOTP({email: authStore.user.email});
+        if(res.data.success){
+            resendTimer.value = res.data.timeLeft;
+            startCountDown();
+        } 
+    }
+    catch(e){
+        handleError(e);
+        console.log(e);
+    }
+}
 
 const startCountDown = () => {
     const countDown = setInterval(() => {
@@ -111,7 +125,6 @@ onMounted(() => {
                                 :class="{
                                     'is-filled':
                                         field.value && field.value[index],
-                                    // MODIFIED: Ab isFocused ko bhi check kiya ja raha hai
                                     'is-active':
                                         (field.value
                                             ? field.value.length
@@ -132,7 +145,7 @@ onMounted(() => {
                 <span class="text-xs text-gray-700 inline-block mb-2">Didn’t get it? Wait for the timer.</span>
             </div>
             <div class="flex justify-between items-center">
-                <el-button :disabled="formattedTime > 0" class="w-full transition-all duration-500"
+                <el-button @click="handleResendOTP" :disabled="formattedTime > 0" class="w-full transition-all duration-500"
                     :class="{
                         '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none': formattedTime > 0,
                         '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white' : formattedTime == 0

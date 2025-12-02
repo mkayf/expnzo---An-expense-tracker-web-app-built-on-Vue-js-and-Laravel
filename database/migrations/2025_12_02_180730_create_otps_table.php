@@ -17,6 +17,8 @@ return new class extends Migration
             $table->integer('attempts')->default(0);
             $table->dateTime('resend_allowed_at');
             $table->dateTime('expires_at');
+            $table->boolean('is_sent')->default(false);
+            $table->string('error')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

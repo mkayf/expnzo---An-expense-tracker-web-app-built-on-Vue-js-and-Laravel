@@ -142,7 +142,7 @@ class AuthController extends Controller
 
         $validatedData = $validation->validated();
 
-        $user = User::where('email', $validatedData['email'])->first();   
+        $user = User::where('email', $validatedData['email'] ?? Auth::user()->email)->first();   
         
         if($user->email_verified === true){
             return response()->json([
@@ -158,7 +158,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'timeLeft' => $OTPInfo['timeLeft'],
-                'message' => 'OTP is sent to your email'
+                'message' => 'New OTP code is sent to your email'
             ], 200);
         }
 
@@ -200,8 +200,28 @@ class AuthController extends Controller
 
         $validatedData = $validation->validated();
 
-        $user = User::where('email', $validatedData['email'])->first();
+        $user = User::where('email', $validatedData['email'] ?? Auth::user()->email)->first();
         
-        $OTPInfo = $OTPService->handleResendOTP($user);        
+        $OTPInfo = $OTPService->handleResendOTP($user);
+        
+        if($OTPInfo['status'] === 'wait'){
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot request new otp before the timer runs out.'
+            ], 429);
+        }
+
+        if($OTPInfo['status'] === 'otp_sent'){
+            return response()->json([
+                'success' => true,
+                'timeLeft' => $OTPInfo['timeLeft'],
+                'message' => 'New OTP code is sent to your email'               
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Cannot send OTP due to internal server error. Please try again'
+        ], 500);
     }
 }

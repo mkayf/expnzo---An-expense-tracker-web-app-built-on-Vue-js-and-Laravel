@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendOTPEmailJob;
 use App\Mail\EmailOTP;
 use App\Models\OTP;
 use App\Models\User;
@@ -29,7 +30,9 @@ class OTPService
         $OTP->expires_at = Carbon::now()->addMinutes(10);
         $OTP->save();
 
-        Mail::to($user->email, $user->name)->send(new EmailOTP($generatedOTP));
+        // Mail::to($user->email, $user->name)->send(new EmailOTP($generatedOTP));
+
+        SendOTPEmailJob::dispatch($user->email, $user->name, $generatedOTP);
 
         return max(0, Carbon::now()->diffInSeconds($OTP->resend_allowed_at, false));
     }
@@ -65,6 +68,22 @@ class OTPService
     }
 
     public function handleResendOTP($user){
+        $OTP = OTP::where('user_id', $user->id)->orderBy('id', 'desc')->first();
+
+        // If OTP exists and resend window time is left:
+        if($OTP && Carbon::parse($OTP->resend_allowed_at) > Carbon::now()){
+            $resendTimeLeft = max(0, Carbon::now()->diffInSeconds($OTP->resend_allowed_at));
+            return [
+                'status' => 'wait',
+                'timeLeft' => $resendTimeLeft
+            ];
+        }
+        
+        $timeLeft = $this->sendOTP($user);
+        return [
+            'status' => 'otp_sent',
+            'timeLeft' => $timeLeft
+        ];
 
     }
 }
