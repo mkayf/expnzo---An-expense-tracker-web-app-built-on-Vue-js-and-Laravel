@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
     Route::post('/resend_otp', [AuthController::class, 'resendOTP']);
+    Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
 });
 
 Route::get('/products', function (){

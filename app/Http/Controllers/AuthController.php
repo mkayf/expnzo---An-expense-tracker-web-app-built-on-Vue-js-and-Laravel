@@ -224,4 +224,60 @@ class AuthController extends Controller
             'message' => 'Cannot send OTP due to internal server error. Please try again'
         ], 500);
     }
+
+    public function verifyEmail(Request $request, OTPService $OTPService){
+        $validation = Validator::make($request->all(), [
+            'email' => ['required', 'email', 'exists:users,email'],
+            'otp_code' => ['required', 'size:6']
+        ]);
+
+        if($validation->fails()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to process your request at the moment. Please check your email and try again.',
+                'errors' => $validation->errors()->toArray()
+            ], 422);
+        }
+
+        $validatedData = $validation->validated();
+       
+        $user = User::where('email', $validatedData['email'] ?? Auth::user()->email)->first();
+
+        $OTPInfo = $OTPService->handleVerifyEmail($user, $validatedData['otp_code']);
+
+        if($OTPInfo['status'] === 'expired'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Your OTP code has been expired. Click on resend button'                
+            ], 422);
+        }
+
+        if($OTPInfo['status'] === 'attempts_exceeded'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many failed attempts. Wait for the timer and request a new OTP code'
+            ], 429);
+        }
+
+        if($OTPInfo['status'] === 'invalid'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Your OTP code is incorrect'
+            ], 400);
+        }
+
+        if($OTPInfo['status'] === 'verified'){
+            return response()->json([
+                'success' => true,
+                'user' => Auth::user(),
+                'message' => 'Your account has been verified successfully',
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Cannot verify your email due to internal server error. Please try again'
+        ], 500);
+
+    }
 }

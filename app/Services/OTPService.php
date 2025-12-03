@@ -42,48 +42,85 @@ class OTPService
         $OTP = OTP::where('user_id', $user->id)->orderBy('id', 'desc')->first();
 
         // If OTP is not generated or expired then mail it to user:
-        if (!$OTP || $OTP->expires_at < Carbon::now()) {
+        if (! $OTP || $OTP->expires_at < Carbon::now()) {
             $timeLeft = $this->sendOTP($user);
+
             return [
                 'status' => 'otp_sent',
-                'timeLeft' => $timeLeft
+                'timeLeft' => $timeLeft,
             ];
         }
 
         // Get the resend_allowed_at for the countdown timer:
         $resendAllowedAt = Carbon::parse($OTP->resend_allowed_at);
-        if(Carbon::now()->lessThan($resendAllowedAt)){
+        if (Carbon::now()->lessThan($resendAllowedAt)) {
             $resendTimeLeft = max(0, Carbon::now()->diffInSeconds($resendAllowedAt));
+
             return [
                 'status' => 'wait',
-                'timeLeft' => $resendTimeLeft
+                'timeLeft' => $resendTimeLeft,
             ];
-        }else{
+        } else {
             return [
                 'status' => 'can_resend',
-                'timeLeft' => 0
+                'timeLeft' => 0,
             ];
         }
 
     }
 
-    public function handleResendOTP($user){
+    public function handleResendOTP($user)
+    {
         $OTP = OTP::where('user_id', $user->id)->orderBy('id', 'desc')->first();
 
         // If OTP exists and resend window time is left:
-        if($OTP && Carbon::parse($OTP->resend_allowed_at) > Carbon::now()){
+        if ($OTP && Carbon::parse($OTP->resend_allowed_at) > Carbon::now()) {
             $resendTimeLeft = max(0, Carbon::now()->diffInSeconds($OTP->resend_allowed_at));
+
             return [
                 'status' => 'wait',
-                'timeLeft' => $resendTimeLeft
+                'timeLeft' => $resendTimeLeft,
             ];
         }
-        
+
         $timeLeft = $this->sendOTP($user);
+
         return [
             'status' => 'otp_sent',
-            'timeLeft' => $timeLeft
+            'timeLeft' => $timeLeft,
         ];
 
+    }
+
+    public function handleVerifyEmail($user, $otp_code)
+    {
+        $OTP = OTP::where('user_id', $user->id)->orderBy('id', 'desc')->first();
+
+        if (! $OTP || $OTP->expires_at < Carbon::now()) {
+            return [
+                'status' => 'expired',
+            ];
+        }
+
+        if ($OTP->attempts >= 10) {
+            return ['status' => 'attempts_exceeded'];
+        }
+        
+        if ($OTP->code !== $otp_code) {
+            $OTP->increment('attempts');
+            return [
+                'status' => 'invalid',
+            ];
+        }
+
+        $user->email_verified_at = Carbon::now();
+        $user->email_verified = true;
+        $user->save();
+
+        $OTP->delete();
+
+        return [
+            'status' => 'verified',
+        ];
     }
 }
