@@ -20,9 +20,6 @@ class SendOTPEmailJob implements ShouldQueue
     public $name;
     public $otp_code;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct($user_email, $user_name, $generatedOtp)
     {
         $this->email = $user_email;
@@ -30,9 +27,6 @@ class SendOTPEmailJob implements ShouldQueue
         $this->otp_code = $generatedOtp;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
         Mail::to($this->email, $this->name)->send(new EmailOTP($this->otp_code));

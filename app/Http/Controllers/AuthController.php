@@ -147,7 +147,7 @@ class AuthController extends Controller
         if($user->email_verified === true){
             return response()->json([
                 'success' => false,
-                'email_status' => 'verified',
+                'email_status' => 1,
                 'message' => 'Your email is already verified'
             ], 403);
         }
@@ -202,6 +202,14 @@ class AuthController extends Controller
 
         $user = User::where('email', $validatedData['email'] ?? Auth::user()->email)->first();
         
+        if($user->email_verified === true){
+            return response()->json([
+                'success' => false,
+                'email_status' => 1,
+                'message' => 'Your email is already verified'
+            ], 403);
+        }
+
         $OTPInfo = $OTPService->handleResendOTP($user);
         
         if($OTPInfo['status'] === 'wait'){
@@ -242,6 +250,14 @@ class AuthController extends Controller
         $validatedData = $validation->validated();
        
         $user = User::where('email', $validatedData['email'] ?? Auth::user()->email)->first();
+
+        if($user->email_verified === true){
+            return response()->json([
+                'success' => false,
+                'email_status' => 1,
+                'message' => 'Your email is already verified'
+            ], 403);
+        }
 
         $OTPInfo = $OTPService->handleVerifyEmail($user, $validatedData['otp_code']);
 

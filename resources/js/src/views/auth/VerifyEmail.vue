@@ -4,14 +4,17 @@ import { emailOTPSchema } from "../../utils/validationSchema";
 import { computed, onMounted, ref } from "vue";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import useAuthStore from "../../stores/auth";
-import { userToBeVerified, resendOTP } from "../../services/auth";
+import { userToBeVerified, resendOTP, verifyEmail } from "../../services/auth";
 import handleError from "../../utils/handleError";
+// import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 
 const loading = ref(false);
 const otpInput = ref(null);
 const isFocused = ref(false);
-const resendTimer = ref(60);
-
+const resendTimer = ref(0);
+const router = useRouter();
+const disableResend = ref(false);
 
 const authStore = useAuthStore();
 const userEmail = computed(() => {
@@ -36,8 +39,23 @@ const userEmail = computed(() => {
 });
 
 
-const verifyEmail = (formData) => {
-    console.log(formData);
+const handleVerifyEmail = async (data) => {
+    try{
+        const res = await verifyEmail({email: authStore.user.email, otp_code: data.otp});
+        if(res.data.success){
+            ElMessage({
+                type: 'success',
+                message: res.data.message
+            });
+            router.push('/dashboard');
+        } else if(!res.data.success && res.data.email_status === 1){
+            disableResend.value = true;
+        }
+    }
+    catch(e){
+        handleError(e);
+        console.log(e);
+    }
 };
 
 // Resend OTP and timer info:
@@ -49,6 +67,9 @@ const canResendOTP = async () => {
         }
     }
     catch(e){
+        if(e.response?.data?.email_status === 1){
+            disableResend.value = true;
+        }
         handleError(e);
         console.log(e);
     }
@@ -63,12 +84,16 @@ const handleResendOTP = async () => {
         } 
     }
     catch(e){
+        if(e.response?.data?.email_status === 1){
+            disableResend.value = true;
+        }
         handleError(e);
         console.log(e);
     }
 }
 
 const startCountDown = () => {
+    if(disableResend) return;
     const countDown = setInterval(() => {
         if(resendTimer.value > 0){
             resendTimer.value -= 1;
@@ -93,7 +118,7 @@ onMounted(() => {
 </script>
 <template>
     <div class="bg-white p-6 rounded-2xl shadow-lg w-full sm:w-100">
-        <Form @submit="verifyEmail" :validation-schema="emailOTPSchema">
+        <Form @submit="handleVerifyEmail" :validation-schema="emailOTPSchema">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl">Verify Email</h2>
             </div>
@@ -145,9 +170,9 @@ onMounted(() => {
                 <span class="text-xs text-gray-700 inline-block mb-2">Didn’t get it? Wait for the timer.</span>
             </div>
             <div class="flex justify-between items-center">
-                <el-button @click="handleResendOTP" :disabled="formattedTime > 0" class="w-full transition-all duration-500"
+                <el-button @click="handleResendOTP" :disabled="formattedTime > 0 || disableResend" class="w-full transition-all duration-500"
                     :class="{
-                        '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none': formattedTime > 0,
+                        '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none': formattedTime > 0 || disableResend,
                         '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white' : formattedTime == 0
                     }"
                     >
@@ -158,6 +183,7 @@ onMounted(() => {
                     :is-loading="loading"
                     text="Verify"
                     classes="w-full"
+                    :isDisabled="disableResend"
                 />
             </div>
         </Form>

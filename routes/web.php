@@ -22,11 +22,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
 });
 
-Route::get('/products', function (){
-    return response()->json([
-        'message' => 'NIce try diddy:- )'
-    ], 200);
-});
 });
 
 

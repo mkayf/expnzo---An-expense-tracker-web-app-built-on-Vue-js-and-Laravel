@@ -29,3 +29,7 @@ export const userToBeVerified = (data) => {
 export const resendOTP = (data) => {
     return api.post('/resend_otp', data);
 }
+
+export const verifyEmail = (data) => {
+    return api.post('/verify_email', data);
+}
