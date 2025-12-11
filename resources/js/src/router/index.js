@@ -24,13 +24,27 @@ export const router = createRouter({
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
+    // Email verification check
+    if(isAuthenticated){
+        const isVerified = authStore.user?.email_verified;
+        if(!isVerified && !to.name === 'VerifyEmail'){
+            next({name: 'VerifyEmail'});
+        }
+
+        if(isVerified && to.name === 'VerifyEmail'){
+            next({name: 'Dashboard'});
+        }
+    }
+
+
     if (to.matched.some((route) => route.meta.requiresAuth)) {
         if (!isAuthenticated) {
             next({
                 name: "Login",
                 query: { redirect: to.fullPath },
             });
-        } else {
+        } 
+        else {
             next();
         }
     } else if (to.matched.some((route) => route.meta.requiresAuth === false)) {

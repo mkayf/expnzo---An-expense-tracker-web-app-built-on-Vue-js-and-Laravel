@@ -38,36 +38,39 @@ const userEmail = computed(() => {
     return newEmail;
 });
 
-
 const handleVerifyEmail = async (data) => {
-    try{
-        const res = await verifyEmail({email: authStore.user.email, otp_code: data.otp});
-        if(res.data.success){
+    try {
+        loading.value = true;
+        const res = await verifyEmail({
+            email: authStore.user.email,
+            otp_code: data.otp,
+        });
+        if (res.data.success) {
             ElMessage({
-                type: 'success',
-                message: res.data.message
+                type: "success",
+                message: res.data.message,
             });
-            router.push('/dashboard');
-        } else if(!res.data.success && res.data.email_status === 1){
+            router.push("/dashboard");
+        } else if (!res.data.success && res.data.email_status === 1) {
             disableResend.value = true;
         }
-    }
-    catch(e){
+    } catch (e) {
         handleError(e);
         console.log(e);
+    } finally {
+        loading.value = false;
     }
 };
 
 // Resend OTP and timer info:
 const canResendOTP = async () => {
-    try{
-        const res = await userToBeVerified({email: authStore.user.email});
-        if(res.data.success){
+    try {
+        const res = await userToBeVerified({ email: authStore.user.email });
+        if (res.data.success) {
             resendTimer.value = res.data.timeLeft;
         }
-    }
-    catch(e){
-        if(e.response?.data?.email_status === 1){
+    } catch (e) {
+        if (e.response?.data?.email_status === 1) {
             disableResend.value = true;
         }
         handleError(e);
@@ -76,37 +79,34 @@ const canResendOTP = async () => {
 };
 
 const handleResendOTP = async () => {
-    try{
-        const res = await resendOTP({email: authStore.user.email});
-        if(res.data.success){
+    try {
+        const res = await resendOTP({ email: authStore.user.email });
+        if (res.data.success) {
             resendTimer.value = res.data.timeLeft;
             startCountDown();
-        } 
-    }
-    catch(e){
-        if(e.response?.data?.email_status === 1){
+        }
+    } catch (e) {
+        if (e.response?.data?.email_status === 1) {
             disableResend.value = true;
         }
         handleError(e);
         console.log(e);
     }
-}
+};
 
 const startCountDown = () => {
-    if(disableResend) return;
     const countDown = setInterval(() => {
-        if(resendTimer.value > 0){
+        if (resendTimer.value > 0) {
             resendTimer.value -= 1;
-        } else{
+        } else {
             clearInterval(countDown);
         }
     }, 1000);
-}
+};
 
 const formattedTime = computed(() => {
     return Math.ceil(resendTimer.value);
 });
-
 
 onMounted(() => {
     canResendOTP();
@@ -114,7 +114,6 @@ onMounted(() => {
     otpInput.value.focus();
     isFocused.value = true;
 });
-
 </script>
 <template>
     <div class="bg-white p-6 rounded-2xl shadow-lg w-full sm:w-100">
@@ -122,8 +121,9 @@ onMounted(() => {
             <div class="flex items-center justify-between">
                 <h2 class="text-xl">Verify Email</h2>
             </div>
-            <span class="text-gray-700 text-xs inline-block mb-3">Enter the OTP which is sent to your email
-                {{ userEmail }}</span>
+            <span class="text-gray-700 text-xs inline-block mb-3"
+                >Enter the OTP which is sent to your email {{ userEmail }}</span
+            >
             <div class="otp-container mb-4">
                 <Field
                     name="otp"
@@ -165,20 +165,27 @@ onMounted(() => {
                         {{ errorMessage }}
                     </div>
                 </Field>
-            </div>          
+            </div>
             <div>
-                <span class="text-xs text-gray-700 inline-block mb-2">Didn’t get it? Wait for the timer.</span>
+                <span class="text-xs text-gray-700 inline-block mb-2"
+                    >Didn’t get it? Wait for the timer.</span
+                >
             </div>
             <div class="flex justify-between items-center">
-                <el-button @click="handleResendOTP" :disabled="formattedTime > 0 || disableResend" class="w-full transition-all duration-500"
-                    :class="{
-                        '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none': formattedTime > 0 || disableResend,
-                        '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white' : formattedTime == 0
-                    }"
-                    >
-                    <span v-if="formattedTime > 0">{{formattedTime}}s</span>
+                <el-button
+                    @click="handleResendOTP"
+                    :disabled="formattedTime > 0 || disableResend"
+                    :class="[
+                        'w-full transition-all duration-500',
+                        formattedTime > 0 || disableResend
+                            ? '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none'
+                            : '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white',
+                    ]"
+                >
+                    <span v-if="formattedTime > 0">{{ formattedTime }}s</span>
                     <span v-else>Resend</span>
                 </el-button>
+
                 <SubmitButton
                     :is-loading="loading"
                     text="Verify"
@@ -191,7 +198,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 .otp-container {
     display: flex;
     flex-direction: column;
@@ -238,10 +244,10 @@ onMounted(() => {
 
 @keyframes blink {
     0% {
-        opacity: 0; 
+        opacity: 0;
     }
     50% {
-        opacity: 1; 
+        opacity: 1;
     }
     100% {
         opacity: 0;
@@ -253,8 +259,8 @@ onMounted(() => {
     position: absolute;
     display: block;
     width: 1px;
-    height: 60%; 
-    background-color: black; 
+    height: 60%;
+    background-color: black;
     top: 20%;
     left: 50%;
     transform: translateX(-50%);

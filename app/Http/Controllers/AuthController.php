@@ -74,6 +74,7 @@ class AuthController extends Controller
         $credentials = Validator::make($request->all(), [
             'email' => ['required', 'email'],
             'password' => ['required', 'min:8'],
+            'remember_me' => ['sometimes', 'boolean']
         ]);
 
         if ($credentials->fails()) {
@@ -87,7 +88,7 @@ class AuthController extends Controller
         $validatedData = $credentials->validated();
 
         try {
-            if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])) {
+            if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']], $validatedData['remember_me'])) {
                 return response()->json([
                     'success' => true,
                     'message' => 'You are logged in successfully!',
