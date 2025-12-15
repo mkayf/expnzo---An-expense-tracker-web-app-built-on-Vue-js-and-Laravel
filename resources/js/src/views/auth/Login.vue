@@ -10,6 +10,7 @@ import "element-plus/es/components/message/style/css";
 import { useRouter, useRoute } from "vue-router";
 import useAuthStore from "../../stores/auth";
 import handleError from "../../utils/handleError";
+import GoogleAuthButton from "../../components/ui/GoogleAuthButton.vue";
 
 let loading = ref(false);
 const router = useRouter();
@@ -103,13 +104,14 @@ const loginUser = async (formData) => {
                     ></small
                 >
             </div>
-            <el-form-item>
+            <el-form-item class="mb-3">
                 <SubmitButton
                     :is-loading="loading"
                     text="Login"
                     classes="w-full"
                 />
             </el-form-item>
+            <GoogleAuthButton />
         </Form>
     </div>
 </template>

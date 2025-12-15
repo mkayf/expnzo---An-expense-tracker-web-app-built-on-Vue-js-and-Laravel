@@ -9,6 +9,7 @@ import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import useAuthStore from "../../stores/auth";
 import { useRouter } from "vue-router";
+import GoogleAuthButton from "../../components/ui/GoogleAuthButton.vue";
 
 let loading = ref(false);
 const authStore = useAuthStore();
@@ -131,13 +132,14 @@ const registerUser = async (formData) => {
                     ></small
                 >
             </div>
-            <el-form-item>
+            <el-form-item class="mb-3">
                 <SubmitButton
                     :is-loading="loading"
                     text="Create"
                     classes="w-full"
                 />
             </el-form-item>
+            <GoogleAuthButton />
         </Form>
     </div>
 </template>

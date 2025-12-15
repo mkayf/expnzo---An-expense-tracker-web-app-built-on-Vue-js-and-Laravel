@@ -38,6 +38,7 @@ class AuthController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => $validatedData['password'],
+                'provider' => 'credentials'
             ]);
 
             if (!$user) {
