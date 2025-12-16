@@ -22,9 +22,13 @@ class GoogleAuthController extends Controller
             $user = Socialite::driver('google')->user();
             $userExist = User::where('email', $user->email)->first();
 
+            Log::info('User exist or not: ', ['user' => $userExist]);
+
             if($userExist){
                 Auth::login($userExist);
+                Log::info('User found', ['user' => $userExist]);
             } else{
+                Log::info('User not found, creating a new one');
                 $newUser = User::updateOrCreate([
                     'email' => $user->email
                 ], [
@@ -34,15 +38,16 @@ class GoogleAuthController extends Controller
                     'email_verified' => true,
                     'provider' => 'google'
                 ]);
-                
+                Log::info('New user created in db', ['user' => $newUser]);    
                 Auth::login($newUser);
+                Log::info('New user logged in');
             }
 
-            return redirect()->to('/dashboard', 200);
+            return redirect()->to('/dashboard')->with(['auth_success' => 'You are logged in']);
         }
         catch(\Throwable $th){
-            
-            Log::error('Failed to authenticate user using Google OAuth');
+            Log::error('Failed to authenticate user using Google OAuth', ['Exception' => $th->getMessage()]);
+            return redirect()->to('/auth/login')->with(['auth_error' => 'Failed to authenticate using google please try again']);
         }
     }
 }

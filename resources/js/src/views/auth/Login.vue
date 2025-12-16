@@ -3,7 +3,7 @@ import logo from "@/assets/logo/logo.png";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import { Field, Form } from "vee-validate";
 import { loginSchema } from "../../utils/validationSchema";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { login } from "../../services/auth";
 import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
@@ -41,6 +41,17 @@ const loginUser = async (formData) => {
         loading.value = false;
     }
 };
+
+onMounted(() => {
+    if(window.__FLASH__?.auth_error){
+        ElMessage({
+            type: 'error',
+            message: window.__FLASH__.auth_error
+        })
+        delete window.__FLASH__.auth_error;
+    }
+})
+
 </script>
 
 <template>

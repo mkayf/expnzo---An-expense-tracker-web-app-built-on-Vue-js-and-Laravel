@@ -14,7 +14,6 @@ Route::prefix('/api')->group(function () {
     Route::middleware(['api_guest', 'throttle:5,1'])->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/register', [AuthController::class, 'register']);
-
     });
 
     // Routes for auth users:
