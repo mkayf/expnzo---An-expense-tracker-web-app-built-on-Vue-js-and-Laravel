@@ -8,6 +8,7 @@ import { ElLoading } from "element-plus";
 import "element-plus/es/components/loading/style/css";
 import "./src/assets/logo/logo.png";
 
+
 async function initializeApp() {
     const loading = ElLoading.service({
         lock: true,
