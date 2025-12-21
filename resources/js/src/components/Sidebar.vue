@@ -3,33 +3,62 @@ import {
     BanknotesIcon,
     ChartBarSquareIcon,
     Cog6ToothIcon,
-    CurrencyDollarIcon,
+    CurrencyDollarIcon, 
     DocumentCurrencyDollarIcon,
     Square3Stack3DIcon,
 } from "@heroicons/vue/24/outline";
+import { computed, ref } from "vue";
+
+const isLocked = ref(true);
+const isHoverExpandable = ref(true);
+const sidebarLock = ref(true);
 
 const handleOpen = (key: string, keyPath: string[]) => {
     console.log("handle open", key, keyPath);
 };
+
 const handleClose = (key: string, keyPath: string[]) => {
     console.log("handle close", key, keyPath);
 };
+
+const handleMouseEnter = () => {
+    isHoverExpandable.value = false
+}
+
+const handleMouseLeave = () => {
+    isHoverExpandable.value = true;
+}
+
+const handleCollapse = computed(() => {
+    if(isLocked.value === true){
+        return false;
+    } else if(isHoverExpandable.value === false){
+        return false;
+    } else if(isHoverExpandable.value === true){
+        return true;
+    }
+})
+
+
 </script>
 
-<template>
-    <el-col :span="5">
+<template> 
+    <el-col :span="4">
         <el-menu
             default-active=""
             class="el-menu-vertical-demo h-screen flex flex-col"
             @open="handleOpen"
             @close="handleClose"
+            :collapse="handleCollapse"
+            @mouseenter="handleMouseEnter"
+            @mouseleave="handleMouseLeave"
         >
             <div class="flex justify-between items-center px-6 pt-6 pb-4">
                 <div>
-                    <img src="../assets/logo/logo.png" class="w-50" />
+                    <img src="../assets/logo/logo.png" class="w-35" />
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" class="sr-only peer" />
+                <label class="relative inline-flex items-center cursor-pointer" >
+                    <input type="checkbox" value="" class="sr-only peer" v-model="isLocked"  />
                     <div
                         class="group peer ring-0 bg-gradient-to-r from-gray-600 to-gray-800 rounded-full outline-none duration-700 after:duration-300 w-12 h-6 shadow-md peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900 peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:bg-gray-50 after:outline-none after:h-5 after:w-5 after:top-0.5 after:left-0.5 peer-checked:after:translate-x-6"
                     >
