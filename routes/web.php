@@ -16,7 +16,7 @@ Route::prefix('/api')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
     });
 
-    // Routes for auth users:
+    // Routes for auth users:   
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
