@@ -1,13 +1,9 @@
 export default [
     {
-        path: '',
-        name: 'Home',
-        component: () => import('../views/Home.vue'),
-    },
-    {
-        path: 'dashboard',
+        path: '/app/dashboard',
         name: 'Dashboard',
         component: () => import('../views/Dashboard.vue'),
+        alias: '/app',
         meta: {
             requiresAuth: true
         }

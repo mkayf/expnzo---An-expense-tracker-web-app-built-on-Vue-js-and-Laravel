@@ -49,7 +49,7 @@ watch(handleCollapse, (val) => {
 <template>
     <el-menu
         default-active=""
-        class="el-menu-vertical-demo h-screen flex flex-col"
+        class="el-menu-vertical-demo h-full flex flex-col"
         @open="handleOpen"
         @close="handleClose"
         :collapse="collapsed"

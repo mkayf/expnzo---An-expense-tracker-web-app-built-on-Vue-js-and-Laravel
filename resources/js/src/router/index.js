@@ -1,12 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 import authRoutes from "./authRoutes";
 import appRoutes from "./appRoutes";
+import publicRoutes from "./publicRoutes";
 import useAuthStore from "../stores/auth";
 
 const routes = [
     {
         path: "/",
         component: () => import("../layouts/DefaultLayout.vue"),
+        children: publicRoutes
+    },
+    {
+        path: "/app",
+        component: () => import("../layouts/DashboardLayout.vue"),
         children: appRoutes,
     },
     {
@@ -14,6 +20,11 @@ const routes = [
         component: () => import("../layouts/AuthLayout.vue"),
         children: authRoutes,
     },
+    {
+        path: "/:pathMatch(.*)*",
+        name: 'NotFound',
+        component: () => import("../views/NotFound.vue")
+    }
 ];
 
 export const router = createRouter({
@@ -29,7 +40,7 @@ router.beforeEach((to, from, next) => {
         const isVerified = authStore.user?.email_verified;
         if(!isVerified && !to.name === 'VerifyEmail'){
             next({name: 'VerifyEmail'});
-        }
+        }   
 
         if(isVerified && to.name === 'VerifyEmail'){
             next({name: 'Dashboard'});

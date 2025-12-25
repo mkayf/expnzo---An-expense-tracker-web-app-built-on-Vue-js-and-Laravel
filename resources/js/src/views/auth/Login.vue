@@ -31,7 +31,7 @@ const loginUser = async (formData) => {
             if(redirectTo){
               router.push(redirectTo);
             } else{
-                router.push("/dashboard");
+                router.push("/app/dashboard");
             }
         }
     } catch (e) {

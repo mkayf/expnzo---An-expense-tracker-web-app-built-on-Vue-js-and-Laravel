@@ -16,7 +16,7 @@ onMounted(() => {
 </script>
 
 <template>  
-<div class="h-[900px]">
-    <h1 class="text-4xl">Dashboard</h1>
+<div class="h-[900px] ">
+    <h1 class="text-4xl font-semibold ">Dashboard</h1>
 </div>            
 </template>

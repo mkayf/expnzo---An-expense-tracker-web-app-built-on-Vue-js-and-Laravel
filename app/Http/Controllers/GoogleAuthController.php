@@ -43,7 +43,7 @@ class GoogleAuthController extends Controller
                 Log::info('New user logged in');
             }
 
-            return redirect()->to('/dashboard')->with(['auth_success' => 'You are logged in']);
+            return redirect()->to('/app/dashboard')->with(['auth_success' => 'You are logged in']);
         }
         catch(\Throwable $th){
             Log::error('Failed to authenticate user using Google OAuth', ['Exception' => $th->getMessage()]);

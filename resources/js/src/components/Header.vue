@@ -1,5 +1,5 @@
 <template>
-    <el-page-header :icon="ArrowLeft">
+    <el-page-header :icon="ArrowLeft" class="">
         <template #content>
             <span class="text-large font-600 mr-3"> Title </span>
         </template>
