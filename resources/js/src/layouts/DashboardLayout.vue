@@ -9,7 +9,7 @@ const isCollapsed = ref(false);
 <template>
     <div class="flex overflow-hidden">
         <el-aside
-            class="transition-width h-full fixed left-0 top-0"
+            class="!overflow-hidden transition-width h-full fixed left-0 top-0 "
             :width="isCollapsed ? '64px' : '230px'"
         >
             <Sidebar
@@ -19,14 +19,14 @@ const isCollapsed = ref(false);
         </el-aside>
 
         <div
-            class=" flex-1 -[230px] h-full flex flex-col overflow-y-auto"
+            class="flex-1 w-[230px] h-full flex flex-col overflow-y-auto"
             :class="isCollapsed ? 'ml-[64px]' : 'ml-[230px]'"
         >
             <el-header class="">
                 <Header />
             </el-header>
 
-            <el-main class="">
+            <el-main class="mt-4">
                 <RouterView />
             </el-main>
         </div>

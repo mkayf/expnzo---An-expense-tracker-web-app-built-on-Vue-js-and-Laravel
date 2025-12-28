@@ -19,4 +19,4 @@ onMounted(() => {
 <div class="h-[900px] ">
     <h1 class="text-4xl font-semibold ">Dashboard</h1>
 </div>            
-</template>
+</template> 
