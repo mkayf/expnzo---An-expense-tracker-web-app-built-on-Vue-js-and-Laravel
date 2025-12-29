@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import {
-    BanknotesIcon,
-    ChartBarSquareIcon,
-    Cog6ToothIcon,
-    CurrencyDollarIcon,
-    DocumentCurrencyDollarIcon,
-    Square3Stack3DIcon,
-} from "@heroicons/vue/24/outline";
+import {Cog6ToothIcon} from "@heroicons/vue/24/outline";
+
 import { computed, ref, Transition, watch } from "vue";
+import menus from "../utils/menu.config";
+import {useRoute, useRouter} from 'vue-router'
 
 const props = defineProps({
     collapsed: Boolean,
@@ -17,14 +13,12 @@ const emit = defineEmits(["collapse-change"]);
 
 const isLocked = ref(true);
 const isHoverExpandable = ref(true);
-const sidebarLock = ref(true);
 
 const handleOpen = (key: string, keyPath: string[]) => {
-    console.log("handle open", key, keyPath);
+    console.log(key, keyPath);
 };
-
 const handleClose = (key: string, keyPath: string[]) => {
-    console.log("handle close", key, keyPath);
+    console.log(key, keyPath);
 };
 
 const handleMouseEnter = () => {
@@ -41,6 +35,11 @@ const handleCollapse = computed(() => {
         : true;
 });
 
+const router = useRouter();
+const route = useRoute();
+
+const navigate = (path) => router.push(path);
+
 watch(handleCollapse, (val) => {
     emit("collapse-change", val);
 });
@@ -48,15 +47,15 @@ watch(handleCollapse, (val) => {
 
 <template>
     <el-menu
-        default-active=""
-        class="el-menu-vertical-demo h-full flex flex-col"
-        @open="handleOpen"
-        @close="handleClose"
+        :default-active="route.path"
+        class="el-menu-vertical-demo h-full flex flex-col border-none w-full"
         :collapse="collapsed"
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
     >
-        <div class="flex justify-between items-center px-6 pt-6 pb-4 w-[230px] box-border transition-all duration-300">
+        <div
+            class="hidden lg:flex justify-between items-center px-6 pt-6 pb-4 w-full box-border transition-all duration-300"
+        >
             <div class="flex items-center">
                 <Transition name="fade" mode="out-in">
                     <img
@@ -113,29 +112,17 @@ watch(handleCollapse, (val) => {
                 </label>
             </Transition>
         </div>
-        <el-menu-item index="1">
-            <ChartBarSquareIcon class="w-6 h-6 mr-2" />
-            <template #title>Dashboard</template>
+        <el-menu-item v-for="menu in menus" :key="menu.path" @click="navigate(menu.path)" :index="menu.path">
+            <component :is="menu.icon" class="w-6 h-6 mr-2" />
+            <template #title>
+                {{ menu.name }}
+            </template>
         </el-menu-item>
-        <el-menu-item index="2">
-            <currency-dollar-icon class="w-6 h-6 mr-2" />
-            <template #title>Income</template>
-        </el-menu-item>
-        <el-menu-item index="3">
-            <banknotes-icon class="w-6 h-6 mr-2" />
-            <template #title>Expenses</template>
-        </el-menu-item>
-        <el-menu-item index="4">
-            <Square3Stack3DIcon class="w-6 h-6 mr-2" />
-            <template #title>Categories</template>
-        </el-menu-item>
-        <el-menu-item index="5">
-            <document-currency-dollar-icon class="w-6 h-6 mr-2" />
-            <template #title>Reports</template>
-        </el-menu-item>
-        <el-menu-item class="mt-auto" index="6">
-            <cog6-tooth-icon class="w-6 h-6 mr-2" />
-            <template #title>Settings</template>
+        <el-menu-item @click="navigate('/app/settings')" index="/app/settings">
+            <Cog6ToothIcon class="w-6 h-6 mr-2" />
+            <template #title>
+                Settings
+            </template>
         </el-menu-item>
     </el-menu>
 </template>
@@ -146,17 +133,16 @@ li {
 }
 
 .el-menu-vertical-demo:not(.el-menu--collapse) {
-  width: 230px;
+    width: 100%;
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
 }
-
 </style>

@@ -1,19 +1,88 @@
+<script setup>
+import { computed, ref, watch } from "vue";
+import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
+import GlobalSearch from "./GlobalSearch.vue"; // Make sure ye input full width le le
+import Avatar from "./ui/Avatar.vue";
+import NotificationBell from "./ui/NotificationBell.vue";
+import { ArrowRight } from "@element-plus/icons-vue";
+import { useRoute } from "vue-router";
+
+defineEmits(["toggle-menu"]);
+
+const showSearchInput = ref(false);
+const route = useRoute()
+const breadcrumbs = computed(() => route.matched.filter(route => route.meta?.breadcrumb));
+
+</script>
+
 <template>
-    <div class="mt-4 bg-white p-4 rounded-md border border-[var(--el-border-color)] flex items-center justify-between">
-        <el-page-header>
-            <template #content>
-                <span class="text-lg">Dashboard</span>
-            </template>
-        </el-page-header>
-        <div class="flex items-center justify-center gap-4 !border-red-500">
-            <global-search />
-            <avatar />
+    <div
+        class="mt-4 mx-4 md:mx-6 bg-white p-4 rounded-md border border-[var(--el-border-color)] flex items-center justify-between relative"
+    >
+        <div class="flex items-center gap-3">
+            <button
+                @click="$emit('toggle-menu')"
+                class="lg:hidden px-2 -ml-2 rounded-md hover:bg-gray-100 text-gray-600"
+            >
+                <Bars3Icon class="w-6 h-6" />
+            </button>
+
+            <div class="lg:hidden flex items-center">
+                <img
+                    src="../assets/logo/logo.png"
+                    alt="Logo"
+                    class="h-6 w-auto object-contain"
+                />
+            </div>
+
+            <div class="breadcrumbs">
+                <el-breadcrumb :separator-icon="ArrowRight" :replace="false">
+                    <el-breadcrumb-item v-for="route in breadcrumbs" :to="route.path" class="cursor-pointer">{{ route.meta.breadcrumb }}</el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button
+                v-if="!showSearchInput"
+                @click="showSearchInput = true"
+                class="lg:hidden text-[var(--el-text-color-regular)]"
+            >
+                <MagnifyingGlassIcon class="w-5 h-5" />
+            </button>
+
+            <div class="hidden lg:block w-64">
+                <GlobalSearch />
+            </div>
+            <div class="flex items-center gap-6">
+                <NotificationBell />
+                <avatar />
+            </div>
+        </div>
+
+        <div
+            v-if="showSearchInput"
+            class="absolute inset-0 bg-white z-20 flex items-center px-4 rounded-md lg:hidden"
+        >
+            <GlobalSearch class="flex-1 mr-2" />
+            <button
+                @click="showSearchInput = false"
+                class="text-sm text-gray-500 font-medium whitespace-nowrap"
+            >
+                Cancel
+            </button>
         </div>
     </div>
 </template>
 
-<script setup>
-import { ArrowLeft } from "@element-plus/icons-vue";
-import GlobalSearch from "./GlobalSearch.vue";
-import Avatar from "./ui/Avatar.vue";
-</script>
+<style>
+.el-breadcrumb__inner a, .el-breadcrumb__inner.is-link{
+    font-weight: 500 !important;
+}
+
+@media (max-width: 1024px){
+    .breadcrumbs{
+        display: none;
+    }
+}
+</style>

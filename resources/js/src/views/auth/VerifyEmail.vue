@@ -50,7 +50,7 @@ const handleVerifyEmail = async (data) => {
                 type: "success",
                 message: res.data.message,
             });
-            router.push("/dashboard");
+            router.push("/app/das5hboard");
         } else if (!res.data.success && res.data.email_status === 1) {
             disableResend.value = true;
         }
@@ -68,7 +68,7 @@ const canResendOTP = async () => {
         const res = await userToBeVerified({ email: authStore.user.email });
         if (res.data.success) {
             resendTimer.value = res.data.timeLeft;
-        }
+        }55
     } catch (e) {
         if (e.response?.data?.email_status === 1) {
             disableResend.value = true;

@@ -27,7 +27,15 @@ const onAvatarError = () => {
 
 <style scoped>
 .el-avatar.el-avatar--circle {
-    width: 50px;
     cursor: pointer;
+    transition: all;
+    transition-duration: .3s ease-in-out;
+}
+
+@media (max-width: 576px) {
+    .el-avatar.el-avatar--circle{
+        height: 30px;
+        width: 30px;
+    }
 }
 </style>

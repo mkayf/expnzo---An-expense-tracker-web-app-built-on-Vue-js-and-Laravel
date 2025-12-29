@@ -10,6 +10,7 @@ import "element-plus/es/components/message/style/css";
 import useAuthStore from "../../stores/auth";
 import { useRouter } from "vue-router";
 import GoogleAuthButton from "../../components/ui/GoogleAuthButton.vue";
+import handleError from "../../utils/handleError";
 
 let loading = ref(false);
 const authStore = useAuthStore();
@@ -28,11 +29,7 @@ const registerUser = async (formData) => {
             router.push("/auth/verify_email");
         }
     } catch (e) {
-        ElMessage({
-            message:
-                "Something went wrong while creating your account. Try again, we’ll wait right here.",
-            type: "error",
-        });
+        handleError(e);
         console.log(e.response?.data?.message);
     } finally {
         loading.value = false;

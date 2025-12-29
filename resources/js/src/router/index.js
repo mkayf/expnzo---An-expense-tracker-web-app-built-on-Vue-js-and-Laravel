@@ -14,6 +14,9 @@ const routes = [
         path: "/app",
         component: () => import("../layouts/DashboardLayout.vue"),
         children: appRoutes,
+        meta: {
+            breadcrumb: 'Dashboard'
+        }
     },
     {
         path: "/auth",
