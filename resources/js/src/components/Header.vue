@@ -1,18 +1,39 @@
 <script setup>
 import { computed, ref, watch } from "vue";
-import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import GlobalSearch from "./GlobalSearch.vue"; // Make sure ye input full width le le
+import { Bars3Icon, MagnifyingGlassIcon, UserIcon, ArrowRightEndOnRectangleIcon } from "@heroicons/vue/24/outline";
+import GlobalSearch from "./GlobalSearch.vue"; 
 import Avatar from "./ui/Avatar.vue";
 import NotificationBell from "./ui/NotificationBell.vue";
 import { ArrowRight } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
+import { logout } from "../services/auth";
+import { ElMessage } from "element-plus";
+import handleError from "../utils/handleError";
 
 defineEmits(["toggle-menu"]);
 
 const showSearchInput = ref(false);
-const route = useRoute()
-const breadcrumbs = computed(() => route.matched.filter(route => route.meta?.breadcrumb));
+const route = useRoute();
+const breadcrumbs = computed(() =>
+    route.matched.filter((route) => route.meta?.breadcrumb)
+);
 
+const logoutUser = async () => {
+    try{
+        const res = await logout();
+        if(res.data.success){
+            ElMessage({
+                type: 'info',
+                message: res.data.message
+            })
+        }
+        window.location.reload();
+    }
+    catch(e){
+        handleError(e);
+        console.log(e);
+    }
+}
 </script>
 
 <template>
@@ -37,7 +58,12 @@ const breadcrumbs = computed(() => route.matched.filter(route => route.meta?.bre
 
             <div class="breadcrumbs">
                 <el-breadcrumb :separator-icon="ArrowRight" :replace="false">
-                    <el-breadcrumb-item v-for="route in breadcrumbs" :to="route.path" class="cursor-pointer">{{ route.meta.breadcrumb }}</el-breadcrumb-item>
+                    <el-breadcrumb-item
+                        v-for="route in breadcrumbs"
+                        :to="route.path"
+                        class="cursor-pointer"
+                        >{{ route.meta.breadcrumb }}</el-breadcrumb-item
+                    >
                 </el-breadcrumb>
             </div>
         </div>
@@ -56,7 +82,23 @@ const breadcrumbs = computed(() => route.matched.filter(route => route.meta?.bre
             </div>
             <div class="flex items-center gap-6">
                 <NotificationBell />
-                <avatar />
+                <el-dropdown placement="bottom-end">
+                    <avatar />
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <router-link to="/app/account/profile">
+                                <el-dropdown-item>
+                                    <UserIcon class="w-5 h-5" />
+                                    <span class="ml-2">My Account</span>
+                                </el-dropdown-item>
+                            </router-link>
+                            <el-dropdown-item @click="logoutUser">
+                                <ArrowRightEndOnRectangleIcon class="w-5 h-5" />
+                                <span class="ml-2">Logout</span>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
 
@@ -76,12 +118,13 @@ const breadcrumbs = computed(() => route.matched.filter(route => route.meta?.bre
 </template>
 
 <style>
-.el-breadcrumb__inner a, .el-breadcrumb__inner.is-link{
+.el-breadcrumb__inner a,
+.el-breadcrumb__inner.is-link {
     font-weight: 500 !important;
 }
 
-@media (max-width: 1024px){
-    .breadcrumbs{
+@media (max-width: 1024px) {
+    .breadcrumbs {
         display: none;
     }
 }

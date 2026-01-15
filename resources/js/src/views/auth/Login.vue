@@ -16,7 +16,6 @@ let loading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const redirectTo = route.query.redirect ?? null;
 
 const loginUser = async (formData) => {
     try {
@@ -28,11 +27,7 @@ const loginUser = async (formData) => {
                 type: "success",
             });
             await authStore.fetchCurrentUser();
-            if(redirectTo){
-              router.push(redirectTo);
-            } else{
-                router.push("/app/dashboard");
-            }
+            router.push('/app/dashboard');
         }
     } catch (e) {
         handleError(e);

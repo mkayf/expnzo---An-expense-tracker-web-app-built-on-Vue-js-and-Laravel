@@ -1,7 +1,7 @@
 import "./bootstrap";
 import { createApp } from "vue";
 import App from "./src/App.vue";
-import { router } from "./src/router/";
+import { router } from "./src/router";
 import { createPinia } from "pinia";
 import useAuthStore from "./src/stores/auth";
 import { ElLoading } from "element-plus";

@@ -48,7 +48,7 @@ const contentMargin = computed(() => {
         ></div>
 
         <aside
-            class="h-full fixed left-0 top-0 z-30 transition-all duration-300 bg-white "
+            class="h-full fixed left-0 top-0 z-30 transition-all duration-300 bg-white"
             :class="[
                 isMobile 
                     ? (isMobileOpen ? 'translate-x-0 w-[230px]' : '-translate-x-full w-[230px]') 
@@ -67,7 +67,7 @@ const contentMargin = computed(() => {
         >
             <Header @toggle-menu="toggleSidebar" />
 
-            <main class="px-4 md:px-6 py-6 mt-2">
+            <main class="px-4 md:px-6 py-6 ">
                 <RouterView />
             </main>
         </div>

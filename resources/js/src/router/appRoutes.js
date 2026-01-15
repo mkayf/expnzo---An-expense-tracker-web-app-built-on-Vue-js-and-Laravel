@@ -1,9 +1,8 @@
 export default [
     {
-        path: '/app/dashboard',
+        path: 'dashboard',
         name: 'Dashboard',
         component: () => import('../views/Dashboard.vue'),
-        alias: '/app',
         meta: {
             requiresAuth: true,
         }
@@ -54,12 +53,29 @@ export default [
         }
     },
     {
-        path: 'profile',
-        name: 'Profile',
-        component: () => import('../views/Profile.vue'),
+        path: 'account',
+        name: 'Account',
+        component: () => import('../views/Account/Account.vue'),
         meta: {
             requiresAuth: true,
-            breadcrumb: 'Profile'
-        }
+            breadcrumb: 'Account'
+        },
+        children: [
+            {
+                path: 'profile',
+                name: 'Profile',
+                component: () => import('../views/Account/components/Profile.vue')
+            },
+            {
+                path: 'password',
+                name: 'Password',
+                component: () => import('../views/Account/components/Password.vue')
+            },
+            {
+                path: 'preferences',
+                name: 'Preferences',
+                component: () => import('../views/Account/components/Preferences.vue')
+            },
+        ]
     },
 ]

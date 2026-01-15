@@ -13,6 +13,7 @@ const routes = [
     {
         path: "/app",
         component: () => import("../layouts/DashboardLayout.vue"),
+        redirect: '/app/dashboard',
         children: appRoutes,
         meta: {
             breadcrumb: 'Dashboard'
@@ -55,7 +56,6 @@ router.beforeEach((to, from, next) => {
         if (!isAuthenticated) {
             next({
                 name: "Login",
-                query: { redirect: to.fullPath },
             });
         } 
         else {

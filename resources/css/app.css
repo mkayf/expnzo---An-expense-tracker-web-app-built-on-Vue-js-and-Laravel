@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 @import "tailwindcss";
-/* @import "element-plus/dist/index.css"; */
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -68,4 +67,22 @@ small {
 
 .el-form-item__label {
     margin-bottom: 2px !important;
+}
+
+.el-menu-item{
+    font-weight: 500;
+    color: var(--text-charcoal) !important;
+}
+
+.el-menu-item.is-active{
+    background-color: var(--el-menu-hover-bg-color);
+}
+
+.account-menu-item.el-menu-item.is-active::after{
+    content: '';
+    position: absolute;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    background-color: var(--el-color-primary);
 }

@@ -17,7 +17,7 @@ Route::prefix('/api')->group(function () {
     });
 
     // Routes for auth users:   
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('auth:web')->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
         });

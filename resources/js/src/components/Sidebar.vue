@@ -128,9 +128,6 @@ watch(handleCollapse, (val) => {
 </template>
 
 <style scoped>
-li {
-    font-weight: 500;
-}
 
 .el-menu-vertical-demo:not(.el-menu--collapse) {
     width: 100%;

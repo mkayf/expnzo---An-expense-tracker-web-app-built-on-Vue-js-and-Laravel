@@ -63,9 +63,10 @@ class AuthController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
+            Log::info('Failed to create account', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create account, AuthController::register, ' . $th->getMessage()
+                'message' => 'Failed to create account. Please try again'
             ], 500);
         }
     }
@@ -89,7 +90,7 @@ class AuthController extends Controller
         $validatedData = $credentials->validated();
 
         try {
-            if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']], $validatedData['remember_me'])) {
+            if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']], isset($validatedData['remember_me']) ? $validatedData['remember_me'] : false)) {
                 return response()->json([
                     'success' => true,
                     'message' => 'You are logged in successfully!',
@@ -101,9 +102,10 @@ class AuthController extends Controller
                 ], 401);
             }
         } catch (\Throwable $th) {
+            Log::info('Failed to login', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to login, AuthController::login, ' . $th->getMessage()
+                'message' => 'Failed to login. Please try again'
             ], 500);
         }
     }
@@ -120,9 +122,10 @@ class AuthController extends Controller
             ]);
         }
         catch(\Throwable $th){
+            Log::info('Failed to logout', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to logout, AuthController::logout, ' . $th->getMessage()
+                'message' => 'Failed to logout due to server error. Please try again'
             ], 500);
         }
                 

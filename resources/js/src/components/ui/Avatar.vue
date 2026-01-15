@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import defaultAvatar from '../../assets/default-avatar.avif';
-
+import { RouterLink } from 'vue-router';
 const props = defineProps({
     avatarURL: {
         type: String,
