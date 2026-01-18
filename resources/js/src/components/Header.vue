@@ -9,8 +9,11 @@ import { useRoute } from "vue-router";
 import { logout } from "../services/auth";
 import { ElMessage } from "element-plus";
 import handleError from "../utils/handleError";
+import useAuthStore from "../stores/auth";
 
 defineEmits(["toggle-menu"]);
+
+const authStore = useAuthStore();
 
 const showSearchInput = ref(false);
 const route = useRoute();
@@ -83,7 +86,10 @@ const logoutUser = async () => {
             <div class="flex items-center gap-6">
                 <NotificationBell />
                 <el-dropdown placement="bottom-end">
-                    <avatar />
+                    <div class="flex items-center gap-2 outline-none cursor-pointer">
+                        <avatar />
+                        <span v-if="authStore.user.name" class="hidden md:block text-md font-medium">{{ authStore.user.name }}</span>
+                    </div>
                     <template #dropdown>
                         <el-dropdown-menu>
                             <router-link to="/app/account/profile">

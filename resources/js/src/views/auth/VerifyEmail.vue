@@ -50,7 +50,7 @@ const handleVerifyEmail = async (data) => {
                 type: "success",
                 message: res.data.message,
             });
-            router.push("/app/das5hboard");
+            router.push("/app/dashboard");
         } else if (!res.data.success && res.data.email_status === 1) {
             disableResend.value = true;
         }

@@ -1,7 +1,7 @@
-<script lang="ts" setup></script>
+<script setup></script>
 
 <template>
-    <h1 class="text-md font-semibold">
-        Password
-    </h1>
+    <div class="p-6">
+        <h4 class="text-xl font-medium mb-4">Change Password</h4>
+    </div>
 </template>

@@ -1,12 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue';
 import defaultAvatar from '../../assets/default-avatar.avif';
-import { RouterLink } from 'vue-router';
+
 const props = defineProps({
     avatarURL: {
         type: String,
         default: null,
     },
+    size: {
+        type: Number,
+        default: 40
+    }
 });
 
 const avatar = ref(props.avatarURL || defaultAvatar);
@@ -21,7 +25,9 @@ const onAvatarError = () => {
 </script>
 
 <template>
-    <el-avatar :src="avatar" @error="onAvatarError" />
+    <div class="outline-none cursor-pointer">
+        <el-avatar :size="size" :src="avatar" @error="onAvatarError" />
+    </div>
 </template>
 
 
@@ -32,10 +38,11 @@ const onAvatarError = () => {
     transition-duration: .3s ease-in-out;
 }
 
-@media (max-width: 576px) {
+
+/* @media (max-width: 576px) {
     .el-avatar.el-avatar--circle{
         height: 30px;
         width: 30px;
     }
-}
+} */
 </style>
