@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { getUser } from "../services/auth";
+import { getUser } from "../services/user";
 
 const useAuthStore = defineStore("auth", {
     state: () => {
@@ -39,6 +39,9 @@ const useAuthStore = defineStore("auth", {
                 this.isReady = true;
             }
         },
+        updateAvatar (newAvatar){
+            this.user.avatar = newAvatar;
+        }
     },
 });
 

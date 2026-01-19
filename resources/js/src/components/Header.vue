@@ -25,6 +25,7 @@ const logoutUser = async () => {
     try{
         const res = await logout();
         if(res.data.success){
+            authStore.logout();
             ElMessage({
                 type: 'info',
                 message: res.data.message
@@ -78,7 +79,7 @@ const logoutUser = async () => {
                 class="lg:hidden text-[var(--el-text-color-regular)]"
             >
                 <MagnifyingGlassIcon class="w-5 h-5" />
-            </button>
+            </button>   
 
             <div class="hidden lg:block w-64">
                 <GlobalSearch />
@@ -87,7 +88,7 @@ const logoutUser = async () => {
                 <NotificationBell />
                 <el-dropdown placement="bottom-end">
                     <div class="flex items-center gap-2 outline-none cursor-pointer">
-                        <avatar />
+                        <avatar :avatarURL="authStore.user?.avatar" />
                         <span v-if="authStore.user.name" class="hidden md:block text-md font-medium">{{ authStore.user.name }}</span>
                     </div>
                     <template #dropdown>

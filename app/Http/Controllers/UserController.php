@@ -53,10 +53,32 @@ class UserController extends Controller
         }
     }
 
-    public function showAvatar(Request $request){
-        $user = $request->user();
-        if($user->avatar && Storage::disk('public')->exists($user->avatar)){
-            
+    public function deleteAvatar(Request $request) {
+        try{
+            $user = $request->user();
+            $path = $user->getRawOriginal('avatar');
+    
+            if($user->has_custom_avatar){
+                if(Storage::disk('public')->exists($path)){
+                    Storage::disk('public')->delete($path);
+                }
+    
+                $user->setAttribute('avatar', null);
+                $user->save();
+    
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profile image deleted successfully',
+                    'url' => $user->avatar
+                ], 200);
+            }
+        }
+        catch(\Throwable $th){
+            Log::info('Failed to delete user avatar image', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete profile image. Please try again'
+            ], 500);
         }
     }
 }

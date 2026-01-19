@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,8 @@ Route::prefix('/api')->group(function () {
         Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
         Route::post('/resend_otp', [AuthController::class, 'resendOTP']);
         Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
+        Route::post('/upload-avatar', [UserController::class, 'uploadAvatar']);
+        Route::post('/delete-avatar', [UserController::class, 'deleteAvatar']);
     });
 
 });

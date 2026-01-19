@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch } from 'vue';
-import defaultAvatar from '../../assets/default-avatar.avif';
 
 const props = defineProps({
     avatarURL: {
@@ -13,20 +12,16 @@ const props = defineProps({
     }
 });
 
-const avatar = ref(props.avatarURL || defaultAvatar);
+const avatar = ref(props.avatarURL);
 
 watch(() => props.avatarURL, (val) => {
-    avatar.value = val || defaultAvatar;
+    avatar.value = val;
 })
-
-const onAvatarError = () => {
-    avatar.value = defaultAvatar;
-}
 </script>
 
 <template>
     <div class="outline-none cursor-pointer">
-        <el-avatar :size="size" :src="avatar" @error="onAvatarError" />
+        <el-avatar :size="size" :src="avatar" />
     </div>
 </template>
 
