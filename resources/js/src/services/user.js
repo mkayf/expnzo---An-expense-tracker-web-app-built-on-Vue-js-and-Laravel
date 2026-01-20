@@ -5,5 +5,9 @@ export const getUser = () => {
 }
 
 export const deleteAvatar = () => {
-    return api.delete('/delete-avatar');    
+    return api.delete('/delete_avatar');    
+}
+
+export const saveProfileDetails = (formData) => {
+    return api.post('/save_profile_details', formData);
 }

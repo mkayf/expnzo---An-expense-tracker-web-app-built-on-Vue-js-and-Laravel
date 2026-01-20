@@ -13,6 +13,10 @@ export const loginSchema = yup.object({
     remember_me: yup.boolean()
 });
 
+export const profileSchema = yup.object({
+    name: yup.string().required('Name is required').min(3, 'Name should be atleast 3 letters'),
+});
+
 export const  emailOTPSchema = yup.object({
     otp: yup
     .string()

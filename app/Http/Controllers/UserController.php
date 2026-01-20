@@ -81,4 +81,19 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function saveProfileDetails(Request $request){
+        $request->validate([
+            'name' => ['required', 'string', 'min:3'],
+        ]);
+
+        $user = $request->user();
+        $user->name = $request->name;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile details saved successfully'
+        ]);
+    }
 }

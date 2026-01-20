@@ -26,8 +26,9 @@ Route::prefix('/api')->group(function () {
         Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
         Route::post('/resend_otp', [AuthController::class, 'resendOTP']);
         Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
-        Route::post('/upload-avatar', [UserController::class, 'uploadAvatar']);
-        Route::post('/delete-avatar', [UserController::class, 'deleteAvatar']);
+        Route::post('/upload_avatar', [UserController::class, 'uploadAvatar']);
+        Route::delete('/delete_avatar', [UserController::class, 'deleteAvatar']);
+        Route::post('/save_profile_details', [UserController::class, 'saveProfileDetails']);
     });
 
 });
