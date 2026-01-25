@@ -125,9 +125,8 @@ const saveProfile = async (formData) => {
         <h4 class="text-xl font-medium mb-4">Profile</h4>
         <div>
             <el-row class="flex items-center">
-                <el-col :xs="24" :md="6">
-                    <Avatar :size="150" :avatarURL="authStore.user?.avatar" />
-
+                <el-col :xs="24" :sm="10">
+                    <Avatar class="flex justify-center" :size="150" :avatarURL="authStore.user?.avatar" />
                     <VueAvatarUpload
                         :headers="uploadHeaders"
                         lang="en"
@@ -141,29 +140,30 @@ const saveProfile = async (formData) => {
                         @error="handleUploadError"
                     />
                 </el-col>
-                <el-col :xs="24" :md="18">
-                    <div>
+                <el-col :xs="24" :sm="14">
+                    <div class="flex justify-center lg:justify-end pl-0 md:pl-4 mt-4 lg:mt-0">
                         <el-button
                             @click="showAvatarModal = true"
                             type="primary"
                         >
-                            <CameraIcon class="w-5 h-5 mr-2" />
-                            <span class="text-sm">Upload new</span>
+                            <CameraIcon class="w-5 h-5 sm:mr-2" />
+                            <span class="text-sm hidden sm:block">Upload new</span>
                         </el-button>
                         <el-button
+                            class=",:mr-2"
                             plain
                             v-if="authStore.user?.has_custom_avatar"
                             @click="confirmDelete"
                         >
-                            <TrashIcon class="w-5 h-5 mr-2" />
-                            <span class="text-sm">Delete Avatar</span>
+                            <TrashIcon class="w-5 h-5 sm:mr-2" />
+                            <span class="text-sm hidden sm:block">Delete Avatar</span>
                         </el-button>
                     </div>
                 </el-col>
             </el-row>
-            <Form :initial-values="{ name: authStore.user.name || '' }" :validation-schema="profileSchema" @submit="saveProfile">
+            <Form :initial-values="{ name: authStore.user.name || '' }" :validation-schema="profileSchema" @submit="saveProfile" class="mt-4">
                 <el-row :gutter="20">
-                    <el-col :xs="24" :md="12" class="">
+                    <el-col :xs="24" :md="12" class="mb-4">
                         <Field name="name" v-slot="{field, handleChange, errorMessage}">
                             <el-form-item label="Name" :error="errorMessage">
                                 <el-input type="text" 
@@ -174,14 +174,14 @@ const saveProfile = async (formData) => {
                             </el-form-item>
                         </Field>
                     </el-col>
-                    <el-col :xs="24" :md="12">
+                    <el-col :xs="24" :md="12" class="">
                             <el-form-item label="Email (cannot be changed)">
                                 <el-input type="email" v-model="authStore.user.email" readonly />
                             </el-form-item>
                     </el-col>
                 </el-row>
                 <div>
-                    <SubmitButton class="!w-[100px] mt-4" text="Save" :isLoading="buttonLoader" />
+                    <SubmitButton classes="md:!w-[100px] mt-4" text="Save" :isLoading="buttonLoader" />
                 </div>
             </Form>
         </div>
@@ -191,5 +191,9 @@ const saveProfile = async (formData) => {
 <style>
 .avatar-upload-actions .avatar-button.-salmon {
     background-color: var(--el-color-primary) !important;
+}
+
+.avatar-upload-root{
+    z-index: 99;
 }
 </style>

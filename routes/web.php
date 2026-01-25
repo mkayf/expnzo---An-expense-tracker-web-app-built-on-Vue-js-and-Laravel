@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
+Route::get('test', function(){
+    return view('test');
+});
+
+
 // Auth routes for guest users:
 Route::prefix('/api')->group(function () {
     Route::middleware(['api_guest', 'throttle:5,1'])->group(function () {
@@ -29,6 +34,7 @@ Route::prefix('/api')->group(function () {
         Route::post('/upload_avatar', [UserController::class, 'uploadAvatar']);
         Route::delete('/delete_avatar', [UserController::class, 'deleteAvatar']);
         Route::post('/save_profile_details', [UserController::class, 'saveProfileDetails']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
     });
 
 });

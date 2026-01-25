@@ -38,7 +38,10 @@ const handleCollapse = computed(() => {
 const router = useRouter();
 const route = useRoute();
 
-const navigate = (path) => router.push(path);
+const navigate = (path) => {
+    router.push(path);
+}
+    
 
 watch(handleCollapse, (val) => {
     emit("collapse-change", val);

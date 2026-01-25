@@ -29,3 +29,7 @@ export const resendOTP = (data) => {
 export const verifyEmail = (data) => {
     return api.post('/verify_email', data);
 }
+
+export const changePassword = (data) => {
+    return api.post('/change-password', data);
+}

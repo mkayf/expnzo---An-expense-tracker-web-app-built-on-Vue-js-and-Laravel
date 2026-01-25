@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import Header from "../components/Header.vue";
 import Sidebar from "../components/Sidebar.vue";
+import { useRoute } from "vue-router";
 
 const isCollapsed = ref(false); 
 const isMobileOpen = ref(false);
@@ -23,6 +24,17 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener("resize", checkScreenSize);
 });
+
+const route = useRoute();
+
+watch(
+    () => route.path,
+    () => {
+        if (isMobile.value) {
+            isMobileOpen.value = false;
+        }
+    }
+);
 
 const toggleSidebar = () => {
     if (isMobile.value) {
