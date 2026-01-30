@@ -321,7 +321,7 @@ class AuthController extends Controller
                     return response()->json([
                         'success' => false,
                         'message' => 'New password cannot be your current password, create a new one.'
-                    ]);
+                    ], 422);
                 }
 
                 $user->password = $request->new_password;

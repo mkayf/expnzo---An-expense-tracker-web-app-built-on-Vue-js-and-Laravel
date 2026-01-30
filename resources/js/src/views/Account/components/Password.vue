@@ -10,7 +10,7 @@ import 'element-plus/es/components/message/style/css'
 
 const buttonLoader = ref(false);
 
-const changeUserPassword = async (formData) => {
+const changeUserPassword = async (formData, {resetForm}) => {
     try{
         buttonLoader.value = true;
         const response = await changePassword(formData);
@@ -20,6 +20,7 @@ const changeUserPassword = async (formData) => {
                 message:
                     response.data.message || "Password changed successfuly",
             });
+            resetForm();
             return;
         }
 
@@ -39,7 +40,7 @@ const changeUserPassword = async (formData) => {
 <template>
     <div class="p-6">
         <h4 class="text-xl font-medium mb-4">Change Password</h4>
-        <Form @submit="changeUserPassword" :validation-schema="changePasswordSchema" class="mt-4">
+        <Form @submit="changeUserPassword" :validation-schema="changePasswordSchema" class="mt-4" v-slot="{resetForm}">
                 <el-row :gutter="20" class="flex flex-col">
                     <el-col :md="12" class="mb-4">
                         <Field name="current_password" v-slot="{field, handleChange, errorMessage}">

@@ -7,7 +7,7 @@ import useAuthStore from "./src/stores/auth";
 import { ElLoading } from "element-plus";
 import "element-plus/es/components/loading/style/css";
 import "./src/assets/logo/logo.png";
-
+import 'element-plus/theme-chalk/dark/css-vars.css'
 
 async function initializeApp() {
     const loading = ElLoading.service({
