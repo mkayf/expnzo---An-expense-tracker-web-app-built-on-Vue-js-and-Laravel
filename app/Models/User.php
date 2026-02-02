@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -32,6 +33,8 @@ class User extends Authenticatable
 
     protected $appends = ['has_custom_avatar'];
 
+    protected $with = ['preferences'];
+
     /**
      * The attributes that should be hidden for serialization.
      *  
@@ -54,6 +57,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    
 
     protected function avatar(): Attribute{
         return Attribute::make(
@@ -65,5 +69,9 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn () => !is_null($this->getRawOriginal('avatar')) && Storage::disk('public')->exists($this->getRawOriginal('avatar'))
         );
+    }
+
+    public function preferences(){
+        return $this->hasOne(UserPreference::class, 'user_id', 'id');
     }
 }

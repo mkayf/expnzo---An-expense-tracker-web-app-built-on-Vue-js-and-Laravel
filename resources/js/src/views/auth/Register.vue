@@ -30,7 +30,7 @@ const registerUser = async (formData) => {
         }
     } catch (e) {
         handleError(e);
-        console.log(e.response?.data?.message);
+        console.log(e);
     } finally {
         loading.value = false;
     }

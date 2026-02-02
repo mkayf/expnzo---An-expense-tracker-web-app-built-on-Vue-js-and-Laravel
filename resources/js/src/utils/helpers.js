@@ -14,3 +14,4 @@ export function capitalizeEachWord(sentence) {
   }
   return words.join(" "); 
 }
+

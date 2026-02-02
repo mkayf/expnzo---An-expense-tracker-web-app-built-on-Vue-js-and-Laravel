@@ -44,7 +44,7 @@ const changeUserPassword = async (formData, {resetForm}) => {
                 <el-row :gutter="20" class="flex flex-col">
                     <el-col :md="12" class="mb-4">
                         <Field name="current_password" v-slot="{field, handleChange, errorMessage}">
-                            <el-form-item label="Current Password" :error="errorMessage">
+                            <el-form-item label="Current Password" :error="errorMessage" label-position="top">
                                 <el-input type="password" 
                                 show-password
                                 :model-value="field.value"
@@ -56,7 +56,7 @@ const changeUserPassword = async (formData, {resetForm}) => {
                     </el-col>
                     <el-col :md="12" class="mb-4">
                             <Field name="new_password" v-slot="{field, handleChange, errorMessage}">
-                            <el-form-item label="New Password" :error="errorMessage">
+                            <el-form-item label="New Password" label-position="top" :error="errorMessage">
                                 <el-input type="password" 
                                 show-password
                                 :model-value="field.value"
@@ -68,7 +68,7 @@ const changeUserPassword = async (formData, {resetForm}) => {
                     </el-col>
                     <el-col :md="12">
                             <Field name="new_password_confirmation" v-slot="{field, handleChange, errorMessage}">
-                            <el-form-item label="Confirm Password" :error="errorMessage">
+                            <el-form-item label="Confirm Password" label-position="top":error="errorMessage">
                                 <el-input type="password" 
                                 show-password
                                 :model-value="field.value"

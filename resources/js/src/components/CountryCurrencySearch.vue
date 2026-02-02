@@ -1,27 +1,35 @@
 <script setup>
-import { getAllISOCodes } from "iso-country-currency";
-import { onMounted, ref } from "vue";
-import { capitalizeEachWord } from "../utils/helpers";
 /*
 This component is used to search ang select country name to set the desired user's currency for the app.
 */
-
+import { getAllISOCodes } from "iso-country-currency";
+import { onMounted, ref } from "vue";
+import { capitalizeEachWord } from "../utils/helpers";
 
 const countryName = ref("");
 const allCountries = ref([]);
-const selectedCountry = ref(null);
 
-const querySearch = (searchValue, callback) => {
-    const suggestions = allCountries.value.filter((item) => {
-        return item.countryName?.includes(capitalizeEachWord(searchValue)) ? item.countryName : null;        
-    })
+const emits = defineEmits(['selected-country']);
+
+const querySearch = (searchValue, cb) => {
+    const suggestions = searchValue ? allCountries.value.filter((item) => {
+        return item.value.indexOf(capitalizeEachWord(searchValue)) === 0;
+    }) : allCountries.value;
+
+    cb(suggestions);
 };
 
-const handleSelect = () => {};
-
+const handleSelect = (country) => {
+    emits('selected-country', country)
+};
 
 onMounted(() => {
-    allCountries.value = getAllISOCodes();
+    allCountries.value = getAllISOCodes().map((country) => {
+        return {
+            ...country,
+            value: country.countryName
+        }
+    });
 })
 
 </script>
@@ -32,7 +40,6 @@ onMounted(() => {
             v-model="countryName"
             :fetch-suggestions="querySearch"
             :trigger-on-focus="false"
-            clearable
             class="w-50"
             placeholder="Country name"
             @select="handleSelect"

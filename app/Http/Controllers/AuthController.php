@@ -40,12 +40,16 @@ class AuthController extends Controller
                 'provider' => 'credentials',
             ]);
 
-            if (! $user) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => "Couldn't create your account, please try again",
                 ], 500);
             }
+
+            $user->preferences()->create([
+                'currency' => 'PKR'
+            ]);
 
             Auth::login($user);
 
