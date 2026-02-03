@@ -37,3 +37,7 @@ export const changePasswordSchema = yup.object({
     new_password: passwordSchema,
     new_password_confirmation: confirmPasswordSchema('new_password')
 })
+
+export const countrySearchSchema = yup.object({
+    country_name: yup.string().required('Please search a country to select currency')
+});

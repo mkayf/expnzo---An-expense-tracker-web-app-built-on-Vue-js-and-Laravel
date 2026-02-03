@@ -9,5 +9,9 @@ export const deleteAvatar = () => {
 }
 
 export const saveProfileDetails = (formData) => {
-    return api.post('/save_profile_details', formData);
+    return api.patch('/save_profile_details', formData);
+}
+
+export const saveUserPrefences = (data) => {
+    return api.patch('/save-preferences', data);
 }

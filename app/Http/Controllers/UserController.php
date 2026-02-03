@@ -94,6 +94,21 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Profile details saved successfully'
-        ]);
+        ], 200);
     }
+
+    public function savePreferences(Request $request){
+        $request->validate([
+            'currency' => 'required|string'
+        ]);
+
+        $user = $request->user();
+        $user->preferences()->update(['currency' => $request->currency]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Preferences saved',
+            'preferences' => $user->preferences
+        ], 200);
+    }   
 }

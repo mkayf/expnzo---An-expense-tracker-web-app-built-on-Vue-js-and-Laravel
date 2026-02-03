@@ -6,7 +6,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -37,7 +36,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that should be hidden for serialization.
-     *  
+     *
      * @var list<string>
      */
     protected $hidden = [
@@ -57,21 +56,23 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
 
-    protected function avatar(): Attribute{
+    protected function avatar(): Attribute
+    {
         return Attribute::make(
-            get: fn ($value) => $value ? asset('storage/' . $value) : asset('media/default-avatar.avif')
+            get: fn ($value) => $value ? asset('storage/'.$value) : asset('media/default-avatar.avif')
         );
     }
 
-    public function hasCustomAvatar(): Attribute{
+    public function hasCustomAvatar(): Attribute
+    {
         return Attribute::make(
-            get: fn () => !is_null($this->getRawOriginal('avatar')) && Storage::disk('public')->exists($this->getRawOriginal('avatar'))
+            get: fn () => ! is_null($this->getRawOriginal('avatar')) && Storage::disk('public')->exists($this->getRawOriginal('avatar'))
         );
     }
 
-    public function preferences(){
+    public function preferences()
+    {
         return $this->hasOne(UserPreference::class, 'user_id', 'id');
     }
 }

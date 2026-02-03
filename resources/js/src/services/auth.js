@@ -31,5 +31,5 @@ export const verifyEmail = (data) => {
 }
 
 export const changePassword = (data) => {
-    return api.post('/change-password', data);
+    return api.patch('/change-password', data);
 }

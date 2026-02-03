@@ -1,18 +1,53 @@
 <script setup>
-import { ref } from "vue";
+import { handleError, onMounted, ref } from "vue";
 import CountryCurrencySearch from "../../../components/CountryCurrencySearch.vue";
 import SubmitButton from "../../../components/ui/SubmitButton.vue";
-import { Form } from "vee-validate";
+import { Field, Form } from "vee-validate";
+import { countrySearchSchema } from "../../../utils/validationSchema";
+import useAuthStore from "../../../stores/auth";
+import { ElMessage } from "element-plus";
+import 'element-plus/es/components/message/style/css';
+import { saveUserPrefences } from "../../../services/user";
 
+const authStore = useAuthStore();
+const defaultCurrency = authStore.user.preferences.currency;
 const selectedCountry = ref(null);
+
+const buttonLoader = ref(false);
 
 const getCountry = (country) => {
     selectedCountry.value = country;
-    console.log(selectedCountry.value);
 };
 
-const savePreferences = (formData) => {
-    console.log(formData);
+const savePreferences = async () => {
+    if(selectedCountry.value.currency === defaultCurrency){
+        ElMessage({
+            type: 'info',
+            message: 'This is already your default country'
+        });
+        return;
+    }
+
+    try{
+        buttonLoader.value = true;
+        const response = await saveUserPrefences({currency: selectedCountry.value.currency});
+        if(response.data.success){
+            authStore.user.preferences = response.data.preferences;
+            ElMessage({
+                type: 'success',
+                message: response.data.message
+            })
+            console.log(authStore.user.preferences);
+            return;
+        }
+        throw new Error(response);
+    }
+    catch(e){
+        handleError(e);
+    }
+    finally{
+        buttonLoader.value = false;
+    }
 };
 
 </script>
@@ -20,26 +55,33 @@ const savePreferences = (formData) => {
 <template>
     <div class="p-6">
         <h4 class="text-xl font-medium mb-4">Preferences</h4>
-        <Form @submit="savePreferences">
+        <Form @submit="savePreferences"
+        :validation-schema="countrySearchSchema"
+        >
             <el-row class="flex flex-col">
                 <el-col :md="12">
-                    <el-form-item
-                        label="Select the currency that you want to use"
-                        label-position="top"
-                    >
-                        <div class="flex items-center gap-4 mt-2">
-                            <CountryCurrencySearch
-                            @selected-country="getCountry"
-                            />
-                            <span
-                                v-if="selectedCountry && selectedCountry.currency"
-                                class="font-semibold text-xl bg-gray-100 p-2 rounded-lg"
-                                >{{ selectedCountry.currency }}</span>    
-                        </div>
-                    </el-form-item>
+                    <Field name="country_name" v-slot="{field, handleChange, errorMessage}">
+                        <el-form-item
+                            label="Select the currency that you want to use"
+                            label-position="top"
+                            :error="errorMessage"
+                        >
+                            <div class="flex items-center gap-4 mt-2">
+                                <CountryCurrencySearch
+                                    @selected-country="getCountry"
+                                    :field="field"
+                                    :handleChange="handleChange"
+                                />
+                                <span
+                                    v-if="(selectedCountry && selectedCountry.currency) || authStore.user.preferences.currency"
+                                    class="font-semibold text-xl bg-gray-100 p-2 rounded-lg"
+                                    >{{ selectedCountry?.currency ?? authStore.user.preferences.currency }}</span>    
+                            </div>
+                        </el-form-item>
+                    </Field>
                 </el-col>
                 <div>
-                    <SubmitButton text="Save" classes="md:!w-[100px] mt-4" />
+                    <SubmitButton :is-loading="buttonLoader" text="Save" classes="md:!w-[100px] mt-4" />
                 </div>
             </el-row>
         </Form>

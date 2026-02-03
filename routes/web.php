@@ -33,8 +33,9 @@ Route::prefix('/api')->group(function () {
         Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
         Route::post('/upload_avatar', [UserController::class, 'uploadAvatar']);
         Route::delete('/delete_avatar', [UserController::class, 'deleteAvatar']);
-        Route::post('/save_profile_details', [UserController::class, 'saveProfileDetails']);
-        Route::post('/change-password', [AuthController::class, 'changePassword']);
+        Route::patch('/save_profile_details', [UserController::class, 'saveProfileDetails']);
+        Route::patch('/change-password', [AuthController::class, 'changePassword']);
+        Route::patch('/save-preferences', [UserController::class, 'savePreferences']);
     });
 
 });
