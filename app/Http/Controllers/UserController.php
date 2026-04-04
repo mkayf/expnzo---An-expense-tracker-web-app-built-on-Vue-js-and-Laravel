@@ -104,7 +104,8 @@ class UserController extends Controller
 
         $user = $request->user();
         $user->preferences()->update(['currency' => $request->currency]);
-        
+        $user->load('preferences');
+
         return response()->json([
             'success' => true,
             'message' => 'Preferences saved',

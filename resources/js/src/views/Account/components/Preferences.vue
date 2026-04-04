@@ -10,7 +10,7 @@ import 'element-plus/es/components/message/style/css';
 import { saveUserPrefences } from "../../../services/user";
 
 const authStore = useAuthStore();
-const defaultCurrency = authStore.user.preferences.currency;
+const defaultCurrency = ref(null);
 const selectedCountry = ref(null);
 
 const buttonLoader = ref(false);
@@ -20,10 +20,10 @@ const getCountry = (country) => {
 };
 
 const savePreferences = async () => {
-    if(selectedCountry.value.currency === defaultCurrency){
+    if(selectedCountry.value.currency === defaultCurrency.value){
         ElMessage({
             type: 'info',
-            message: 'This is already your default country'
+            message: "You're already using this currency"
         });
         return;
     }
@@ -32,12 +32,13 @@ const savePreferences = async () => {
         buttonLoader.value = true;
         const response = await saveUserPrefences({currency: selectedCountry.value.currency});
         if(response.data.success){
-            authStore.user.preferences = response.data.preferences;
+            authStore.user.preferences = response.data?.preferences;
+            // directly updating default currency here
+            defaultCurrency.value =  response.data?.preferences?.currency;
             ElMessage({
                 type: 'success',
-                message: response.data.message
+                message: response.data?.message
             })
-            console.log(authStore.user.preferences);
             return;
         }
         throw new Error(response);
@@ -50,12 +51,17 @@ const savePreferences = async () => {
     }
 };
 
+onMounted(() => {
+    defaultCurrency.value = authStore.user.preferences.currency;
+});
+
 </script>
 
 <template>
     <div class="p-6">
         <h4 class="text-xl font-medium mb-4">Preferences</h4>
-        <Form @submit="savePreferences"
+        <Form @submit.prevent
+        @keydown.enter.prevent
         :validation-schema="countrySearchSchema"
         >
             <el-row class="flex flex-col">
@@ -81,7 +87,7 @@ const savePreferences = async () => {
                     </Field>
                 </el-col>
                 <div>
-                    <SubmitButton :is-loading="buttonLoader" text="Save" classes="md:!w-[100px] mt-4" />
+                    <SubmitButton @submit-form="savePreferences"  :is-loading="buttonLoader" text="Save" classes="md:!w-[100px] mt-4" />
                 </div>
             </el-row>
         </Form>

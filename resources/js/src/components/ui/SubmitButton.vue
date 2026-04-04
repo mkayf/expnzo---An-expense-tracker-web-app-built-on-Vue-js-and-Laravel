@@ -23,10 +23,14 @@ const props = defineProps({
     }
 });
 
+const emit = defineEmits(['submit-form']);
+
+const handleClick = () => emit('submit-form');
+
 </script>
 
 <template>
-    <el-button :disabled="isDisabled" :loading="isLoading" native-type="submit" class="transition-all duration-500 w-full" :class="[
+    <el-button @click.prevent="handleClick" :disabled="isDisabled" :loading="isLoading" native-type="submit" class="transition-all duration-500 w-full" :class="[
         props.classes
         ,{
         '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)]  !text-white' : isDisabled === false,
