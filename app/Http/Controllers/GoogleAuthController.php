@@ -40,6 +40,10 @@ class GoogleAuthController extends Controller
                 ]);
                 Log::info('New user created in db', ['user' => $newUser]);    
                 Auth::login($newUser);
+                // set preverences for the new user
+                $newUser->preferences()->create([
+                    'currency' => 'PKR'
+                ]);
                 Log::info('New user logged in');
             }
 

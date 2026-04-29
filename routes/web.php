@@ -43,3 +43,7 @@ Route::prefix('/api')->group(function () {
 Route::get('/{any?}', function () {
     return view('app');
 })->where('any', '.*');
+
+// Route::get('{any}', function () {
+//     return view('app');
+// })->where('any', '^(?!storage).*$');

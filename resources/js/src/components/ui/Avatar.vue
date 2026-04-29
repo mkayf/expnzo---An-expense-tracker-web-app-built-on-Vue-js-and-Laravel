@@ -15,7 +15,10 @@ const props = defineProps({
 const avatar = ref(props.avatarURL);
 
 watch(() => props.avatarURL, (val) => {
-    avatar.value = val;
+    if(val){
+        console.log('Avatar URL updated:', val);
+        avatar.value = val;
+    }
 })
 </script>
 
@@ -34,10 +37,4 @@ watch(() => props.avatarURL, (val) => {
 }
 
 
-/* @media (max-width: 576px) {
-    .el-avatar.el-avatar--circle{
-        height: 30px;
-        width: 30px;
-    }
-} */
 </style>
