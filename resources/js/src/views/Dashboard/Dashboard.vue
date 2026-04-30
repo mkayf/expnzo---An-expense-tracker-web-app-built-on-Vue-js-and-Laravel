@@ -3,7 +3,7 @@ import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import { onMounted, ref, watch } from "vue";
 import PopupButton from "../../components/ui/PopupButton.vue";
-import { PlusIcon } from "@heroicons/vue/24/outline";
+import { PlusIcon, WalletIcon } from "@heroicons/vue/24/outline";
 import StatCard from "./components/StatCard.vue";
 
 const monthFilter = ref(null);
@@ -41,7 +41,11 @@ onMounted(() => {
                 </div>
             </div>
             <div class="dashboard-body mt-6">
-                <StatCard />
+                <StatCard label="Total Balance">
+                    <template #icon>
+                        <WalletIcon class="h-6 w-6" />
+                    </template>
+                </StatCard>
             </div>
         </div>
     </div>
