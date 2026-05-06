@@ -8,7 +8,7 @@ class UserPreference extends Model
 {
     protected $table = 'user_preferences';
 
-    protected $fillable = ['user_id', 'currency'];
+    protected $fillable = ['user_id', 'currency', 'currency_iso'];
 
     public function user(){
         return $this->belongsTo('user', 'user_id');

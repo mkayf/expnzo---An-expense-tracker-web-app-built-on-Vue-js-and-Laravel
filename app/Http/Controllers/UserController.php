@@ -33,16 +33,15 @@ class UserController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Profile uploaded successfully',
-                    'url' => asset('storage/'.$path),
+                    'url' => asset('storage/' . $path),
                 ], 200);
-            }
-            else{
+            } else {
                 Log::info('Image not provided by frontend', ['file_came' => $request->avatar]);
 
                 return response()->json([
                     'success' => false,
                     'message' => 'Please upload a proper image file'
-                ], 400); 
+                ], 400);
             }
         } catch (\Throwable $th) {
             Log::info('Failed to upload avatar', ['error' => $th->getMessage()]);
@@ -53,27 +52,27 @@ class UserController extends Controller
         }
     }
 
-    public function deleteAvatar(Request $request) {
-        try{
+    public function deleteAvatar(Request $request)
+    {
+        try {
             $user = $request->user();
             $path = $user->getRawOriginal('avatar');
-    
-            if($user->has_custom_avatar){
-                if(Storage::disk('public')->exists($path)){
+
+            if ($user->has_custom_avatar) {
+                if (Storage::disk('public')->exists($path)) {
                     Storage::disk('public')->delete($path);
                 }
-    
+
                 $user->setAttribute('avatar', null);
                 $user->save();
-    
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Profile image deleted successfully',
                     'url' => $user->avatar
                 ], 200);
             }
-        }
-        catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::info('Failed to delete user avatar image', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
@@ -82,7 +81,8 @@ class UserController extends Controller
         }
     }
 
-    public function saveProfileDetails(Request $request){
+    public function saveProfileDetails(Request $request)
+    {
         $request->validate([
             'name' => ['required', 'string', 'min:3'],
         ]);
@@ -97,13 +97,15 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function savePreferences(Request $request){
+    public function savePreferences(Request $request)
+    {
         $request->validate([
-            'currency' => 'required|string'
+            'currency' => 'required|string',
+            'currency_iso' => 'required|string'
         ]);
 
         $user = $request->user();
-        $user->preferences()->update(['currency' => $request->currency]);
+        $user->preferences()->update(['currency' => $request->currency, 'currency_iso' => $request->currency_iso]);
         $user->load('preferences');
 
         return response()->json([
@@ -111,5 +113,5 @@ class UserController extends Controller
             'message' => 'Preferences saved',
             'preferences' => $user->preferences
         ], 200);
-    }   
+    }
 }

@@ -41,11 +41,28 @@ onMounted(() => {
                 </div>
             </div>
             <div class="dashboard-body mt-6">
-                <StatCard label="Total Balance">
-                    <template #icon>
-                        <WalletIcon class="h-6 w-6" />
-                    </template>
-                </StatCard>
+                <div class="grid grid-cols-1  lg:grid-cols-4 gap-5">
+                    <StatCard label="Total Balance">
+                        <template #icon>
+                            <WalletIcon class="h-6 w-6" />
+                        </template>
+                    </StatCard>
+                    <StatCard label="Total Balance">
+                        <template #icon>
+                            <WalletIcon class="h-6 w-6" />
+                        </template>
+                    </StatCard>
+                    <StatCard label="Total Balance">
+                        <template #icon>
+                            <WalletIcon class="h-6 w-6" />
+                        </template>
+                    </StatCard>
+                    <StatCard label="Total Balance">
+                        <template #icon>
+                            <WalletIcon class="h-6 w-6" />
+                        </template>
+                    </StatCard>
+                </div>
             </div>
         </div>
     </div>
