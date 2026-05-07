@@ -17,18 +17,33 @@ export function capitalizeEachWord(sentence) {
     return words.join(" ");
 }
 
-export function formatAmount(amount, currency_iso = "PK") {
+export function formatAmount(amount = 0, currency_iso = "PK") {
     if (typeof amount !== "number") return 0;
-    const value = Number(new Intl.NumberFormat("en-" + currency_iso, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(amount));
 
-    // Implement more money handling logic here ASAP you VENOM
+    let value = amount;
 
-    // if(value < 1000000000000 && value > ){
+    const amountMapping = {
+        million: 1000000,
+        billion: 1000000000
+    };
 
-    // }
+    if(value > 1000000000000){
+        return 'Tryna be smart?'
+    }
+    else if(value < 1000000000000 && value >= 1000000000 ){
+        value = Number(amount / amountMapping['billion']).toFixed(2) + 'B'
+    } else if(value < 1000000000 && value >= 1000000){
+        value = Number(amount / amountMapping['million']).toFixed(2) + 'M'
+    }
+
+    if(typeof value == "number"){
+        const formattedValue = new Intl.NumberFormat("en-" + currency_iso, {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }).format(amount);
+        return formattedValue;
+    }
 
     return value;
+
 }

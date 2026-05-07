@@ -36,8 +36,8 @@ const userCurrencyIso = authStore.user?.preferences?.currency_iso;
                     <span class="text-md text-slate-700">{{
                         userCurrency ?? ""
                     }}</span>
-                    <span class="ml-1 text-3xl font-medium">
-                        {{ formatAmount(10.22365, userCurrencyIso) }}</span
+                    <span class="ml-1 text-3xl font-semibold">
+                        {{ formatAmount(505000,userCurrencyIso) }}</span
                     >
                 </div>
                 <div class="mt-1 border-4 border-amber-600 w-full">
