@@ -18,7 +18,7 @@ export function capitalizeEachWord(sentence) {
 }
 
 export function formatAmount(amount = 0, currency_iso = "PK") {
-    if (typeof amount !== "number") return 0;
+    if (!Number.isFinite(amount)) return 0;
 
     let value = amount;
 
@@ -27,16 +27,16 @@ export function formatAmount(amount = 0, currency_iso = "PK") {
         billion: 1000000000
     };
 
-    if(value > 1000000000000){
+    if(value > 1000000000000 || value < -1000000000000){
         return 'Tryna be smart?'
     }
-    else if(value < 1000000000000 && value >= 1000000000 ){
-        value = Number(amount / amountMapping['billion']).toFixed(2) + 'B'
-    } else if(value < 1000000000 && value >= 1000000){
-        value = Number(amount / amountMapping['million']).toFixed(2) + 'M'
+    else if((value < 1000000000000 && value >= 1000000000) || (value > -1000000000000 && value <= -1000000000)){
+        value = (amount / amountMapping['billion']).toFixed(2) + 'B'
+    } else if((value < 1000000000 && value >= 1000000) || (value > -1000000000 && value <= -1000000)){
+        value = (amount / amountMapping['million']).toFixed(2) + 'M'
     }
 
-    if(typeof value == "number"){
+    if(Number.isFinite(value)){
         const formattedValue = new Intl.NumberFormat("en-" + currency_iso, {
             maximumFractionDigits: 2,
             minimumFractionDigits: 2
@@ -45,5 +45,4 @@ export function formatAmount(amount = 0, currency_iso = "PK") {
     }
 
     return value;
-
 }

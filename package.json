@@ -29,6 +29,7 @@
         "pinia": "^3.0.3",
         "vee-validate": "^4.15.1",
         "vue-router": "^4.5.1",
+        "vue3-apexcharts": "^1.11.1",
         "yup": "^1.7.1"
     }
 }
