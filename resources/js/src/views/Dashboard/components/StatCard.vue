@@ -18,35 +18,55 @@ const authStore = useAuthStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
+// const options = {
+//     xaxis: {
+//         categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
+//     },
+//     zoom: {
+//         enabled: false,
+//     },
+//     chart: {
+//         type: 'area',
+//         sparkline: {
+//             enabled: true
+//         }
+//     },
+//     colors: ['var(--el-color-primary)'],
+//     stroke: {
+//         width: 2,
+//         curve: 'smooth'
+//     },
+//     fill: {
+//         type: 'gradient'
+//     }
+// };
+
+// const series = [
+//     {
+//         name: "sales",
+//         data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+//     },
+// ];
+
 const options = {
-    xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
+    chart: {
+        type: "donut",
     },
-    zoom: {
+    legend: {
+        show: false,
+    },
+    dataLabels: {
         enabled: false,
     },
-    chart: {
-        type: 'area',
-        sparkline: {
-            enabled: true
-        }
-    },
-    colors: ['var(--el-color-primary)'],
     stroke: {
-        width: 2,
-        curve: 'smooth'
+        width: 0
     },
-    fill: {
-        type: 'gradient' 
-    }
+    colors: ['var(--el-color-primary)', '#FF5F1F'], // 'income' => 'green', 'expense' => 'orange'
+    labels: ['Income', 'Expense']
 };
 
-const series = [
-    {
-        name: "sales",
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-    },
-];
+const series = [44, 55];
+
 </script>
 <template>
     <div
@@ -57,7 +77,10 @@ const series = [
                 <div class="flex items-center gap-2">
                     <span
                         class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
-                        style="box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 16px 0px;;"
+                        style="
+                            box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 16px
+                                0px;
+                        "
                     >
                         <slot name="icon"></slot>
                     </span>
