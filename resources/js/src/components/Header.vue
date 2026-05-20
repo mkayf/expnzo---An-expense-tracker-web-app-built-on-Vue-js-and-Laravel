@@ -42,7 +42,7 @@ const logoutUser = async () => {
 
 <template>
     <div
-        class="mt-4 mx-4 md:mx-6 bg-white p-4 rounded-md border border-[var(--el-border-color)] flex items-center justify-between relative"
+        class="mt-4 mx-4 md:mx-6 bg-white px-4 py-2 rounded-md border border-[var(--el-border-color)] flex items-center justify-between relative"
     >
         <div class="flex items-center gap-3">
             <button
