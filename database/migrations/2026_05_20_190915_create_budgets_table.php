@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('month', 7);
-            $table->decimal(12, 2);
+            $table->decimal('limit_amount', 12, 2);
             $table->timestamps();
         });
     }
