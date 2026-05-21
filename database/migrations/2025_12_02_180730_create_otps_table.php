@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('otps', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
             $table->string('code');
             $table->integer('attempts')->default(0);
             $table->dateTime('resend_allowed_at');
