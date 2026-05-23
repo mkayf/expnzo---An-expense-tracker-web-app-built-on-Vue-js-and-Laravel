@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Budget extends Model
 {
     protected $fillable = ['user_id', 'month', 'limit_amount'];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

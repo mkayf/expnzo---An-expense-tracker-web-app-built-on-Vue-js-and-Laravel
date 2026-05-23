@@ -75,4 +75,20 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserPreference::class, 'user_id', 'id');
     }
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    public function budgets(){
+        return $this->hasMany(Budget::class, 'user_id');
+    }
+    
+    public function categories(){
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function customCategories(){
+        return $this->hasMany(Category::class, 'user_id');
+    }
 }

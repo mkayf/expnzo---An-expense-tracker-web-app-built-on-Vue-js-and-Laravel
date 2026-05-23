@@ -7,4 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $fillable = ['user_id', 'name', 'type'];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function users(){
+        return $this->belongsToMany(User::class);
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class, 'category_id');
+    }
+
 }
