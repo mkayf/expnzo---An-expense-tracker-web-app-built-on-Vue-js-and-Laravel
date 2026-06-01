@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -36,7 +37,12 @@ Route::prefix('/api')->group(function () {
         Route::patch('/save_profile_details', [UserController::class, 'saveProfileDetails']);
         Route::patch('/change-password', [AuthController::class, 'changePassword']);
         Route::patch('/save-preferences', [UserController::class, 'savePreferences']);
+
+        // Transaction routes:
+        Route::post('/store_transaction', [TransactionController::class, 'store'])->name('transaction.store');
+        Route::patch('/update_transaction', [TransactionController::class, 'update'])->name('transaction.update');
     });
+
 
 });
 
