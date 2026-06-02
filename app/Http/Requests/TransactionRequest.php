@@ -32,6 +32,7 @@ class TransactionRequest extends FormRequest
 
         if ($this->routeIs('transaction.update')) {
             return [
+                'id' => ['required', 'exists:transactions,id'],
                 'category_id' => $categoryRule,
                 'type' => ['required', 'in:income,expense'],
                 'amount' => ['required', 'decimal:0,999,999,999,999'],
