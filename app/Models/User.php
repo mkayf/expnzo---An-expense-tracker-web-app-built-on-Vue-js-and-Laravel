@@ -92,3 +92,4 @@ class User extends Authenticatable
         return $this->hasMany(Category::class, 'user_id');
     }
 }
+    
