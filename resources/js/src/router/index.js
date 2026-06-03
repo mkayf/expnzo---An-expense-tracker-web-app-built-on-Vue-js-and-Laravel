@@ -8,16 +8,16 @@ const routes = [
     {
         path: "/",
         component: () => import("../layouts/DefaultLayout.vue"),
-        children: publicRoutes
+        children: publicRoutes,
     },
     {
         path: "/app",
         component: () => import("../layouts/DashboardLayout.vue"),
-        redirect: '/app/dashboard',
+        redirect: "/app/dashboard",
         children: appRoutes,
         meta: {
-            breadcrumb: 'Dashboard'
-        }
+            breadcrumb: "Dashboard",
+        },
     },
     {
         path: "/auth",
@@ -26,9 +26,9 @@ const routes = [
     },
     {
         path: "/:pathMatch(.*)*",
-        name: 'NotFound',
-        component: () => import("../views/NotFound.vue")
-    }
+        name: "NotFound",
+        component: () => import("../views/NotFound.vue"),
+    },
 ];
 
 export const router = createRouter({
@@ -36,40 +36,70 @@ export const router = createRouter({
     routes,
 });
 
+// // router.beforeEach((to, from, next) => {
+// //     const authStore = useAuthStore();
+// //     const isAuthenticated = authStore.isAuthenticated;
+// //     // Email verification check
+// //     if(isAuthenticated){
+// //         const isVerified = authStore.user?.email_verified;
+// //         if(!isVerified && !to.name === 'VerifyEmail'){
+// //             next({name: 'VerifyEmail'});
+// //         }
+
+// //         if(isVerified && to.name === 'VerifyEmail'){
+// //             next({name: 'Dashboard'});
+// //         }
+// //     }
+
+// //     if (to.matched.some((route) => route.meta.requiresAuth)) {
+// //         if (!isAuthenticated) {
+// //             next({
+// //                 name: "Login",
+// //             });
+// //         }
+// //         else {
+// //             next();
+// //         }
+// //     } else if (to.matched.some((route) => route.meta.requiresAuth === false)) {
+// //         if (isAuthenticated) {
+// //             next({
+// //                 name: "Dashboard",
+// //             });
+// //         } else {
+// //             next();
+// //         }
+// //     } else {
+// //         next();
+// //     }
+// });
+
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
-    // Email verification check
-    if(isAuthenticated){
-        const isVerified = authStore.user?.email_verified;
-        if(!isVerified && !to.name === 'VerifyEmail'){
-            next({name: 'VerifyEmail'});
-        }   
-
-        if(isVerified && to.name === 'VerifyEmail'){
-            next({name: 'Dashboard'});
-        }
-    }
-
+    const isVerified = authStore.user?.email_verified ?? false;
 
     if (to.matched.some((route) => route.meta.requiresAuth)) {
         if (!isAuthenticated) {
-            next({
-                name: "Login",
-            });
-        } 
-        else {
-            next();
+            return next({ name: "Login" });
         }
-    } else if (to.matched.some((route) => route.meta.requiresAuth === false)) {
-        if (isAuthenticated) {
-            next({
-                name: "Dashboard",
-            });
-        } else {
-            next();
+
+        if (!isVerified && to.name !== "VerifyEmail") {
+            return next({ name: "VerifyEmail" });
         }
-    } else {
-        next();
+
+        if (isVerified && to.name === "VerifyEmail") {
+            return next({ name: "Dashboard" });
+        }
+
+        return next();
     }
+
+    if (to.matched.some((route) => route.meta.requiresAuth === false)) {
+        if (isAuthenticated) {
+            return isVerified ? next({ name: "Dashboard" }) : next({ name: "VerifyEmail" });
+        }
+        return next();
+    }
+
+    return next();
 });

@@ -46,6 +46,8 @@ const handleVerifyEmail = async (data) => {
             otp_code: data.otp,
         });
         if (res.data.success) {
+            authStore.user.email_verified = !!res.data.user.email_verified;
+            authStore.user.email_verified_at = res.data.user.email_verified_at;
             ElMessage({
                 type: "success",
                 message: res.data.message,

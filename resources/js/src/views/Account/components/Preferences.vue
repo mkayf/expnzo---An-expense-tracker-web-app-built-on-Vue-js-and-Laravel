@@ -20,7 +20,7 @@ const getCountry = (country) => {
 };
 
 const savePreferences = async () => {
-    console.log(selectedCountry.value.iso === defaultCurrencyIso.value);
+    
     if (selectedCountry.value.iso === defaultCurrencyIso.value) {
         ElMessage({
             type: "info",
@@ -63,7 +63,7 @@ onMounted(() => {
     <div class="p-6">
         <h4 class="text-xl font-medium mb-4">Preferences</h4>
         <Form
-            @submit.prevent
+            @submit="savePreferences"
             @keydown.enter.prevent
             :validation-schema="countrySearchSchema"
         >
@@ -102,7 +102,6 @@ onMounted(() => {
                 </el-col>
                 <div>
                     <SubmitButton
-                        @submit-form="savePreferences"
                         :is-loading="buttonLoader"
                         text="Save"
                         classes="md:!w-[100px] mt-4"

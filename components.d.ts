@@ -15,6 +15,7 @@ declare module 'vue' {
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButto: typeof import('element-plus/es')['ElButto']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElButtonF: typeof import('element-plus/es')['ElButtonF']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']

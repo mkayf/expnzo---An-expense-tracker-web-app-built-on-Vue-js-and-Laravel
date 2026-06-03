@@ -16,22 +16,27 @@ Route::get('test', function(){
 });
 
 
-// Auth routes for guest users:
 Route::prefix('/api')->group(function () {
+    // Auth routes for guest users:
     Route::middleware(['api_guest', 'throttle:5,1'])->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/register', [AuthController::class, 'register']);
     });
 
+    // Routes for email verification:
+    Route::middleware(['auth:web'])->group(function(){
+        Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
+        Route::post('/resend_otp', [AuthController::class, 'resendOTP']);
+        Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
+
+    });
+    
     // Routes for auth users:   
-    Route::middleware('auth:web')->group(function () {
+    Route::middleware(['auth:web', 'verified'])->group(function () {
         Route::get('/user', function (Request $request) {
             return $request->user();
         });
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/user_to_be_verified', [AuthController::class, 'userToBeVerified']);
-        Route::post('/resend_otp', [AuthController::class, 'resendOTP']);
-        Route::post('/verify_email', [AuthController::class, 'verifyEmail']);
         Route::post('/upload_avatar', [UserController::class, 'uploadAvatar']);
         Route::delete('/delete_avatar', [UserController::class, 'deleteAvatar']);
         Route::patch('/save_profile_details', [UserController::class, 'saveProfileDetails']);
@@ -41,6 +46,9 @@ Route::prefix('/api')->group(function () {
         // Transaction routes:
         Route::post('/store_transaction', [TransactionController::class, 'store'])->name('transaction.store');
         Route::patch('/update_transaction', [TransactionController::class, 'update'])->name('transaction.update');
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
+        Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');
+        Route::delete('/transaction/{id}', [TransactionController::class, 'delete'])->name('transaction.delete');
     });
 
 

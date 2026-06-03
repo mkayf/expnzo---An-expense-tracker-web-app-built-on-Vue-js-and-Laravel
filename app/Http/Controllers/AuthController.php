@@ -48,7 +48,8 @@ class AuthController extends Controller
             }
 
             $user->preferences()->create([
-                'currency' => 'PKR'
+                'currency' => 'PKR',
+                'currency_iso' => 'PK'
             ]);
 
             Auth::login($user);
@@ -298,7 +299,7 @@ class AuthController extends Controller
         if ($OTPInfo['status'] === 'verified') {
             return response()->json([
                 'success' => true,
-                'user' => Auth::user(),
+                'user' => Auth::user()->refresh(),
                 'message' => 'Your account has been verified successfully',
             ], 200);
         }
