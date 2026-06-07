@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -53,6 +54,29 @@ class CategoryController extends Controller
                 'message' => 'Somethin went wrong while creating categories, please try again later',
             ], 500);
         }
+    }
 
+    public function deleteCustomCategory(Request $request){
+        try {
+            $validated = $request->validate([
+                'id' => ['required', 'exists:categories,id']
+            ]);
+
+            $user = $request->user();
+            $user->customCategories()->where('id', $validated['id'])->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Your custom category has been deleted successfully'
+            ], 200);
+
+        } catch (\Throwable $th) {
+             Log::info('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Somethin went wrong while deleting categories, please try again later',
+            ], 500);
+        }
     }
 }
