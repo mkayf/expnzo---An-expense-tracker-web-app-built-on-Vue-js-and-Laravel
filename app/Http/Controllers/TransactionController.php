@@ -70,7 +70,7 @@ class TransactionController extends Controller
                 ], 201);
             }
         } catch (\Throwable $th) {
-            Log::info('Error occured while creating transcation', ['error' => $th->getMessage()]);
+            Log::info('Error occured while creating transaction', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while making transaction, please try again later'
