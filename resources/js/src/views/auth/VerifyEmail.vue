@@ -4,7 +4,7 @@ import { emailOTPSchema } from "../../utils/validationSchema";
 import { computed, onMounted, ref } from "vue";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import useAuthStore from "../../stores/auth";
-import { userToBeVerified, resendOTP, verifyEmail } from "../../services/auth";
+import { userToBeVerified, resendOTP, verifyEmail } from "../../services/auth.service.js";
 import handleError from "../../utils/handleError";
 // import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";

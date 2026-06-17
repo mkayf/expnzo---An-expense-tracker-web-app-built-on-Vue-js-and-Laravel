@@ -10,7 +10,7 @@ import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import "element-plus/es/components/message-box/style/css";
 import "element-plus/es/components/loading/style/css";
-import { deleteAvatar, saveProfileDetails } from "../../../services/user";
+import { deleteAvatar, saveProfileDetails } from "../../../services/user.service.js";
 import { Form, Field} from "vee-validate";
 import { profileSchema } from "../../../utils/validationSchema";
 import SubmitButton from "../../../components/ui/SubmitButton.vue";

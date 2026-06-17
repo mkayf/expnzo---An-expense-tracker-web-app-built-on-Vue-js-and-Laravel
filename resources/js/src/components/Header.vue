@@ -6,7 +6,7 @@ import Avatar from "./ui/Avatar.vue";
 import NotificationBell from "./ui/NotificationBell.vue";
 import { ArrowRight } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
-import { logout } from "../services/auth";
+import { logout } from "../services/auth.service.js";
 import { ElMessage } from "element-plus";
 import handleError from "../utils/handleError";
 import useAuthStore from "../stores/auth";

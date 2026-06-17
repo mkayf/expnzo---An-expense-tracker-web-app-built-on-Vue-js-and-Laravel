@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,9 @@ Route::prefix('/api')->group(function () {
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
         Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');
         Route::delete('/transaction/{id}', [TransactionController::class, 'delete'])->name('transaction.delete');
+
+        // Dashboard routes:
+        Route::get('/dashboard/stats-summary', [DashboardController::class, 'getSummary'])->name('dashboard.stats');
     });
 
 

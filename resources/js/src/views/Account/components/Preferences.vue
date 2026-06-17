@@ -7,7 +7,7 @@ import { countrySearchSchema } from "../../../utils/validationSchema";
 import useAuthStore from "../../../stores/auth";
 import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
-import { saveUserPrefences } from "../../../services/user";
+import { saveUserPrefences } from "../../../services/user.service.js";
 
 const authStore = useAuthStore();
 const selectedCountry = ref(null);

@@ -3,7 +3,7 @@ import { Form, Field} from "vee-validate";
 import { ref } from "vue";
 import SubmitButton from "../../../components/ui/SubmitButton.vue";
 import { changePasswordSchema } from "../../../utils/validationSchema";
-import { changePassword } from "../../../services/auth";
+import { changePassword } from "../../../services/auth.service.js";
 import handleError from "../../../utils/handleError";
 import { ElMessage } from "element-plus";
 import 'element-plus/es/components/message/style/css'

@@ -5,9 +5,6 @@ import { formatAmount } from "../../../utils/helpers";
 import VueApexCharts from "vue3-apexcharts";
 
 const props = defineProps({
-    label: {
-        type: String,
-    },
     amount: {
         type: Number,
         default: 0,
@@ -18,63 +15,61 @@ const authStore = useAuthStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
-// const options = {
-//     xaxis: {
-//         categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
-//     },
-//     zoom: {
-//         enabled: false,
-//     },
-//     chart: {
-//         type: 'area',
-//         sparkline: {
-//             enabled: true
-//         }
-//     },
-//     colors: ['var(--el-color-primary)'],
-//     stroke: {
-//         width: 2,
-//         curve: 'smooth'
-//     },
-//     fill: {
-//         type: 'gradient'
-//     }
-// };
-
-// const series = [
-//     {
-//         name: "sales",
-//         data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-//     },
-// ];
-
 const options = {
-    chart: {
-        type: "donut",
+    xaxis: {
+        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
     },
-    legend: {
-        show: false,
-    },
-    dataLabels: {
+    zoom: {
         enabled: false,
     },
-    stroke: {
-        width: 0
+    chart: {
+        type: 'area',
+        sparkline: {
+            enabled: true
+        }
     },
-    colors: ['var(--el-color-primary)', '#FF5F1F'], // 'income' => 'green', 'expense' => 'orange'
-    labels: ['Income', 'Expense']
+    colors: ['var(--el-color-primary)'],
+    stroke: {
+        width: 2,
+        curve: 'smooth'
+    },
+    fill: {
+        type: 'gradient'
+    }
 };
 
-const series = [44, 55];
+const series = [
+    {
+        name: "sales",
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+    },
+];
+
+// const options = {
+//     chart: {
+//         type: "donut",
+//     },
+//     legend: {
+//         show: false,
+//     },
+//     dataLabels: {
+//         enabled: false,
+//     },
+//     stroke: {
+//         width: 0
+//     },
+//     colors: ['var(--el-color-primary)', '#FF5F1F'], // 'income' => 'green', 'expense' => 'orange'
+//     labels: ['Income', 'Expense']
+// };
+
+// const series = [44, 55];
 
 </script>
 <template>
     <div
-        class="border border-[var(--el-border-color)] rounded-2xl bg-white p-4"
-    >
-        <div class="grid grid-cols-4">
-            <div class="col-span-3">
-                <div class="flex items-center gap-2">
+        class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3"
+    >   
+    <div class="flex items-center gap-2">
                     <span
                         class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
                         style="
@@ -84,10 +79,13 @@ const series = [44, 55];
                     >
                         <slot name="icon"></slot>
                     </span>
-                    <span class="font-medium text-md text-slate-700">{{
-                        label
-                    }}</span>
+                    <span class="font-semibold text-sm text-slate-700">
+                        <slot name="label"></slot>
+                    </span>
                 </div>
+        <div class="grid grid-cols-4">
+            <div class="col-span-3">
+                
                 <div class="mt-3">
                     <span class="text-md font-medium text-slate-700">{{
                         userCurrency ?? ""
@@ -102,9 +100,9 @@ const series = [44, 55];
                     >
                 </div>
             </div>
-            <div class="flex flex-col justify-center items-end">
+            <div class="flex flex-col items-end justify-end">
                 <VueApexCharts
-                    width="60"
+                    width="50"
                     height="80"
                     :options="options"
                     :series="series"

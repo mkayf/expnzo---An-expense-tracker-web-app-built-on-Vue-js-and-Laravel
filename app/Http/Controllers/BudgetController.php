@@ -13,11 +13,6 @@ class BudgetController extends Controller
     {
     }
 
-    public function show(Request $request)
-    {
-
-    }
-
     public function setBudget(Request $request)
     {
         try {   
