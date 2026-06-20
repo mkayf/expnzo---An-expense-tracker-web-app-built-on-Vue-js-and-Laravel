@@ -66,47 +66,34 @@ const series = [
 
 </script>
 <template>
-    <div
-        class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3"
-    >   
-    <div class="flex items-center gap-2">
-                    <span
-                        class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
-                        style="
+    <div class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3">
+        <div class="flex items-center gap-2">
+            <span class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl" style="
                             box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 16px
                                 0px;
-                        "
-                    >
-                        <slot name="icon"></slot>
-                    </span>
-                    <span class="font-semibold text-sm text-slate-700">
-                        <slot name="label"></slot>
-                    </span>
-                </div>
+                        ">
+                <slot name="icon"></slot>
+            </span>
+            <span class="font-semibold text-sm text-slate-700">
+                <slot name="label"></slot>
+            </span>
+        </div>
         <div class="grid grid-cols-4">
             <div class="col-span-3">
-                
+
                 <div class="mt-3">
                     <span class="text-md font-medium text-slate-700">{{
                         userCurrency ?? ""
-                    }}</span>
+                        }}</span>
                     <span class="ml-1 text-2xl font-semibold">
-                        {{ formatAmount(100000, userCurrencyIso) }}</span
-                    >
+                        {{ formatAmount(100000, userCurrencyIso) }}</span>
                 </div>
                 <div class="mt-1 w-full">
-                    <span class="text-xs w-full text-green-700"
-                        >↑ 20% more than last month</span
-                    >
+                    <span class="text-xs w-full text-green-700">↑ 20% more than last month</span>
                 </div>
             </div>
             <div class="flex flex-col items-end justify-end">
-                <VueApexCharts
-                    width="50"
-                    height="80"
-                    :options="options"
-                    :series="series"
-                >
+                <VueApexCharts width="50" height="80" :options="options" :series="series">
                 </VueApexCharts>
             </div>
         </div>
