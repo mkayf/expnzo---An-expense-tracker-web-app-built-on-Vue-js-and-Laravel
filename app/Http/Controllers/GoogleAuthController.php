@@ -22,13 +22,13 @@ class GoogleAuthController extends Controller
             $user = Socialite::driver('google')->user();
             $userExist = User::where('email', $user->email)->first();
 
-            Log::info('User exist or not: ', ['user' => $userExist]);
+            Log::error('User exist or not: ', ['user' => $userExist]);
 
             if($userExist){
                 Auth::login($userExist);
-                Log::info('User found', ['user' => $userExist]);
+                Log::error('User found', ['user' => $userExist]);
             } else{
-                Log::info('User not found, creating a new one');
+                Log::error('User not found, creating a new one');
                 $newUser = User::updateOrCreate([
                     'email' => $user->email
                 ], [
@@ -38,14 +38,14 @@ class GoogleAuthController extends Controller
                     'email_verified' => true,
                     'provider' => 'google'
                 ]);
-                Log::info('New user created in db', ['user' => $newUser]);    
+                Log::error('New user created in db', ['user' => $newUser]);    
                 Auth::login($newUser);
                 // set preverences for the new user
                 $newUser->preferences()->create([
                     'currency' => 'PKR',
                     'currency_iso' => 'PK'
                 ]);
-                Log::info('New user logged in');
+                Log::error('New user logged in');
             }
 
             return redirect()->to('/app/dashboard')->with(['auth_success' => 'You are logged in']);

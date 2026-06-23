@@ -56,7 +56,7 @@ class AuthController extends Controller
 
             $OTPService->sendOTP($user);
 
-            Log::info('OTP verification email sent to user');
+            Log::error('OTP verification email sent to user');
 
             DB::commit();
 
@@ -67,7 +67,7 @@ class AuthController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
-            Log::info('Failed to create account', ['error' => $th->getMessage()]);
+            Log::error('Failed to create account', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -107,7 +107,7 @@ class AuthController extends Controller
                 ], 401);
             }
         } catch (\Throwable $th) {
-            Log::info('Failed to login', ['error' => $th->getMessage()]);
+            Log::error('Failed to login', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -128,7 +128,7 @@ class AuthController extends Controller
                 'message' => 'You are logged out successfully',
             ]);
         } catch (\Throwable $th) {
-            Log::info('Failed to logout', ['error' => $th->getMessage()]);
+            Log::error('Failed to logout', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -343,7 +343,7 @@ class AuthController extends Controller
                 ], 422);
             }
         } catch (\Throwable $th) {
-            Log::info('Failed to change password', ['error' => $th->getMessage()]);
+            Log::error('Failed to change password', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to change password, please try again',

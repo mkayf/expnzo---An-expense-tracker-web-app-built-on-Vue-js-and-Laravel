@@ -30,7 +30,7 @@ class BudgetController extends Controller
             }
 
         } catch (\Throwable $th) {
-            Log::info('Error occured while setting budget', ['error' => $th->getMessage()]);
+            Log::error('Error occured while setting budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while setting budget, please try again later'
@@ -55,7 +55,7 @@ class BudgetController extends Controller
             }
 
         } catch (\Throwable $th) {
-            Log::info('Error occured while updating budget', ['error' => $th->getMessage()]);
+            Log::error('Error occured while updating budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while updating your budget, please try again later'
@@ -77,7 +77,7 @@ class BudgetController extends Controller
 
 
         } catch (\Throwable $th) {
-            Log::info('Error occured while deleting budget', ['error' => $th->getMessage()]);
+            Log::error('Error occured while deleting budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while deleting your budget, please try again later'

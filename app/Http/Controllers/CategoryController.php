@@ -20,7 +20,7 @@ class CategoryController extends Controller
             ], 200);
 
         } catch (\Throwable $th) {
-            Log::info('Error occured while getting categories', ['error' => $th->getMessage()]);
+            Log::error('Error occured while getting categories', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -47,7 +47,7 @@ class CategoryController extends Controller
             ], 201);
 
         } catch (\Throwable $th) {
-            Log::info('Error occured while creating category', ['error' => $th->getMessage()]);
+            Log::error('Error occured while creating category', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
@@ -71,7 +71,7 @@ class CategoryController extends Controller
             ], 200);
 
         } catch (\Throwable $th) {
-             Log::info('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
+             Log::error('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,

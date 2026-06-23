@@ -31,7 +31,7 @@ class SendOTPEmailJob implements ShouldQueue
     {
         Mail::to($this->email, $this->name)->send(new EmailOTP($this->otp_code));
         OTP::where('code', $this->otp_code)->update(['is_sent' => true]);
-        Log::info('OTP is mailed to user successfully!');
+        Log::error('OTP is mailed to user successfully!');
     }
 
     public function failed(\Throwable $exception){

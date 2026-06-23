@@ -17,7 +17,7 @@ class UserController extends Controller
 
         $user = $request->user();
         try {
-            Log::info('Trying to upload user profile');
+            Log::error('Trying to upload user profile');
             if ($request->hasFile('avatar')) {
                 if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                     Storage::disk('public')->delete($user->avatar);
@@ -28,7 +28,7 @@ class UserController extends Controller
                 $user->avatar = $path;
                 $user->save();
 
-                Log::info('Profile uploaded successfully');
+                Log::error('Profile uploaded successfully');
 
                 return response()->json([
                     'success' => true,
@@ -36,7 +36,7 @@ class UserController extends Controller
                     'url' => asset('storage/' . $path),
                 ], 200);
             } else {
-                Log::info('Image not provided by frontend', ['file_came' => $request->avatar]);
+                Log::error('Image not provided by frontend', ['file_came' => $request->avatar]);
 
                 return response()->json([
                     'success' => false,
@@ -44,7 +44,7 @@ class UserController extends Controller
                 ], 400);
             }
         } catch (\Throwable $th) {
-            Log::info('Failed to upload avatar', ['error' => $th->getMessage()]);
+            Log::error('Failed to upload avatar', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to upload profile. Please try again'
@@ -73,7 +73,7 @@ class UserController extends Controller
                 ], 200);
             }
         } catch (\Throwable $th) {
-            Log::info('Failed to delete user avatar image', ['error' => $th->getMessage()]);
+            Log::error('Failed to delete user avatar image', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete profile image. Please try again'
