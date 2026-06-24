@@ -3,7 +3,7 @@ import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import { onMounted, ref, watch } from "vue";
 import PopupButton from "../../components/ui/PopupButton.vue";
-import { PlusIcon, WalletIcon } from "@heroicons/vue/24/outline";
+import { PlusIcon, WalletIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BanknotesIcon } from "@heroicons/vue/24/outline";
 import StatCard from "./components/StatCard.vue";
 import useAuthStore from "../../stores/auth";
 import { getSummaryStats } from "../../services/dashboard.service.js";
@@ -63,7 +63,7 @@ onMounted(() => {
                         Total Income • Aug 25
                     </template>
                     <template #icon>
-                        <WalletIcon class="h-6 w-6" />
+                        <ArrowTrendingUpIcon class="h-6 w-6" />
                     </template>
                 </StatCard>
                 <StatCard>
@@ -71,7 +71,7 @@ onMounted(() => {
                         Total Expense • Aug 25
                     </template>
                     <template #icon>
-                        <WalletIcon class="h-6 w-6" />
+                        <ArrowTrendingDownIcon class="h-6 w-6" />
                     </template>
                 </StatCard>
                 <StatCard>
@@ -79,7 +79,7 @@ onMounted(() => {
                         Budget
                     </template>
                     <template #icon>
-                        <WalletIcon class="h-6 w-6" />
+                        <BanknotesIcon class="h-6 w-6" />
                     </template>
                 </StatCard>
             </div>
