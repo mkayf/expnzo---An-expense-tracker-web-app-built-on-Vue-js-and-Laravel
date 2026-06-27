@@ -89,7 +89,70 @@ class FinancialSummaryService
             $income_amounts[] = $income['amount'];
         }
 
+        // Expense calculation:
+        $expensePercentage = null;
+        $expenseDirection = null;
+
+        if($last_month_expense == 0){
+            $expenseDirection = 'new';
+        } else{
+            $expensePercentage = (($current_month_expense - $last_month_expense) / $last_month_expense) * 100;
+
+            if($expensePercentage == 0){
+                $expenseDirection = 'neutral';
+            } else if($expensePercentage > 0){
+                $expenseDirection = 'up';
+            } else{
+                $expenseDirection = 'down';
+            }
+        }
+
+        $daily_expense = $user->transactions()
+        ->where('type', 'expense')
+        ->whereBetween('transaction_date',
+         [$current_date->copy()->startOfMonth(),
+          $current_date->copy()->endOfDay()]
+        )
+        ->selectRaw('transaction_date, SUM(amount) as amount')
+        ->groupBy('transaction_date')
+        ->orderBy('transaction_date')
+        ->get();
+
+        $expense_dates = [];
+        $expense_amounts = [];
+
+        foreach($daily_expense as $expense){
+            $expense_dates[] = $expense['transaction_date'];
+            $expense_amounts[] = $expense['amount'];
+        }
+
+        // Budget calculation:
+        $period = $current_date->copy()->format('Y-m');
+        $budget = $user?->budgets()->where('period', $period)->value('limit_amount');
+        $budgetUsePercentage = null;
+        $budgetDirection = null;
+        $usedBudget = null;
+        $remainingBudget = null;
+
+        if($budget){
+            $budgetUsePercentage = ($current_month_expense / $budget) * 100;
+
+            if($budgetUsePercentage == 0){
+                $budgetDirection = 'neutral';
+            }
+            else if($budgetUsePercentage > 70){
+                $budgetDirection = 'up';
+            } else if($budgetDirection <= 70){
+                $budgetDirection = 'down';
+            }
+
+            $usedBudget = $current_month_balance;
+            $remainingBudget = $budget - $usedBudget;
+        }
+
+
         return [
+            'current_month' => $current_month,
             'balance' => [
                 'total_balance' => $total_balance,
                 'last_month_balance' => $last_month_balance,
@@ -104,7 +167,6 @@ class FinancialSummaryService
                 ]
             ],
             'income' => [
-                'current_month' => $current_month,
                 'current_month_income' => $current_month_income,
                 'trend' => [
                     'direction' => $incomeDirection,
@@ -113,6 +175,28 @@ class FinancialSummaryService
                 'chart_data' => [
                     'income_dates' => $income_dates,
                     'income_amounts' => $income_amounts
+                ]
+            ],
+            'expense' => [
+                'current_month_expense' => $current_month_expense,
+                'trend' => [
+                    'direction' => $expenseDirection,
+                    'percentage' => $expensePercentage
+                ],
+                'chart_data' => [
+                    'expense_dates' => $expense_dates,
+                    'expense_amounts' => $expense_amounts
+                ]
+            ],
+            'budget' => [
+                'current_month_budget' => $budget,
+                'trend' => [
+                    'percentage' => $budgetUsePercentage,
+                    'direction' => $budgetDirection
+                ],
+                'chart_data' => [
+                    'used_budget' => $usedBudget,
+                    'remaining_budget' => $remainingBudget
                 ]
             ]
         ];
