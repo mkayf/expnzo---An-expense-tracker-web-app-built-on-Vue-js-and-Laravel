@@ -7,17 +7,31 @@ import { PlusIcon, WalletIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, Bankn
 import StatCard from "./components/StatCard.vue";
 import useAuthStore from "../../stores/auth";
 import { getSummaryStats } from "../../services/dashboard.service.js";
+import handleError from "../../utils/handleError.js";
 
 const monthFilter = ref(null);
+
+const statsSummary = ref({
+    balance: {},
+    income: {},
+    expense: {},
+    budget: {}
+});
 
 const authStore = useAuthStore();
 const username = authStore.user.name ?? 'User'
 
-
 const fetchStatsSummary = async () => {
-    const response = await getSummaryStats();
-    if (response.ok) {
-        console.log(response.data?.summary);
+    try {
+        const response = await getSummaryStats();
+        if (response?.data?.success) {
+            statsSummary.value = response.data?.summary;
+            console.log(statsSummary.value);
+        }
+    }
+    catch (e) {
+        handleError(e);
+        console.log(e);
     }
 }
 
@@ -50,36 +64,36 @@ onMounted(() => {
         </div>
         <div class="dashboard-body mt-6">
             <div class="grid grid-cols-1 md:grid-cols-2 xl:!grid-cols-4 gap-5">
-                <StatCard>
+                <StatCard type="balance" :data="statsSummary.balance" chart="donut">
                     <template #label>
                         Total Balance
                     </template>
                     <template #icon>
-                        <WalletIcon class="h-6 w-6" />
+                        <WalletIcon class="h-4 w-4" />
                     </template>
                 </StatCard>
-                <StatCard >
+                <StatCard type="income" :data="statsSummary.income" chart="area">
                     <template #label>
-                        Total Income • Aug 25
+                        Total Income
                     </template>
                     <template #icon>
-                        <ArrowTrendingUpIcon class="h-6 w-6" />
+                        <ArrowTrendingUpIcon class="h-4 w-4" />
                     </template>
                 </StatCard>
-                <StatCard>
-                    <template #label> 
-                        Total Expense • Aug 25
+                <StatCard type="expense" :data="statsSummary.expense" chart="area">
+                    <template #label>
+                        Total Expense
                     </template>
                     <template #icon>
-                        <ArrowTrendingDownIcon class="h-6 w-6" />
+                        <ArrowTrendingDownIcon class="h-4 w-4" />
                     </template>
                 </StatCard>
-                <StatCard>
+                <StatCard type="budget" :data="statsSummary.budget" chart="donut">
                     <template #label>
                         Budget
                     </template>
                     <template #icon>
-                        <BanknotesIcon class="h-6 w-6" />
+                        <BanknotesIcon class="h-4 w-4" />
                     </template>
                 </StatCard>
             </div>
