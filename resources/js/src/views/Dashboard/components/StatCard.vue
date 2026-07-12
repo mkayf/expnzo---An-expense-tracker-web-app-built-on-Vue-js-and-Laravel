@@ -37,18 +37,54 @@ const showMonth = computed(() => {
 })
 
 const showTrendText = computed(() => {
-    if (props.type === 'balance') {
-        if(props.data?.trend?.direction === 'neutral'){
+    if (props.type === 'balance' || props.type == 'income') {
+        if (props.data?.current_month_transactions == 0) {
+            return 'No transactions this month';
+        }
+        else if (props.data?.trend?.direction === 'neutral') {
             return '↔ No change from last month';
         }
         else if (props.data?.trend?.direction === 'up') {
             trendTextColor.value = 'green';
-            return `↑ ${props.data?.trend?.percentage}% more than last month`;
-        } else if(props.data?.trend?.direction === 'down'){
+            return `↑ ${props.data?.trend?.percentage}% vs last month`;
+        }
+        else if (props.data?.trend?.direction === 'down') {
             trendTextColor.value = 'red';
-            return `↓ ${props.data?.trend?.percentage}% less than last month`;
+            return `↓ ${props.data?.trend?.percentage}% vs last month`;
         }
     }
+    else if (props.type === 'expense') {
+        if (props.data?.trend?.direction === 'neutral') {
+            return '↔ No change from last month';
+        }
+        else if (props.data?.trend?.direction === 'up') {
+            trendTextColor.value = 'red';
+            return `↑ ${props.data?.trend?.percentage}% vs last month`;
+        }
+        else if (props.data?.trend?.direction === 'down') {
+            trendTextColor.value = 'green';
+            return `↓ ${props.data?.trend?.percentage}% vs last month`;
+        }
+    }
+    else if (props.type === 'budget') {
+        if (props.data?.percentage == null && props.data?.direction == null) {
+            return 'No budget set for this month';
+        }
+        else if (props.data?.trend?.direction === 'over') {
+            trendTextColor.value = 'red';
+            return `${props.data?.trend?.over_budget_percentage}% over budget`;
+        }
+        else if (props.data?.trend?.direction === 'up') {
+            trendTextColor.value = 'yellow';
+
+        }
+        else if (props.data?.trend?.direction === 'down') {
+            trendTextColor.value = 'gray';
+        }
+
+        return `${props.data?.trend?.percentage}% budget is used`;
+    }
+
 
     return null;
 })
@@ -66,55 +102,61 @@ const trendTextClass = computed(() => {
     }
 })
 
-const options = {
-    xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
-    },
-    zoom: {
-        enabled: false,
-    },
-    chart: {
-        type: 'area',
-        sparkline: {
-            enabled: true
+const chartConfig = computed(() => {
+    if (props.type === 'balance' || props.type === 'budget') {
+        return {
+            options: {
+                chart: {
+                    type: "donut",
+                },
+                legend: {
+                    show: false,
+                },
+                dataLabels: {
+                    enabled: false,
+                },
+                stroke: {
+                    width: 0
+                },
+                colors: props.type === 'balance' ? ['var(--el-color-primary)', '#FF5F1F'] : ['white', 'var(--el-color-primary)'],
+                labels: props.type === 'balance' ? ['Total Income', 'Total Expense'] : ['Remaining Budget', 'Used Budget']
+            },
+            series: props.type === 'balance' ? [props.data?.chart_data?.total_incomes, props.data?.chart_data?.total_expense] : [props.data?.chart_data?.remaining_budget, props.data?.chart_data?.used_budget]
         }
-    },
-    colors: ['var(--el-color-primary)'],
-    stroke: {
-        width: 2,
-        curve: 'smooth'
-    },
-    fill: {
-        type: 'gradient'
     }
-};
 
-const series = [
-    {
-        name: "sales",
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-    },
-];
+    return {
+        options: {
+            xaxis: {
+                categories: props.data?.chart_data?.dates,
+            },
+            zoom: {
+                enabled: false,
+            },
+            chart: {
+                type: 'area',
+                sparkline: {
+                    enabled: true
+                }
+            },
+            colors: ['var(--el-color-primary)'],
+            stroke: {
+                width: 2,
+                curve: 'smooth'
+            },
+            fill: {
+                type: 'gradient'
+            }
+        },
+        series: [
+            {
+                name: props.type === "income" ? 'Daily Income' : 'Daily Expense',
+                data: props.data?.chart_data?.amounts,
+            },
+        ]
+    }
+})
 
-
-// const options = {
-//     chart: {
-//         type: "donut",
-//     },
-//     legend: {
-//         show: false,
-//     },
-//     dataLabels: {
-//         enabled: false,
-//     },
-//     stroke: {
-//         width: 0
-//     },
-//     colors: ['var(--el-color-primary)', '#FF5F1F'], // 'income' => 'green', 'expense' => 'orange'
-//     labels: ['Income', 'Expense']
-// };
-
-// const series = [44, 55];
 
 </script>
 <template>
@@ -139,11 +181,12 @@ const series = [
                         {{ formatAmount(data.amount, userCurrencyIso) }}</span>
                 </div>
                 <div class="mt-1 w-full">
-                    <span v-if="showTrendText" class="text-xs w-full" :class="trendTextClass">{{ showTrendText }}</span>
+                    <span v-if="showTrendText" style="font-size: 0.7rem;" class="w-full" :class="trendTextClass">{{
+                        showTrendText }}</span>
                 </div>
             </div>
             <div class="flex flex-col items-end justify-end">
-                <VueApexCharts width="50" height="80" :options="options" :series="series">
+                <VueApexCharts width="50" height="80" :options="chartConfig.options" :series="chartConfig.series">
                 </VueApexCharts>
             </div>
         </div>

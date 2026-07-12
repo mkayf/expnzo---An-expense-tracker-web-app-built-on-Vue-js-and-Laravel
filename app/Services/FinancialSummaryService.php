@@ -22,21 +22,18 @@ class FinancialSummaryService
 
         $last_month_balance = $last_month_income - $last_month_expense;
 
+        $current_month_transactions = $user?->transactions()->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->count();
+
         $current_month_income = (float) ($user?->transactions()->where('type', 'income')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->sum('amount') ?? 0);
 
         $current_month_expense = (float) ($user?->transactions()->where('type', 'expense')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->sum('amount') ?? 0);
 
-
         $current_month_balance = $current_month_income - $current_month_expense;
 
         $balancePercentage = null;
-        // Direction has 3 states:
-        // new => means no last month balance which means we have to show the difference amount between current month and last month
-        // neutral => means percentage is 0, no gain no loss
-        // up and down
         $balanceDirection = null;
 
-        if ($last_month_balance != 0 || $last_month_balance > 0) {
+        if ($last_month_balance != 0) {
             $balancePercentage = round((($current_month_balance - $last_month_balance) / $last_month_balance) * 100);
 
             if ($balancePercentage == 0) {
@@ -49,7 +46,6 @@ class FinancialSummaryService
         }
 
         // Income calculation:
-
         $incomePercentage = null;
         $incomeDirection = null;
 
@@ -129,9 +125,10 @@ class FinancialSummaryService
         $period = $current_date->copy()->format('Y-m');
         $budget = (float) ($user?->budgets()->where('period', $period)->value('limit_amount') ?? 0);
         $budgetUsePercentage = null;
+        $overBudgetPercentage = null;
         $budgetDirection = null;
-        $usedBudget = null;
-        $remainingBudget = null;
+        $usedBudget = 0;
+        $remainingBudget = 0;
 
         if ($budget) {
             $budgetUsePercentage = round(($current_month_expense / $budget) * 100);
@@ -140,9 +137,10 @@ class FinancialSummaryService
                 $budgetDirection = 'neutral';
             } else if ($budgetUsePercentage > 100) {
                 $budgetDirection = 'over';
-            } else if ($budgetUsePercentage > 70) {
+                $overBudgetPercentage = round($budgetUsePercentage - 100);
+            } else if ($budgetUsePercentage > 75) {
                 $budgetDirection = 'up';
-            } else if ($budgetUsePercentage <= 70) {
+            } else if ($budgetUsePercentage <= 75) {
                 $budgetDirection = 'down';
             }
 
@@ -154,20 +152,21 @@ class FinancialSummaryService
         return [
             'balance' => [
                 'amount' => $total_balance,
+                'current_month_transactions' => $current_month_transactions,
                 'trend' => [
                     'direction' => $balanceDirection,
-                    'percentage' => $balancePercentage
+                    'percentage' => abs($balancePercentage)
                 ],
                 'chart_data' => [
                     'total_incomes' => $total_incomes,
                     'total_expense' => $total_expenses
                 ]
-            ],
+            ],                  
             'income' => [
                 'amount' => $current_month_income,
                 'trend' => [
                     'direction' => $incomeDirection,
-                    'percentage' => $incomePercentage
+                    'percentage' => abs($incomePercentage)
                 ],
                 'chart_data' => [
                     'dates' => $income_dates,
@@ -178,7 +177,7 @@ class FinancialSummaryService
                 'amount' => $current_month_expense,
                 'trend' => [
                     'direction' => $expenseDirection,
-                    'percentage' => $expensePercentage
+                    'percentage' => abs($expensePercentage)
                 ],
                 'chart_data' => [
                     'dates' => $expense_dates,
@@ -189,7 +188,8 @@ class FinancialSummaryService
                 'amount' => $budget,
                 'trend' => [
                     'direction' => $budgetDirection,
-                    'percentage' => $budgetUsePercentage
+                    'percentage' => abs($budgetUsePercentage),
+                    'over_budget_percentage' => abs($overBudgetPercentage)
                 ],
                 'chart_data' => [
                     'used_budget' => $usedBudget,
