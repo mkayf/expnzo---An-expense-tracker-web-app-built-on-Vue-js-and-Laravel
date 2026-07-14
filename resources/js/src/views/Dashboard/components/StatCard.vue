@@ -157,7 +157,6 @@ const chartConfig = computed(() => {
     }
 })
 
-
 </script>
 <template>
     <div class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3">
