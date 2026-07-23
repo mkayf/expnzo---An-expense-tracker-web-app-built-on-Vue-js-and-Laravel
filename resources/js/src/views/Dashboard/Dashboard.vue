@@ -9,9 +9,10 @@ import StatShimmerCard from "../../components/ui/StatShimmerCard.vue";
 import useAuthStore from "../../stores/auth";
 import { getSummaryStats } from "../../services/dashboard.service.js";
 import handleError from "../../utils/handleError.js";
+import BudgetForm from "../../components/BudgetForm.vue";
 
 const monthFilter = ref(null);
-const statsLoading = ref(false);
+const statsLoading = ref(true);
 
 const statsSummary = ref({
     balance: {},
@@ -20,12 +21,13 @@ const statsSummary = ref({
     budget: {}
 });
 
+const isBudgetModalOpen = ref(false);
+
 const authStore = useAuthStore();
 const username = authStore.user.name ?? 'User'
 
 const fetchStatsSummary = async () => {
     try {
-        statsLoading.value = true;
         const response = await getSummaryStats();
         if (response?.data?.success) {
             statsSummary.value = response.data?.summary;
@@ -52,10 +54,11 @@ onMounted(() => {
     fetchStatsSummary();
 
 });
+
 </script>
 
 <template>
-    <div class="">
+    <div>
         <div class="dashboard-header flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
             <h1 class="text-md md:text-lg font-semibold">
                 Welcome Back, <span class="text-[var(--primary-color)]">{{ username }}</span>
@@ -100,7 +103,7 @@ onMounted(() => {
                             <ArrowTrendingDownIcon class="h-4 w-4" />
                         </template>
                     </StatCard>
-                    <StatCard type="budget" :data="statsSummary.budget" chart="donut">
+                    <StatCard type="budget" :data="statsSummary.budget" chart="donut" @open-budget-form="isBudgetModalOpen = true">
                         <template #label>
                             Budget
                         </template>
@@ -111,5 +114,7 @@ onMounted(() => {
                 </template>
             </div>
         </div>
+
+        <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false" />
     </div>
 </template>

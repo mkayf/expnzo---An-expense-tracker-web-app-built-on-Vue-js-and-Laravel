@@ -19,6 +19,8 @@ const props = defineProps({
     }
 });
 
+const emit = defineEmits(['open-budget-form']);
+
 const authStore = useAuthStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
@@ -29,6 +31,7 @@ const currentMonth = new Date().toLocaleDateString('en-US', {
 });
 
 const trendTextColor = ref(null);
+const showBudgetBtn = ref(false);
 
 const showMonth = computed(() => {
     if (props.type === 'income' || props.type === 'expense' || (props.type === 'budget' && props.data.amount !== 0)) {
@@ -67,7 +70,8 @@ const showTrendText = computed(() => {
         }
     }
     else if (props.type === 'budget') {
-        if (props.data?.percentage == null && props.data?.direction == null) {
+        showBudgetBtn.value = true;
+        if (props.data?.trend?.percentage == 0 && props.data?.trend?.direction == null) {
             return 'No budget set for this month';
         }
         else if (props.data?.trend?.direction === 'over') {
@@ -76,13 +80,13 @@ const showTrendText = computed(() => {
         }
         else if (props.data?.trend?.direction === 'up') {
             trendTextColor.value = 'yellow';
-
         }
         else if (props.data?.trend?.direction === 'down') {
             trendTextColor.value = 'gray';
+        } else if (props.data?.trend?.direction === 'down' || props.data?.trend?.direction === 'up') {
+            return `${props.data?.trend?.percentage}% is used`;
         }
 
-        return `${props.data?.trend?.percentage}% budget is used`;
     }
 
 
@@ -157,27 +161,35 @@ const chartConfig = computed(() => {
     }
 })
 
+
 </script>
 <template>
     <div class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3">
-        <div class="flex items-center gap-2">
-            <span class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
-                style="box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 8px 0px;">
-                <slot name="icon"></slot>
-            </span>
-            <span class="font-semibold text-sm text-slate-700">
-                <slot name="label"></slot> {{ showMonth }}
-            </span>
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
+                    style="box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 8px 0px;">
+                    <slot name="icon"></slot>
+                </span>
+                <span class="font-semibold text-sm text-slate-700">
+                    <slot name="label"></slot> {{ showMonth }}
+                </span>
+            </div>
+            <div v-if="showBudgetBtn">
+                <el-button size="small" @click="emit('open-budget-form')">Set budget</el-button>
+            </div>
         </div>
         <div class="grid grid-cols-4">
             <div class="col-span-3">
-
-                <div class="mt-3">
-                    <span class="text-md font-medium text-slate-700">{{
-                        userCurrency ?? ""
-                    }}</span>
-                    <span class="ml-1 text-2xl font-semibold">
-                        {{ formatAmount(data.amount, userCurrencyIso) }}</span>
+                <div class="mt-3 flex items-center justify-between">
+                    <div>
+                        <span class="text-md font-medium text-slate-700">{{
+                            userCurrency ?? ""
+                        }}</span>
+                        <span class="ml-1 text-2xl font-semibold">
+                            {{ formatAmount(data.amount, userCurrencyIso) }}</span>
+                    </div>
+                    
                 </div>
                 <div class="mt-1 w-full">
                     <span v-if="showTrendText" style="font-size: 0.7rem;" class="w-full" :class="trendTextClass">{{

@@ -6,6 +6,9 @@ import path from 'path';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers';
+import dns from 'dns';
+
+dns.setDefaultResultOrder('ipv4first');
 
 export default defineConfig({
     plugins: [      
@@ -29,11 +32,12 @@ export default defineConfig({
         }
     }, 
 
-    // server: {
-    //     host: '0.0.0.0',
-    //     port: 5173,
-    //     hmr: {
-    //         host: '192.168.1.46',
-    //     },
-    // },
+    server: {
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '127.0.0.1',
+        },
+    },
 });
