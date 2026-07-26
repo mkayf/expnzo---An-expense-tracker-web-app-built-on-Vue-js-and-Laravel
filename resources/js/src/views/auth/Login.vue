@@ -59,7 +59,7 @@ onMounted(() => {
                     name="email"
                     v-slot="{ field, errorMessage, handleChange }"
                 >
-                    <el-form-item label="Email" :error="errorMessage">
+                    <el-form-item label="Email" label-position="top" :error="errorMessage">
                         <el-input
                             type="email"
                             :model-value="field.value"
@@ -74,7 +74,7 @@ onMounted(() => {
                     name="password"
                     v-slot="{ field, errorMessage, handleChange }"
                 >
-                    <el-form-item label="Password" :error="errorMessage">
+                    <el-form-item label="Password" label-position="top" :error="errorMessage">
                         <el-input
                             type="password"
                             :model-value="field.value"
@@ -85,7 +85,7 @@ onMounted(() => {
                     </el-form-item>
                 </Field>
             </div>
-            <div class="mb-4">
+            <div class="mt-8">
                 <Field
                     name="remember_me"
                     v-slot="{ field, errorMessage, handleChange }"

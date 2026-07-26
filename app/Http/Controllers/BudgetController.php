@@ -42,7 +42,7 @@ class BudgetController extends Controller
     {
         try {
             $validated = $request->validate([
-                'limit_amount' => ['required', 'numeric', 'min:1', 'max:999999999999']
+                'limit_amount' => ['required', 'numeric', 'min:1', 'max:100000000']
             ]);
 
             $budget = $this->budgetService->updateBudget($request->user(), $id, $validated['limit_amount']);
@@ -84,5 +84,6 @@ class BudgetController extends Controller
             ], 500);
         }
     }
+
 
 }

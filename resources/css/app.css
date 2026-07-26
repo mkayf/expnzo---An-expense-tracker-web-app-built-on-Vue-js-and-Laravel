@@ -29,10 +29,11 @@
     --accent-sky-blue: #3b82f6;
     --bg-light-gray: #f9fafb;
     --text-charcoal: #111827;
+    --body-color: rgb(245, 245, 245)
 }
 
 body {
-    background-color: rgb(245, 245, 245);
+    background-color: var(--body-color);
     font-family: "Montserrat", sans-serif;
     font-style: normal;
 }
