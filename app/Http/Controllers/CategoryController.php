@@ -24,7 +24,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Somethin went wrong while getting categories, please try again later',
+                'message' => 'Somethin went wrong while getting categories, please try again',
             ], 500);
         }
 
@@ -51,7 +51,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Somethin went wrong while creating categories, please try again later',
+                'message' => 'Somethin went wrong while creating categories, please try again',
             ], 500);
         }
     }
@@ -75,7 +75,7 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Somethin went wrong while deleting categories, please try again later',
+                'message' => 'Somethin went wrong while deleting categories, please try again',
             ], 500);
         }
     }

@@ -20,7 +20,7 @@ const handleError = (error) => {
         }
     } 
     else if (error.request) {
-        message = 'Server did nt respond! Please try again later.';
+        message = 'Server did nt respond! please try again.';
     } 
     else {
         message = error.message || message;

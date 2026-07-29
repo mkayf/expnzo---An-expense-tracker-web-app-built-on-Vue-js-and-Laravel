@@ -27,7 +27,7 @@ class TransactionController extends Controller
             Log::error('Error occured while listing transcations', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while getting transactions, please try again later'
+                'message' => 'Something went wrong while getting transactions, please try again'
             ], 500);
         }
     }
@@ -53,7 +53,7 @@ class TransactionController extends Controller
             Log::error('Error occured while fetching single transcation', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while getting transaction, please try again later'
+                'message' => 'Something went wrong while getting transaction, please try again'
             ], 500);
         }
     }
@@ -73,7 +73,7 @@ class TransactionController extends Controller
             Log::error('Error occured while creating transaction', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while making transaction, please try again later'
+                'message' => 'Something went wrong while making transaction, please try again'
             ], 500);
         }
     }
@@ -93,7 +93,7 @@ class TransactionController extends Controller
             Log::error('Error occured while updating transcation', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while updating transaction, please try again later'
+                'message' => 'Something went wrong while updating transaction, please try again'
             ], 500);
         }
     }
@@ -118,7 +118,7 @@ class TransactionController extends Controller
             Log::error('Error occured while deleting transaction', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while deleting transaction, please try again later'
+                'message' => 'Something went wrong while deleting transaction, please try again'
             ], 500);
         }
     }

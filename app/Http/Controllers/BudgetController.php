@@ -33,7 +33,7 @@ class BudgetController extends Controller
             Log::error('Error occured while setting budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while setting budget, please try again later'
+                'message' => 'Something went wrong while setting budget, please try again'
             ], 500);
         }
     }
@@ -58,7 +58,30 @@ class BudgetController extends Controller
             Log::error('Error occured while updating budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while updating your budget, please try again later'
+                'message' => 'Something went wrong while updating your budget, please try again'
+            ], 500);
+        }
+    }
+
+    /* 
+        This method is used in BudgetForm component to show current budget,
+        fetch last month budget (if any) and other data required for that form
+    */
+    public function show(Request $request){
+        try{
+            $budgetData = $this->budgetService->getBudgetData($request->user());
+
+            return response()->json([
+                'success' => true,
+                'data' => $budgetData,
+                'message' => 'Budget data fetch successfully'
+            ], 200);
+        }
+        catch(\Throwable $th){
+            Log::error('Error occured while fetching budget', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while fetching your budget, please try again'
             ], 500);
         }
     }
@@ -80,7 +103,7 @@ class BudgetController extends Controller
             Log::error('Error occured while deleting budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while deleting your budget, please try again later'
+                'message' => 'Something went wrong while deleting your budget, please try again'
             ], 500);
         }
     }

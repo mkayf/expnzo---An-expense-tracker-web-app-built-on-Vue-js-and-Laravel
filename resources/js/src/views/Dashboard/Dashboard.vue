@@ -10,9 +10,11 @@ import useAuthStore from "../../stores/auth";
 import { getSummaryStats } from "../../services/dashboard.service.js";
 import handleError from "../../utils/handleError.js";
 import BudgetForm from "../../components/BudgetForm.vue";
+import { getBudgetData } from "../../services/budget.service.js";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
+const budgetDataLoader = ref(false);
 
 const statsSummary = ref({
     balance: {},
@@ -20,6 +22,8 @@ const statsSummary = ref({
     expense: {},
     budget: {}
 });
+
+const budgetData = ref(null);
 
 const isBudgetModalOpen = ref(false);
 
@@ -41,6 +45,24 @@ const fetchStatsSummary = async () => {
         statsLoading.value = false;
     }
 }
+
+const fetchBudgetdata = async () => {
+    try {
+        budgetDataLoader.value = true;
+        isBudgetModalOpen.value = true
+        const response = await getBudgetData();
+        if(response?.data?.success){
+            budgetData.value = response?.data?.data;
+        }
+    } catch (e) {
+        handleError(e);
+        console.log(e);
+    }
+    finally{
+        budgetDataLoader.value = false;
+    }
+}
+
 
 onMounted(() => {
     if (window.__FLASH__?.auth_success) {
@@ -103,7 +125,7 @@ onMounted(() => {
                             <ArrowTrendingDownIcon class="h-4 w-4" />
                         </template>
                     </StatCard>
-                    <StatCard type="budget" :data="statsSummary.budget" chart="donut" @open-budget-form="isBudgetModalOpen = true">
+                    <StatCard type="budget" :data="statsSummary.budget" chart="donut" @open-budget-form="fetchBudgetdata">
                         <template #label>
                             Budget
                         </template>

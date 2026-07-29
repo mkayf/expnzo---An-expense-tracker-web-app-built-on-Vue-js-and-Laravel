@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import useAuthStore from "../../../stores/auth";
 import { formatAmount } from "../../../utils/helpers";
 import VueApexCharts from "vue3-apexcharts";
+import { getCurrentPeriod } from "../../../utils/helpers";
 
 const props = defineProps({
     type: {
@@ -25,17 +26,12 @@ const authStore = useAuthStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
-const currentMonth = new Date().toLocaleDateString('en-US', {
-    month: 'short',
-    year: '2-digit',
-});
-
 const trendTextColor = ref(null);
 const showBudgetBtn = ref(false);
 
 const showMonth = computed(() => {
     if (props.type === 'income' || props.type === 'expense' || (props.type === 'budget' && props.data.amount !== 0)) {
-        return ' • ' + currentMonth;
+        return ' • ' + getCurrentPeriod();
     }
 })
 

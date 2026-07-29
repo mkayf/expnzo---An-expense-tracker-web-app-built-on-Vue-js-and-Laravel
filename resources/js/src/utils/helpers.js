@@ -46,3 +46,12 @@ export function formatAmount(amount = 0, currency_iso = "PK") {
 
     return value;
 }
+
+export function getCurrentPeriod(){
+    const period = new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        year: '2-digit',
+    });
+
+    return period;
+}

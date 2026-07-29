@@ -8,9 +8,8 @@ class BudgetService
 {
     public function setBudget($user, $amount)
     {
-        $period = Carbon::now()->format('Y-m');
         return $user->budgets()->updateOrCreate([
-            'period' => $period
+            'period' => $this->getCurrentPeriod()
         ], [
             'limit_amount' => $amount
         ]);
@@ -19,6 +18,19 @@ class BudgetService
     public function deleteBudget($user, $id){
         $budget = $user->budgets()->findOrFail($id);
         return $budget->delete();
+    }
+
+    public function getBudgetData($user){
+        $currentBudget = (float) ($user->budgets()->where('period', $this->getCurrentPeriod())->value('limit_amount') ?? 0);
+
+        return [
+            'current_budget' => $currentBudget,
+            'current_period' => $this->getCurrentPeriod()
+        ];
+    }
+
+    protected function getCurrentPeriod(){
+        return Carbon::now()->format('Y-m');       
     }
 
 }
