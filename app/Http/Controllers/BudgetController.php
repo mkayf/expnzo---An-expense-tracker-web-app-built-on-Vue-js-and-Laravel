@@ -38,31 +38,6 @@ class BudgetController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
-    {
-        try {
-            $validated = $request->validate([
-                'limit_amount' => ['required', 'numeric', 'min:1', 'max:100000000']
-            ]);
-
-            $budget = $this->budgetService->updateBudget($request->user(), $id, $validated['limit_amount']);
-
-            if ($budget) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Budget updated successfully'
-                ], 200);
-            }
-
-        } catch (\Throwable $th) {
-            Log::error('Error occured while updating budget', ['error' => $th->getMessage()]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong while updating your budget, please try again'
-            ], 500);
-        }
-    }
-
     /* 
         This method is used in BudgetForm component to show current budget,
         fetch last month budget (if any) and other data required for that form

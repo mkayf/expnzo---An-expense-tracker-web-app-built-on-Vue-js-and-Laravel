@@ -137,6 +137,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false" />
+        <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false" :loading="budgetDataLoader" :data="budgetData" />
     </div>
 </template>
