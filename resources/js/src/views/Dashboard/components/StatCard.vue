@@ -76,10 +76,10 @@ const showTrendText = computed(() => {
         }
         else if (props.data?.trend?.direction === 'up') {
             trendTextColor.value = 'yellow';
+            return `${props.data?.trend?.percentage}% is used`;
         }
         else if (props.data?.trend?.direction === 'down') {
             trendTextColor.value = 'gray';
-        } else if (props.data?.trend?.direction === 'down' || props.data?.trend?.direction === 'up') {
             return `${props.data?.trend?.percentage}% is used`;
         }
 
@@ -118,8 +118,16 @@ const chartConfig = computed(() => {
                 stroke: {
                     width: 0
                 },
-                colors: props.type === 'balance' ? ['var(--el-color-primary)', '#FF5F1F'] : ['white', 'var(--el-color-primary)'],
-                labels: props.type === 'balance' ? ['Total Income', 'Total Expense'] : ['Remaining Budget', 'Used Budget']
+                colors: props.type === 'balance' ? ['var(--el-color-primary)', '#F59E0B'] : ['var(--el-color-primary)', '#F59E0B'],
+                labels: props.type === 'balance' ? ['Total Income', 'Total Expense'] : ['Remaining Budget', 'Used Budget'],
+                tooltip: {
+                    fixed: {
+                        enabled: true,
+                        position: 'topRight',
+                        offsetX: 0,
+                        offsetY: 0,
+                    }
+                }
             },
             series: props.type === 'balance' ? [props.data?.chart_data?.total_incomes, props.data?.chart_data?.total_expense] : [props.data?.chart_data?.remaining_budget, props.data?.chart_data?.used_budget]
         }
@@ -146,7 +154,15 @@ const chartConfig = computed(() => {
             },
             fill: {
                 type: 'gradient'
+            },
+            tooltip: {
+            fixed: {
+                enabled: true,
+                position: 'topRight',
+                offsetX: 0,
+                offsetY: 0,
             }
+        }
         },
         series: [
             {
@@ -171,9 +187,9 @@ const chartConfig = computed(() => {
                     <slot name="label"></slot> {{ showMonth }}
                 </span>
             </div>
-            <div v-if="showBudgetBtn">
+            <!-- <div v-if="showBudgetBtn">
                 <el-button size="small" @click="emit('open-budget-form')">Set budget</el-button>
-            </div>
+            </div> -->
         </div>
         <div class="grid grid-cols-4">
             <div class="col-span-3">
@@ -183,17 +199,17 @@ const chartConfig = computed(() => {
                             userCurrency ?? ""
                         }}</span>
                         <span class="ml-1 text-2xl font-semibold">
-                            {{ formatAmount(data.amount, userCurrencyIso) }}</span>
+                            {{ formatAmount(props.data?.amount, userCurrencyIso) }}</span>
                     </div>
-                    
+
                 </div>
                 <div class="mt-1 w-full">
                     <span v-if="showTrendText" style="font-size: 0.7rem;" class="w-full" :class="trendTextClass">{{
                         showTrendText }}</span>
                 </div>
             </div>
-            <div class="flex flex-col items-end justify-end">
-                <VueApexCharts width="50" height="80" :options="chartConfig.options" :series="chartConfig.series">
+            <div class="flex flex-col items-end justify-end h-[70px]">
+                <VueApexCharts width="50" height="70" :options="chartConfig.options" :series="chartConfig.series">
                 </VueApexCharts>
             </div>
         </div>

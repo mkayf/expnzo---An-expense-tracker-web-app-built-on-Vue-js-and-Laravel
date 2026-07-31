@@ -53,6 +53,7 @@ const fetchBudgetdata = async () => {
         const response = await getBudgetData();
         if(response?.data?.success){
             budgetData.value = response?.data?.data;
+            console.log('dashboard budgetData: ', budgetData.value);
         }
     } catch (e) {
         handleError(e);
