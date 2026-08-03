@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
-    public function __construct(protected TransactionService $transactionService) {}
+    public function __construct(protected TransactionService $transactionService)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -34,14 +36,14 @@ class TransactionController extends Controller
 
     public function show(Request $request)
     {
-        try {
-            $validated = $request->validated([
-                'id' => ['required', 'exists:transactions,id']
-            ]);
+        $validated = $request->validated([
+            'id' => ['required', 'exists:transactions,id']
+        ]);
 
+        try {
             $transaction = $this->transactionService->showTransaction($request->user, $validated['id']);
 
-            if($transaction){
+            if ($transaction) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Transaction fetched succesfully',

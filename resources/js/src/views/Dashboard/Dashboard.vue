@@ -15,6 +15,7 @@ import { getBudgetData } from "../../services/budget.service.js";
 const monthFilter = ref(null);
 const statsLoading = ref(true);
 const budgetDataLoader = ref(false);
+const showBudgetBtn = ref(false);
 
 const statsSummary = ref({
     balance: {},
@@ -32,6 +33,7 @@ const username = authStore.user.name ?? 'User'
 
 const fetchStatsSummary = async () => {
     try {
+        statsLoading.value = true;
         const response = await getSummaryStats();
         if (response?.data?.success) {
             statsSummary.value = response.data?.summary;
@@ -51,15 +53,14 @@ const fetchBudgetdata = async () => {
         budgetDataLoader.value = true;
         isBudgetModalOpen.value = true
         const response = await getBudgetData();
-        if(response?.data?.success){
+        if (response?.data?.success) {
             budgetData.value = response?.data?.data;
-            console.log('dashboard budgetData: ', budgetData.value);
         }
     } catch (e) {
         handleError(e);
         console.log(e);
     }
-    finally{
+    finally {
         budgetDataLoader.value = false;
     }
 }
@@ -88,9 +89,8 @@ onMounted(() => {
             </h1>
             <div class="flex items-center gap-4">
                 <el-date-picker v-model="monthFilter" value-format="YYYY-MM" type="month" placeholder="Pick a month" />
-                <PopupButton text="Add Expense">
-                    <PlusIcon class="w-5 h-5" />
-                </PopupButton>
+                <el-button color="var(--el-color-primary)"><PlusIcon class="w-5 h-5" /> Add Expense</el-button>
+                <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
         </div>
         <div class="dashboard-body mt-6">
@@ -126,7 +126,7 @@ onMounted(() => {
                             <ArrowTrendingDownIcon class="h-4 w-4" />
                         </template>
                     </StatCard>
-                    <StatCard type="budget" :data="statsSummary.budget" chart="donut" @open-budget-form="fetchBudgetdata">
+                    <StatCard type="budget" :data="statsSummary.budget" chart="donut">
                         <template #label>
                             Budget
                         </template>
@@ -138,6 +138,16 @@ onMounted(() => {
             </div>
         </div>
 
-        <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false" :loading="budgetDataLoader" :data="budgetData" />
+        <BudgetForm v-model:visible="isBudgetModalOpen"
+         @close-dialog="isBudgetModalOpen = false"
+        :loading="budgetDataLoader"
+        :data="budgetData"
+        @budget-saved="fetchStatsSummary" />
     </div>
 </template>
+
+<style scoped>
+.el-button+.el-button{
+    margin-left: 0 !important;
+}
+</style>

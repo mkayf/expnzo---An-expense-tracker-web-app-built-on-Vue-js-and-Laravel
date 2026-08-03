@@ -57,6 +57,7 @@ Route::prefix('/api')->group(function () {
 
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
+        Route::post('/set-budget', [BudgetController::class, 'setBudget'])->name('budget.set');
     });
 
 

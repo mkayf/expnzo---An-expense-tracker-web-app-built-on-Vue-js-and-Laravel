@@ -32,12 +32,12 @@ class CategoryController extends Controller
 
     public function createCustomCategory(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'name' => ['required', 'string', 'min:5', 'max:50'],
-                'type' => ['required', 'string', 'in:income,expense'],
-            ]);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:5', 'max:50'],
+            'type' => ['required', 'string', 'in:income,expense'],
+        ]);
 
+        try {
             $user = $request->user();
             $category = $user->customCategories()->create($validated);
 
@@ -56,11 +56,13 @@ class CategoryController extends Controller
         }
     }
 
-    public function deleteCustomCategory(Request $request){
+    public function deleteCustomCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => ['required', 'exists:categories,id']
+        ]);
+
         try {
-            $validated = $request->validate([
-                'id' => ['required', 'exists:categories,id']
-            ]);
 
             $user = $request->user();
             $user->customCategories()->where('id', $validated['id'])->delete();
@@ -71,7 +73,7 @@ class CategoryController extends Controller
             ], 200);
 
         } catch (\Throwable $th) {
-             Log::error('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
+            Log::error('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,

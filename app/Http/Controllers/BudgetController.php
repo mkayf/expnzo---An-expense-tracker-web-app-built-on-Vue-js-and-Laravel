@@ -15,10 +15,11 @@ class BudgetController extends Controller
 
     public function setBudget(Request $request)
     {
-        try {   
-            $validated = $request->validate([
-                'limit_amount' => ['required', 'numeric', 'min:1', 'max:100000000']
-            ]);
+        $validated = $request->validate([
+            'limit_amount' => ['required', 'numeric', 'min:1', 'max:100000000']
+        ]);
+
+        try {
 
             $budget = $this->budgetService->setBudget($request->user(), $validated['limit_amount']);
 
@@ -42,8 +43,9 @@ class BudgetController extends Controller
         This method is used in BudgetForm component to show current budget,
         fetch last month budget (if any) and other data required for that form
     */
-    public function show(Request $request){
-        try{
+    public function show(Request $request)
+    {
+        try {
             $budgetData = $this->budgetService->getBudgetData($request->user());
 
             return response()->json([
@@ -51,8 +53,7 @@ class BudgetController extends Controller
                 'data' => $budgetData,
                 'message' => 'Budget data fetch successfully'
             ], 200);
-        }
-        catch(\Throwable $th){
+        } catch (\Throwable $th) {
             Log::error('Error occured while fetching budget', ['error' => $th->getMessage()]);
             return response()->json([
                 'success' => false,

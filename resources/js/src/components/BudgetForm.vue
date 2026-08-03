@@ -3,6 +3,10 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useAuthStore from '../stores/auth';
 import { BanknotesIcon, WalletIcon, ReceiptPercentIcon } from '@heroicons/vue/24/outline';
 import { getCurrentPeriod, formatAmount } from '../utils/helpers';
+import handleError from '../utils/handleError';
+import { setBudgetData } from '../services/budget.service';
+import { ElMessage } from 'element-plus';
+import SubmitButton from './ui/SubmitButton.vue';
 
 const props = defineProps({
     visible: {
@@ -19,11 +23,13 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close-dialog']);
+const emit = defineEmits(['close-dialog', 'budget-saved']);
 
 const authStore = useAuthStore();
 
 const budgetAmount = ref(0);
+const setBudgetLoader = ref(false);
+
 const userCurrency = authStore.user?.preferences?.currency ?? 'PKR';
 
 const dialogVisible = computed({
@@ -50,6 +56,35 @@ const parsed = (value) => {
 const useLastBudget = () => {
     budgetAmount.value = props.data?.last_budget ?? 0;
 }
+
+const setBudget =  async () => {
+    try{
+        if(!budgetAmount.value || isNaN(budgetAmount.value) || budgetAmount.value <= 0){
+            ElMessage({
+                type: 'error',
+                message: 'Please enter a valid amount for budget'
+            });
+            return;
+        }
+        setBudgetLoader.value = true;
+        const response = await setBudgetData({limit_amount: budgetAmount.value});
+        if(response.data.success){
+            closeDialog();
+            ElMessage({
+                type: 'success',
+                message: response?.data?.message
+            });
+            emit('budget-saved');
+        }
+    }
+    catch(e){
+        handleError(e);
+    }
+    finally{
+        setBudgetLoader.value = false;
+    }
+}
+
 
 watch(() => props.data, (data) => {
     if(!data) return;
@@ -134,11 +169,9 @@ watch(() => props.data, (data) => {
             </el-row>
         </div>
         <template #footer>
-            <div class="dialog-footer">
+            <div class="dialog-footer"> 
                 <el-button @click="closeDialog">Cancel</el-button>
-                <el-button type="primary">
-                    Save
-                </el-button>
+                <SubmitButton text="Save" :is-loading="setBudgetLoader" @click="setBudget" />
             </div>
         </template>
     </el-dialog>

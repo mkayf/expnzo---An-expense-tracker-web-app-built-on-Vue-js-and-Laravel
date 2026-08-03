@@ -27,7 +27,6 @@ const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
 const trendTextColor = ref(null);
-const showBudgetBtn = ref(false);
 
 const showMonth = computed(() => {
     if (props.type === 'income' || props.type === 'expense' || (props.type === 'budget' && props.data.amount !== 0)) {
@@ -66,7 +65,6 @@ const showTrendText = computed(() => {
         }
     }
     else if (props.type === 'budget') {
-        showBudgetBtn.value = true;
         if (props.data?.trend?.percentage == 0 && props.data?.trend?.direction == null) {
             return 'No budget set for this month';
         }
@@ -78,7 +76,7 @@ const showTrendText = computed(() => {
             trendTextColor.value = 'yellow';
             return `${props.data?.trend?.percentage}% is used`;
         }
-        else if (props.data?.trend?.direction === 'down') {
+        else if (props.data?.trend?.direction === 'down' || props.data?.trend?.direction === 'neutral') {
             trendTextColor.value = 'gray';
             return `${props.data?.trend?.percentage}% is used`;
         }
@@ -187,9 +185,6 @@ const chartConfig = computed(() => {
                     <slot name="label"></slot> {{ showMonth }}
                 </span>
             </div>
-            <!-- <div v-if="showBudgetBtn">
-                <el-button size="small" @click="emit('open-budget-form')">Set budget</el-button>
-            </div> -->
         </div>
         <div class="grid grid-cols-4">
             <div class="col-span-3">

@@ -29,7 +29,7 @@ const props = defineProps({
         :disabled="isDisabled"
         :loading="isLoading"
         native-type="submit"
-        class="transition-all duration-500 w-full"
+        class="transition-all duration-500"
         :class="[
             props.classes,
             {
