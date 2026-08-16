@@ -11,6 +11,7 @@ import { getSummaryStats } from "../../services/dashboard.service.js";
 import handleError from "../../utils/handleError.js";
 import BudgetForm from "../../components/BudgetForm.vue";
 import { getBudgetData } from "../../services/budget.service.js";
+import TransactionForm from "../../components/TransactionForm.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -25,8 +26,8 @@ const statsSummary = ref({
 });
 
 const budgetData = ref(null);
-
 const isBudgetModalOpen = ref(false);
+const isTransactionModalOpen = ref(false); 
 
 const authStore = useAuthStore();
 const username = authStore.user.name ?? 'User'
@@ -87,9 +88,9 @@ onMounted(() => {
             <h1 class="text-md md:text-lg font-semibold">
                 Welcome Back, <span class="text-[var(--primary-color)]">{{ username }}</span>
             </h1>
-            <div class="flex items-center gap-4">
+            <div class="flex flex-wrap items-center gap-4">
                 <el-date-picker v-model="monthFilter" value-format="YYYY-MM" type="month" placeholder="Pick a month" />
-                <el-button color="var(--el-color-primary)"><PlusIcon class="w-5 h-5" /> Add Expense</el-button>
+                <el-button color="var(--el-color-primary)" @click="isTransactionModalOpen = true">Add Transaction</el-button>
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
         </div>
@@ -143,6 +144,8 @@ onMounted(() => {
         :loading="budgetDataLoader"
         :data="budgetData"
         @budget-saved="fetchStatsSummary" />
+
+        <TransactionForm v-model:visible="isTransactionModalOpen" @close-dialog="isTransactionModalOpen = false" @transaction-saved="fetchStatsSummary" />
     </div>
 </template>
 

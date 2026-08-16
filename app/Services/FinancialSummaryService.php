@@ -22,11 +22,11 @@ class FinancialSummaryService
 
         $last_month_balance = $last_month_income - $last_month_expense;
 
-        $current_month_transactions = $user?->transactions()->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->count();
+        $current_month_transactions = $user?->transactions()->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()->endOfMonth()])->count();
 
-        $current_month_income = (float) ($user?->transactions()->where('type', 'income')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->sum('amount') ?? 0);
+        $current_month_income = (float) ($user?->transactions()->where('type', 'income')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()->endOfMonth()])->sum('amount') ?? 0);
 
-        $current_month_expense = (float) ($user?->transactions()->where('type', 'expense')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()])->sum('amount') ?? 0);
+        $current_month_expense = (float) ($user?->transactions()->where('type', 'expense')->whereBetween('transaction_date', [$current_date->copy()->startOfMonth(), $current_date->copy()->endOfMonth()])->sum('amount') ?? 0);
 
         $current_month_balance = $current_month_income - $current_month_expense;
 
@@ -34,7 +34,7 @@ class FinancialSummaryService
         $balanceDirection = null;
 
         if ($last_month_balance != 0) {
-            $balancePercentage = round((($current_month_balance - $last_month_balance) / $last_month_balance) * 100);
+            $balancePercentage = round((($current_month_balance - $last_month_balance) / $last_month_balance) * 100, 2);
 
             if ($balancePercentage == 0) {
                 $balanceDirection = 'neutral';
@@ -50,7 +50,7 @@ class FinancialSummaryService
         $incomeDirection = null;
 
         if ($last_month_income != 0) {
-            $incomePercentage = round((($current_month_income - $last_month_income) / $last_month_income) * 100);
+            $incomePercentage = round((($current_month_income - $last_month_income) / $last_month_income) * 100, 2);
 
             if ($incomePercentage == 0) {
                 $incomeDirection = 'neutral';
@@ -67,7 +67,7 @@ class FinancialSummaryService
                 'transaction_date',
                 [
                     $current_date->copy()->startOfMonth(),
-                    $current_date->copy()->endOfDay()
+                    $current_date->copy()->endOfMonth() 
                 ]
             )
             ->selectRaw('transaction_date, SUM(amount) as amount')
@@ -88,7 +88,8 @@ class FinancialSummaryService
         $expenseDirection = null;
 
         if ($last_month_expense != 0) {
-            $expensePercentage = round((($current_month_expense - $last_month_expense) / $last_month_expense) * 100);
+            $expensePercentage = round((($current_month_expense - $last_month_expense) / $last_month_expense) * 100,
+             2);
 
             if ($expensePercentage == 0) {
                 $expenseDirection = 'neutral';
@@ -105,7 +106,7 @@ class FinancialSummaryService
                 'transaction_date',
                 [
                     $current_date->copy()->startOfMonth(),
-                    $current_date->copy()->endOfDay()
+                    $current_date->copy()->endOfMonth()
                 ]
             )
             ->selectRaw('transaction_date, SUM(amount) as amount')
@@ -131,13 +132,13 @@ class FinancialSummaryService
         $remainingBudget = 0;
 
         if ($budget) {
-            $budgetUsePercentage = round(($current_month_expense / $budget) * 100);
+            $budgetUsePercentage = round(($current_month_expense / $budget) * 100, 2);
 
             if ($budgetUsePercentage == 0) {
                 $budgetDirection = 'neutral';
             } else if ($budgetUsePercentage > 100) {
                 $budgetDirection = 'over';
-                $overBudgetPercentage = round($budgetUsePercentage - 100);
+                $overBudgetPercentage = round($budgetUsePercentage - 100, 2);
             } else if ($budgetUsePercentage > 75) {
                 $budgetDirection = 'up';
             } else if ($budgetUsePercentage <= 75) {

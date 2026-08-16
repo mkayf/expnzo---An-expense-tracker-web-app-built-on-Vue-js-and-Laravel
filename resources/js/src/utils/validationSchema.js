@@ -41,3 +41,11 @@ export const changePasswordSchema = yup.object({
 export const countrySearchSchema = yup.object({
     country_name: yup.string().required('Please search a country to select currency')
 });
+
+export const transactionSchema = yup.object({
+    type: yup.string().required('Please select a transaction type'),
+    amount:  yup.number().min(1).max(100000000).required('Please enter valid amount for transaction'),
+    category_id: yup.number().nullable(),
+    note: yup.string().max(300).nullable(),
+    transaction_date: yup.string().matches(/^\d{4}-\d{2}-\d{2}$/,'Date must be in YYYY-MM-DD format').required('Transaction date is required')
+})

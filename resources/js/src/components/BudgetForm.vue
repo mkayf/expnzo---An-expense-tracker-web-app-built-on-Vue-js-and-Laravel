@@ -116,7 +116,6 @@ watch(() => props.data, (data) => {
                 <div class="flex-4">
                     <el-input-number style="width: 100%;" v-model="budgetAmount" :precision="2" :step="1"
                         :formatter="formatted" :parser="parsed" :max="100000000" />
-                    <span class="text-xs float-right"></span>
                 </div>
             </div>
             <el-row class="flex" :gutter="8">

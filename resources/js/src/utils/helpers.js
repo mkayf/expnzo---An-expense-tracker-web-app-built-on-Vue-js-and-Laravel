@@ -24,22 +24,27 @@ export function formatAmount(amount = 0, currency_iso = "PK") {
 
     const amountMapping = {
         million: 1000000,
-        billion: 1000000000
+        billion: 1000000000,
     };
 
-    if(value > 1000000000000 || value < -1000000000000){
-        return 'Tryna be smart?'
-    }
-    else if((value < 1000000000000 && value >= 1000000000) || (value > -1000000000000 && value <= -1000000000)){
-        value = (amount / amountMapping['billion']).toFixed(2) + 'B'
-    } else if((value < 1000000000 && value >= 1000000) || (value > -1000000000 && value <= -1000000)){
-        value = (amount / amountMapping['million']).toFixed(2) + 'M'
+    if (value > 1000000000000 || value < -1000000000000) {
+        return "Tryna be smart?";
+    } else if (
+        (value < 1000000000000 && value >= 1000000000) ||
+        (value > -1000000000000 && value <= -1000000000)
+    ) {
+        value = (amount / amountMapping["billion"]).toFixed(2) + "B";
+    } else if (
+        (value < 1000000000 && value >= 1000000) ||
+        (value > -1000000000 && value <= -1000000)
+    ) {
+        value = (amount / amountMapping["million"]).toFixed(2) + "M";
     }
 
-    if(Number.isFinite(value)){
+    if (Number.isFinite(value)) {
         const formattedValue = new Intl.NumberFormat("en-" + currency_iso, {
             maximumFractionDigits: 2,
-            minimumFractionDigits: 2
+            minimumFractionDigits: 2,
         }).format(amount);
         return formattedValue;
     }
@@ -47,11 +52,24 @@ export function formatAmount(amount = 0, currency_iso = "PK") {
     return value;
 }
 
-export function getCurrentPeriod(){
-    const period = new Date().toLocaleDateString('en-US', {
-        month: 'short',
-        year: '2-digit',
+export function getCurrentPeriod() {
+    const period = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        year: "2-digit",
     });
 
     return period;
+}
+
+export function getCurrentDate() {
+    const date = new Date();
+    const dtf = new Intl.DateTimeFormat("en", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    });
+
+    const [{ value: month }, , { value: day }, , { value: year }] = dtf.formatToParts(date);
+
+    return `${year}-${month}-${day}`;
 }

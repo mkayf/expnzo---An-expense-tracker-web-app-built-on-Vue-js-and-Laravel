@@ -23,9 +23,9 @@ class TransactionRequest extends FormRequest
     public function rules(): array
     {
         $categoryRule = [
-            'sometimes',
+            'sometimes', 'nullable',
             Rule::exists('categories', 'id')->where(function ($query){
-                return $query->whereNull('user_id')->orWhere('user_id', $this->user()->id());
+                return $query->whereNull('user_id')->orWhere('user_id', $this->user());
             })
         ];
 
@@ -36,7 +36,7 @@ class TransactionRequest extends FormRequest
                 'category_id' => $categoryRule,
                 'type' => ['required', 'in:income,expense'],
                 'amount' => ['required', 'decimal:0,999,999,999,999'],
-                'note' => ['sometimes', 'string'],
+                'note' => ['sometimes', 'string', 'nullable'],
             ];
         }
 
@@ -44,7 +44,7 @@ class TransactionRequest extends FormRequest
             'category_id' => $categoryRule,
             'type' => ['required', 'in:income,expense'],
             'amount' => ['required', 'decimal:0,999,999,999,999'],
-            'note' => ['sometimes', 'string'],
+            'note' => ['sometimes', 'string', 'nullable'],
             'transaction_date' => ['required', 'date']
         ];
     }

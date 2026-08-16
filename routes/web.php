@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -46,10 +47,10 @@ Route::prefix('/api')->group(function () {
         Route::patch('/save-preferences', [UserController::class, 'savePreferences']);
 
         // Transaction routes:
-        Route::post('/store_transaction', [TransactionController::class, 'store'])->name('transaction.store');
-        Route::patch('/update_transaction', [TransactionController::class, 'update'])->name('transaction.update');
+        Route::post('/store-transaction', [TransactionController::class, 'store'])->name('transaction.store');
+        Route::patch('/update-transaction', [TransactionController::class, 'update'])->name('transaction.update');
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
-        Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');
+        Route::get('/transaction/{idT}', [TransactionController::class, 'show'])->name('transaction.show');
         Route::delete('/transaction/{id}', [TransactionController::class, 'delete'])->name('transaction.delete');
 
         // Dashboard routes:
@@ -58,6 +59,9 @@ Route::prefix('/api')->group(function () {
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
         Route::post('/set-budget', [BudgetController::class, 'setBudget'])->name('budget.set');
+
+        // Category routes:
+        Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
     });
 
 
