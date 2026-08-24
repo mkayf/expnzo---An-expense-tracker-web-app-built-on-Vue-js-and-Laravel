@@ -3,7 +3,8 @@ import { ElMessage } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import { onMounted, ref, watch } from "vue";
 import PopupButton from "../../components/ui/PopupButton.vue";
-import { PlusIcon, WalletIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BanknotesIcon } from "@heroicons/vue/24/outline";
+import { PlusIcon, WalletIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BanknotesIcon, ArrowDownIcon } from "@heroicons/vue/24/outline";
+import { ArrowDown } from '@element-plus/icons-vue'
 import StatCard from "./components/StatCard.vue";
 import StatShimmerCard from "../../components/ui/StatShimmerCard.vue";
 import useAuthStore from "../../stores/auth";
@@ -12,6 +13,8 @@ import handleError from "../../utils/handleError.js";
 import BudgetForm from "../../components/BudgetForm.vue";
 import { getBudgetData } from "../../services/budget.service.js";
 import TransactionForm from "../../components/TransactionForm.vue";
+import Card from "../../components/ui/Card.vue";
+import DropDown from "../../components/ui/DropDown.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -27,7 +30,7 @@ const statsSummary = ref({
 
 const budgetData = ref(null);
 const isBudgetModalOpen = ref(false);
-const isTransactionModalOpen = ref(false); 
+const isTransactionModalOpen = ref(false);
 
 const authStore = useAuthStore();
 const username = authStore.user.name ?? 'User'
@@ -66,6 +69,24 @@ const fetchBudgetdata = async () => {
     }
 }
 
+// for last months chart
+
+const selectedLastMonths = ref(6);
+
+const lastMonthOptions = [
+    {
+        value: 3,
+        label: 'Last 3 Months',
+    },
+    {
+        value: 6,
+        label: 'Last 6 Months',
+    },
+    {
+        value: 12,
+        label: 'Last 12 Months',
+    },
+];
 
 onMounted(() => {
     if (window.__FLASH__?.auth_success) {
@@ -90,12 +111,13 @@ onMounted(() => {
             </h1>
             <div class="flex flex-wrap items-center gap-4">
                 <el-date-picker v-model="monthFilter" value-format="YYYY-MM" type="month" placeholder="Pick a month" />
-                <el-button color="var(--el-color-primary)" @click="isTransactionModalOpen = true">Add Transaction</el-button>
+                <el-button color="var(--el-color-primary)" @click="isTransactionModalOpen = true">Add
+                    Transaction</el-button>
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
         </div>
         <div class="dashboard-body mt-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:!grid-cols-4 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:!grid-cols-4 gap-5 mb-5">
                 <template v-if="statsLoading">
                     <StatShimmerCard />
                     <StatShimmerCard />
@@ -137,20 +159,30 @@ onMounted(() => {
                     </StatCard>
                 </template>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <Card>
+                    <template #header>
+                        Income vs Expense • Last 6 Months
+                    </template>
+                    <template #addons>
+                        <el-select v-model="selectedLastMonths" placeholder="Select months" style="width: 140px" size="small">
+                            <el-option v-for="item in lastMonthOptions" :key="item.value" :label="item.label" :value="item.value" />
+                        </el-select>
+                    </template>
+                </Card>
+            </div>
         </div>
 
-        <BudgetForm v-model:visible="isBudgetModalOpen"
-         @close-dialog="isBudgetModalOpen = false"
-        :loading="budgetDataLoader"
-        :data="budgetData"
-        @budget-saved="fetchStatsSummary" />
+        <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false"
+            :loading="budgetDataLoader" :data="budgetData" @budget-saved="fetchStatsSummary" />
 
-        <TransactionForm v-model:visible="isTransactionModalOpen" @close-dialog="isTransactionModalOpen = false" @transaction-saved="fetchStatsSummary" />
+        <TransactionForm v-model:visible="isTransactionModalOpen" @close-dialog="isTransactionModalOpen = false"
+            @transaction-saved="fetchStatsSummary" />
     </div>
 </template>
 
 <style scoped>
-.el-button+.el-button{
+.el-button+.el-button {
     margin-left: 0 !important;
 }
 </style>

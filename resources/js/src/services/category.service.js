@@ -1,5 +1,5 @@
 import api from "./axios";
 
-export const getCategories = () => {
-    return api.get('/get-categories');
+export const getCategories = (type) => {
+    return api.get(`/get-categories?type=${type}`);
 }

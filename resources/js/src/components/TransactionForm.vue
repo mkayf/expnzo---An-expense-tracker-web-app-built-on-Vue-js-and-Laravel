@@ -1,5 +1,5 @@
 <script setup>
-import { computed, handleError, ref, watch } from 'vue';
+import { computed, handleError, nextTick, ref, watch } from 'vue';
 import { Form, Field } from 'vee-validate';
 import { transactionSchema } from '../utils/validationSchema.js';
 import { getCategories } from '../services/category.service.js';
@@ -30,6 +30,7 @@ const emit = defineEmits(['close-dialog', 'transaction-saved']);
 const saveTransactionLoader = ref(false);
 const transactionAmount = ref(0);
 const transactionType = ref('expense');
+
 const initialValues = {
     type: 'expense',
     amount: 0,
@@ -38,8 +39,16 @@ const initialValues = {
     note: null
 };
 
+const formRef = ref();
+
 const categories = ref([]);
 const categoriesLoader = ref(false);
+const newCategoryVal = ref('')
+const newCategoryInputVisible = ref(false)
+const newCategoryInputRef = ref()
+
+
+
 
 const formatted = (value) => {
     if (value === null || value === undefined || value === '') return ''
@@ -58,10 +67,10 @@ const dialogVisible = computed({
     }
 })
 
-const fetchCategories = async () => {
+const fetchCategories = async (type = 'expense') => {
     try {
         categoriesLoader.value = true
-        const response = await getCategories();
+        const response = await getCategories(type);
         if (response.data.success) {
             categories.value = response.data.data;
         }
@@ -98,13 +107,33 @@ const shortcuts = [
     },
 ]
 
-const saveTransaction = async (formData, {resetForm}) => {
+const showNewCategoryInput = () => {
+    newCategoryInputVisible.value = true
+    nextTick(() => {
+        newCategoryInputRef.value.input.focus()
+    })
+}
+
+
+const handleNewCategory = () => {
+    if (newCategoryVal.value) {
+        categories.value.push(newCategoryVal.value)
+    }
+    newCategoryInputVisible.value = false
+    newCategoryVal.value = ''
+}
+
+const handleFormSubmit = () => {
+    formRef.value?.$el?.requestSubmit();
+}
+
+const saveTransaction = async (formData, { resetForm }) => {
     try {
         if (!formData) return;
         saveTransactionLoader.value = true;
         const response = await storeTransaction(formData);
         if (response.data.success) {
-            resetForm({value: initialValues})
+            resetForm({ value: initialValues })
             closeDialog();
             ElMessage({
                 type: 'success',
@@ -121,6 +150,12 @@ const saveTransaction = async (formData, {resetForm}) => {
     }
 
 }
+
+const transactionTypeChanged = (type) => {
+    if (type !== 'expense' && type !== 'income') return;
+    fetchCategories(type);
+}
+
 
 const closeDialog = () => {
     emit('close-dialog');
@@ -143,14 +178,15 @@ watch(() => props.visible, (val) => {
             <p class="text-xs" v-if="!editMode">Record your income or expenses with the details below.</p>
             <p class="text-xs" v-else>Update the transaction details below.</p>
         </template>
-        <Form @submit="saveTransaction" :validation-schema="transactionSchema" :initial-values="initialValues" v-slot="{resetForm}">
-
-            <div v-loading="loading">
+        <div v-loading="loading">
+            <Form ref="formRef" @submit="saveTransaction" :validation-schema="transactionSchema"
+                :initial-values="initialValues" v-slot="{ resetForm }">
                 <el-row :gutter="20" class="items-center">
                     <el-col :xs="24" :sm="12">
                         <Field name="type" v-slot="{ field, errorMessage, handleChange }">
                             <el-form-item label="Select transaction type" label-position="top" :error="errorMessage">
-                                <el-radio-group :model-value="field.value" @update:model-value="handleChange">
+                                <el-radio-group :model-value="field.value" @update:model-value="handleChange"
+                                    @change="transactionTypeChanged(field.value)">
                                     <el-radio value="expense" size="large" border>Expense</el-radio>
                                     <el-radio value="income" size="large" border>Income</el-radio>
                                 </el-radio-group>
@@ -184,8 +220,12 @@ watch(() => props.visible, (val) => {
                         </Field>
                     </el-col>
                     <el-col :xs="24">
+                        <div class="flex items-center justify-between">
+                            <span>Categories</span>
+                            <el-button size="small" type="warning" plain class="mb-2" @click="openCategoryForm">Add new</el-button>
+                        </div>
                         <Field name="category_id" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item label="Categories" label-position="top" :error="errorMessage">
+                            <el-form-item :error="errorMessage">
                                 <el-skeleton animated v-if="categoriesLoader">
                                     <template #template>
                                         <div class="flex flex-wrap items-center gap-3">
@@ -200,24 +240,31 @@ watch(() => props.visible, (val) => {
                                         </div>
                                     </template>
                                 </el-skeleton>
-                                <div class="flex flex-wrap gap-2" v-else>
+                                <div class="flex items-center flex-wrap gap-2" v-else>
                                     <el-check-tag type="primary" :checked="field.value === category.id"
                                         @change="handleChange(field.value === category.id ? null : category.id)"
                                         v-for="category in categories" :key="category.id" class="!text-xs !px-2 !py-1">
                                         {{ category.name }}
                                     </el-check-tag>
+                                    <!-- <div>
+                                        <el-input v-if="newCategoryInputVisible" ref="newCategoryInputRef" v-model="newCategoryVal" class="w-10"
+                                            size="small" @keyup.enter="handleNewCategory" @blur="handleNewCategory" />
+                                        <el-button v-else class="button-new-tag" size="small" @click="showNewCategoryInput">
+                                            + New
+                                        </el-button>
+                                    </div> -->
                                 </div>
                             </el-form-item>
                         </Field>
                     </el-col>
-                    <el-col>
-                        <div class="flex justify-end">
-                            <el-button @click="closeDialog">Cancel</el-button>
-                            <SubmitButton text="Save" :is-loading="saveTransactionLoader" />
-                        </div>
-                    </el-col>
                 </el-row>
+            </Form>
+        </div>
+        <template #footer>
+            <div>
+                <el-button @click="closeDialog">Cancel</el-button>
+                <SubmitButton text="Save" @click="handleFormSubmit" :is-loading="saveTransactionLoader" />
             </div>
-        </Form>
+        </template>
     </el-dialog>
 </template>

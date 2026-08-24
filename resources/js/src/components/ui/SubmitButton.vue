@@ -22,6 +22,8 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits(['click']);
+
 </script>
 
 <template>
@@ -29,6 +31,7 @@ const props = defineProps({
         :disabled="isDisabled"
         :loading="isLoading"
         native-type="submit"
+        @click="emit('click', $event)"
         class="transition-all duration-500"
         :class="[
             props.classes,

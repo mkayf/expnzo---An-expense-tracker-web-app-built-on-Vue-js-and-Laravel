@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Log;
 class CategoryController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
+        $validated = $request->validate([
+            'type' => ['required', 'in:expense,income']
+        ]);
+
         try {
-            $categories = Category::whereNull('user_id')->orWhere('user_id', $request->user()->id)->select('id', 'user_id', 'name', 'type')->get();
+            $categories = Category::where('type', $validated['type'])->whereNull('user_id')->orWhere('user_id', $request->user()->id)->select('id', 'user_id', 'name', 'type')->get();
 
             return response()->json([
                 'success' => true,
