@@ -62,6 +62,7 @@ Route::prefix('/api')->group(function () {
 
         // Category routes:
         Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
+        Route::post('/create-custom-category', [CategoryController::class, 'createCustomCategory'])->name('category.store');
     });
 
 

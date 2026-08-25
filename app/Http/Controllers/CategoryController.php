@@ -15,7 +15,10 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $categories = Category::where('type', $validated['type'])->whereNull('user_id')->orWhere('user_id', $request->user()->id)->select('id', 'user_id', 'name', 'type')->get();
+            $categories = Category::where('type', $validated['type'])
+            ->where(function($query) use($request) {
+                $query->whereNull('user_id')->orWhere('user_id', $request->user()->id);
+            })->get();
 
             return response()->json([
                 'success' => true,

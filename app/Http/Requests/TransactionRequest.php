@@ -25,7 +25,7 @@ class TransactionRequest extends FormRequest
         $categoryRule = [
             'sometimes', 'nullable',
             Rule::exists('categories', 'id')->where(function ($query){
-                return $query->whereNull('user_id')->orWhere('user_id', $this->user());
+                return $query->whereNull('user_id')->orWhere('user_id', $this->user()->id);
             })
         ];
 

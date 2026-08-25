@@ -2,12 +2,13 @@
 import { computed, handleError, nextTick, ref, watch } from 'vue';
 import { Form, Field } from 'vee-validate';
 import { transactionSchema } from '../utils/validationSchema.js';
-import { getCategories } from '../services/category.service.js';
+import { createCategory, getCategories } from '../services/category.service.js';
 import SubmitButton from './ui/SubmitButton.vue';
 import { getCurrentDate } from '../utils/helpers.js';
 import { storeTransaction } from '../services/transaction.service.js';
 import { ElMessage } from 'element-plus';
-
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
+import { Check, Close } from '@element-plus/icons-vue'
 
 const props = defineProps({
     visible: {
@@ -46,7 +47,7 @@ const categoriesLoader = ref(false);
 const newCategoryVal = ref('')
 const newCategoryInputVisible = ref(false)
 const newCategoryInputRef = ref()
-
+const transactionTypeForCategory = ref('expense');
 
 
 
@@ -114,13 +115,41 @@ const showNewCategoryInput = () => {
     })
 }
 
+const transactionTypeChanged = (type) => {
+    if (type !== 'expense' && type !== 'income') return;
+    transactionTypeForCategory.value = type;
+    fetchCategories(type);
+}
 
-const handleNewCategory = () => {
-    if (newCategoryVal.value) {
-        categories.value.push(newCategoryVal.value)
+const clearCategoryVal = () => {
+    newCategoryInputVisible.value = false;
+    newCategoryVal.value = '';
+}
+
+const handleNewCategory = async () => {
+    try {
+        if (!newCategoryVal.value || newCategoryVal.value.trim() === '' || (transactionTypeForCategory.value !== 'expense' && transactionTypeForCategory.value !== 'income')) {
+            ElMessage({
+                type: 'warning',
+                message: 'Please enter a category name and select a valid transaction type'
+            });
+            return;
+        }
+
+        const response = await createCategory({
+            name: newCategoryVal.value,
+            type: transactionTypeForCategory.value
+        });
+        if (response.data.success) {
+            newCategoryInputVisible.value = false;
+            newCategoryVal.value = '';
+            fetchCategories(transactionTypeForCategory.value);
+        }
+
+    } catch (e) {
+        handleError(e);
     }
-    newCategoryInputVisible.value = false
-    newCategoryVal.value = ''
+
 }
 
 const handleFormSubmit = () => {
@@ -149,11 +178,6 @@ const saveTransaction = async (formData, { resetForm }) => {
         saveTransactionLoader.value = false;
     }
 
-}
-
-const transactionTypeChanged = (type) => {
-    if (type !== 'expense' && type !== 'income') return;
-    fetchCategories(type);
 }
 
 
@@ -220,12 +244,8 @@ watch(() => props.visible, (val) => {
                         </Field>
                     </el-col>
                     <el-col :xs="24">
-                        <div class="flex items-center justify-between">
-                            <span>Categories</span>
-                            <el-button size="small" type="warning" plain class="mb-2" @click="openCategoryForm">Add new</el-button>
-                        </div>
                         <Field name="category_id" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item :error="errorMessage">
+                            <el-form-item label="Categories" label-position="top" :error="errorMessage">
                                 <el-skeleton animated v-if="categoriesLoader">
                                     <template #template>
                                         <div class="flex flex-wrap items-center gap-3">
@@ -246,13 +266,22 @@ watch(() => props.visible, (val) => {
                                         v-for="category in categories" :key="category.id" class="!text-xs !px-2 !py-1">
                                         {{ category.name }}
                                     </el-check-tag>
-                                    <!-- <div>
-                                        <el-input v-if="newCategoryInputVisible" ref="newCategoryInputRef" v-model="newCategoryVal" class="w-10"
-                                            size="small" @keyup.enter="handleNewCategory" @blur="handleNewCategory" />
-                                        <el-button v-else class="button-new-tag" size="small" @click="showNewCategoryInput">
+                                    <div>
+                                        <div v-if="newCategoryInputVisible" class="flex items-center gap-2">
+                                            <el-input ref="newCategoryInputRef" v-model="newCategoryVal" class="w-10"
+                                                size="small" @keyup.enter="handleNewCategory" />
+                                            <div class="flex">
+                                                <el-button type="success" size="small" :icon="Check" circle
+                                                    @click="handleNewCategory" />
+                                                <el-button type="danger" size="small" :icon="Close" circle
+                                                    @click="clearCategoryVal" class="ml-2" />
+                                            </div>
+                                        </div>
+                                        <el-button v-else class="button-new-tag" size="small"
+                                            @click="showNewCategoryInput">
                                             + New
                                         </el-button>
-                                    </div> -->
+                                    </div>
                                 </div>
                             </el-form-item>
                         </Field>
