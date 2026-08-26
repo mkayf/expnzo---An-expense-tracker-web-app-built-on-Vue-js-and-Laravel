@@ -4,11 +4,12 @@ import { Form, Field } from 'vee-validate';
 import { transactionSchema } from '../utils/validationSchema.js';
 import { createCategory, getCategories } from '../services/category.service.js';
 import SubmitButton from './ui/SubmitButton.vue';
-import { getCurrentDate } from '../utils/helpers.js';
+import { debounce, getCurrentDate } from '../utils/helpers.js';
 import { storeTransaction } from '../services/transaction.service.js';
 import { ElMessage } from 'element-plus';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
 import { Check, Close } from '@element-plus/icons-vue'
+import useCategoryStore from '../stores/categoryStore.js';
 
 const props = defineProps({
     visible: {
@@ -48,8 +49,8 @@ const newCategoryVal = ref('')
 const newCategoryInputVisible = ref(false)
 const newCategoryInputRef = ref()
 const transactionTypeForCategory = ref('expense');
-
-
+let categoriesTimer;
+const categoryStore = useCategoryStore();
 
 const formatted = (value) => {
     if (value === null || value === undefined || value === '') return ''
@@ -121,6 +122,9 @@ const transactionTypeChanged = (type) => {
     fetchCategories(type);
 }
 
+const debouncedTransactionTypeChanged = debounce(transactionTypeChanged, 500);
+
+
 const clearCategoryVal = () => {
     newCategoryInputVisible.value = false;
     newCategoryVal.value = '';
@@ -140,9 +144,17 @@ const handleNewCategory = async () => {
             name: newCategoryVal.value,
             type: transactionTypeForCategory.value
         });
-        if (response.data.success) {
+
+        if (response.data?.success && response.data?.category) {
             newCategoryInputVisible.value = false;
             newCategoryVal.value = '';
+            let responseCategory = response.data?.category;
+            if(responseCategory.type === 'expense'){
+                categoryStore.expenseCategories.push(responseCategory);
+            }
+            if(responseCategory.type === 'income'){
+                categoryStore.incomeCategories.push(responseCategory);
+            }
             fetchCategories(transactionTypeForCategory.value);
         }
 
@@ -210,7 +222,7 @@ watch(() => props.visible, (val) => {
                         <Field name="type" v-slot="{ field, errorMessage, handleChange }">
                             <el-form-item label="Select transaction type" label-position="top" :error="errorMessage">
                                 <el-radio-group :model-value="field.value" @update:model-value="handleChange"
-                                    @change="transactionTypeChanged(field.value)">
+                                    @change="debouncedTransactionTypeChanged(field.value)">
                                     <el-radio value="expense" size="large" border>Expense</el-radio>
                                     <el-radio value="income" size="large" border>Income</el-radio>
                                 </el-radio-group>

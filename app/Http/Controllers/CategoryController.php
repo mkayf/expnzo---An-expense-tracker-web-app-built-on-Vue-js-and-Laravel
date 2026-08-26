@@ -50,7 +50,8 @@ class CategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'New category added successfully'
+                'message' => 'New category added successfully',
+                'category' => $category
             ], 201);
 
         } catch (\Throwable $th) {
