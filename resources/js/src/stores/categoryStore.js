@@ -17,6 +17,15 @@ const useCategoryStore = defineStore("category", {
             if(type === 'income'){
                 this.incomeCategories = categories;
             }
+        },
+        addCategory(type, category){
+            if(type === 'expense'){
+                this.expenseCategories.push(category);
+            }
+            
+            if(type === 'income'){
+                this.incomeCategories.push(category);
+            }
         }
     }
 

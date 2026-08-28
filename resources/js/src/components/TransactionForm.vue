@@ -43,7 +43,6 @@ const initialValues = {
 
 const formRef = ref();
 
-const categories = ref([]);
 const categoriesLoader = ref(false);
 const newCategoryVal = ref('')
 const newCategoryInputVisible = ref(false)
@@ -69,12 +68,28 @@ const dialogVisible = computed({
     }
 })
 
+const categories = computed(() => {
+    return transactionTypeForCategory.value === 'expense' ? categoryStore.expenseCategories : categoryStore.incomeCategories;
+})
+
+
+const getCachedCategories = (type) => {
+    return type === 'expense' ? categoryStore.expenseCategories : categoryStore.incomeCategories;
+}
+
 const fetchCategories = async (type = 'expense') => {
     try {
-        categoriesLoader.value = true
+        categoriesLoader.value = true;
+
+        if(getCachedCategories(type)?.length){
+            return;
+        }
+
         const response = await getCategories(type);
         if (response.data.success) {
-            categories.value = response.data.data;
+            // categories.value = response.data.data;
+            categoryStore.setCategories(type, response.data.data);
+            console.log('fetchCategories chala api call keliye')
         }
     }
     catch (e) {
@@ -148,14 +163,7 @@ const handleNewCategory = async () => {
         if (response.data?.success && response.data?.category) {
             newCategoryInputVisible.value = false;
             newCategoryVal.value = '';
-            let responseCategory = response.data?.category;
-            if(responseCategory.type === 'expense'){
-                categoryStore.expenseCategories.push(responseCategory);
-            }
-            if(responseCategory.type === 'income'){
-                categoryStore.incomeCategories.push(responseCategory);
-            }
-            fetchCategories(transactionTypeForCategory.value);
+            categoryStore.addCategory(response.data?.category?.type, response.data?.category);
         }
 
     } catch (e) {
