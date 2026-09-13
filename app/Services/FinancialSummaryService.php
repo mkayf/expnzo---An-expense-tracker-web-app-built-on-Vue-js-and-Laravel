@@ -200,4 +200,33 @@ class FinancialSummaryService
         ];
 
     }
+
+    public function incomeVsExpense($user, $months = 6){
+        $start_date = Carbon::now()->subMonthsNoOverflow($months - 1)->startOfMonth();
+
+        // Get the existing months data:
+        $existing_months_data = $user?->transactions()
+        ->selectRaw("DATE_FORMAT(transaction_date, '%Y-%m') as month_key")
+        ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
+        ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
+        ->where('transaction_date', '>=', $start_date)
+        ->groupBy('month_key')
+        ->get()
+        ->keyBy('month_key');
+
+        // generate months when there was no transactions:
+        $data = collect(range(0, $months - 1))->map(function (int $i) use ($start_date, $existing_months_data){
+            $date = $start_date->copy()->addMonths($i);
+            $key = $date->format('Y-m');
+            $row = $existing_months_data->get($key);
+
+            return [
+                'month' => $date->format('M'),
+                'income' => (float) ($row->income ?? 0),
+                'expense' => (float) ($row->expense ?? 0)
+            ];
+        });
+
+        return $data;
+    }
 }

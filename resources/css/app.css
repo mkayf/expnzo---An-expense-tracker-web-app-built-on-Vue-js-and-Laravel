@@ -29,7 +29,8 @@
     --accent-sky-blue: #3b82f6;
     --bg-light-gray: #f9fafb;
     --text-charcoal: #111827;
-    --body-color: rgb(245, 245, 245)
+    --body-color: rgb(245, 245, 245);
+    --yellow-color: #F59E0B;
 }
 
 body {

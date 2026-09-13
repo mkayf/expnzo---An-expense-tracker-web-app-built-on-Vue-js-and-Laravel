@@ -13,7 +13,7 @@ import handleError from "../../utils/handleError.js";
 import BudgetForm from "../../components/BudgetForm.vue";
 import { getBudgetData } from "../../services/budget.service.js";
 import TransactionForm from "../../components/TransactionForm.vue";
-import Card from "../../components/ui/Card.vue";
+import IncomeExpense from "./components/IncomeExpense.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -68,24 +68,8 @@ const fetchBudgetdata = async () => {
     }
 }
 
-// for last months chart
 
-const selectedLastMonths = ref(6);
 
-const lastMonthOptions = [
-    {
-        value: 3,
-        label: 'Last 3 Months',
-    },
-    {
-        value: 6,
-        label: 'Last 6 Months',
-    },
-    {
-        value: 12,
-        label: 'Last 12 Months',
-    },
-];
 
 onMounted(() => {
     if (window.__FLASH__?.auth_success) {
@@ -109,7 +93,6 @@ onMounted(() => {
                 Welcome Back, <span class="text-[var(--primary-color)]">{{ username }}</span>
             </h1>
             <div class="flex flex-wrap items-center gap-4">
-                <el-date-picker v-model="monthFilter" value-format="YYYY-MM" type="month" placeholder="Pick a month" />
                 <el-button color="var(--el-color-primary)" @click="isTransactionModalOpen = true">Add
                     Transaction</el-button>
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
@@ -121,6 +104,7 @@ onMounted(() => {
                     <StatShimmerCard />
                     <StatShimmerCard />
                     <StatShimmerCard />
+
                     <StatShimmerCard />
                 </template>
                 <template v-else>
@@ -159,16 +143,7 @@ onMounted(() => {
                 </template>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Card>
-                    <template #header>
-                        Income vs Expense • Last 6 Months
-                    </template>
-                    <template #addons>
-                        <el-select v-model="selectedLastMonths" placeholder="Select months" style="width: 140px" size="small">
-                            <el-option v-for="item in lastMonthOptions" :key="item.value" :label="item.label" :value="item.value" />
-                        </el-select>
-                    </template>
-                </Card>
+                <IncomeExpense />
             </div>
         </div>
 

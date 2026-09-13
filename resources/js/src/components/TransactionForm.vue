@@ -7,7 +7,7 @@ import SubmitButton from './ui/SubmitButton.vue';
 import { debounce, getCurrentDate } from '../utils/helpers.js';
 import { storeTransaction } from '../services/transaction.service.js';
 import { ElMessage } from 'element-plus';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
+import { ArrowTrendingDownIcon, ArrowTrendingUpIcon, ArrowsRightLeftIcon, BanknotesIcon, CalendarDaysIcon, PencilSquareIcon, TagIcon } from '@heroicons/vue/24/outline';
 import { Check, Close } from '@element-plus/icons-vue'
 import useCategoryStore from '../stores/categoryStore.js';
 
@@ -47,6 +47,7 @@ const categoriesLoader = ref(false);
 const newCategoryVal = ref('')
 const newCategoryInputVisible = ref(false)
 const newCategoryInputRef = ref()
+const newCategoryInputLoader = ref(false);
 const transactionTypeForCategory = ref('expense');
 let categoriesTimer;
 const categoryStore = useCategoryStore();
@@ -81,7 +82,7 @@ const fetchCategories = async (type = 'expense') => {
     try {
         categoriesLoader.value = true;
 
-        if(getCachedCategories(type)?.length){
+        if (getCachedCategories(type)?.length) {
             return;
         }
 
@@ -147,6 +148,7 @@ const clearCategoryVal = () => {
 
 const handleNewCategory = async () => {
     try {
+        newCategoryInputLoader.value = true;
         if (!newCategoryVal.value || newCategoryVal.value.trim() === '' || (transactionTypeForCategory.value !== 'expense' && transactionTypeForCategory.value !== 'income')) {
             ElMessage({
                 type: 'warning',
@@ -168,6 +170,8 @@ const handleNewCategory = async () => {
 
     } catch (e) {
         handleError(e);
+    } finally {
+        newCategoryInputLoader.value = false;
     }
 
 }
@@ -225,82 +229,152 @@ watch(() => props.visible, (val) => {
         <div v-loading="loading">
             <Form ref="formRef" @submit="saveTransaction" :validation-schema="transactionSchema"
                 :initial-values="initialValues" v-slot="{ resetForm }">
-                <el-row :gutter="20" class="items-center">
-                    <el-col :xs="24" :sm="12">
+                <el-row :gutter="20">
+                    <el-col :span="24">
                         <Field name="type" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label="Select transaction type" label-position="top" :error="errorMessage">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                                <template #label>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <ArrowsRightLeftIcon class="h-3.5 w-3.5" />
+                                        Transaction type
+                                    </span>
+                                </template>
                                 <el-radio-group :model-value="field.value" @update:model-value="handleChange"
-                                    @change="debouncedTransactionTypeChanged(field.value)">
-                                    <el-radio value="expense" size="large" border>Expense</el-radio>
-                                    <el-radio value="income" size="large" border>Income</el-radio>
+                                    @change="debouncedTransactionTypeChanged(field.value)"
+                                    class="!grid w-full grid-cols-2 gap-3">
+                                    <el-radio value="expense"
+                                        class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
+                                        :class="field.value === 'expense'
+                                            ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
+                                            : '!border-gray-200 bg-white hover:!border-gray-300'">
+                                        <span class="flex min-w-0 items-center gap-2.5">
+                                            <span
+                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                                :class="field.value === 'expense'
+                                                    ? 'bg-(--primary-green) text-white'
+                                                    : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
+                                                <ArrowTrendingDownIcon class="h-4 w-4" />
+                                            </span>
+                                            <span class="min-w-0 leading-tight">
+                                                <span class="block text-sm font-semibold text-(--text-charcoal)">Expense</span>
+                                                <span class="block text-[11px] font-normal text-(--secondary-gray)">Money out</span>
+                                            </span>
+                                        </span>
+                                    </el-radio>
+                                    <el-radio value="income"
+                                        class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
+                                        :class="field.value === 'income'
+                                            ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
+                                            : '!border-gray-200 bg-white hover:!border-gray-300'">
+                                        <span class="flex min-w-0 items-center gap-2.5">
+                                            <span
+                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                                :class="field.value === 'income'
+                                                    ? 'bg-(--primary-green) text-white'
+                                                    : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
+                                                <ArrowTrendingUpIcon class="h-4 w-4" />
+                                            </span>
+                                            <span class="min-w-0 leading-tight">
+                                                <span class="block text-sm font-semibold text-(--text-charcoal)">Income</span>
+                                                <span class="block text-[11px] font-normal text-(--secondary-gray)">Money in</span>
+                                            </span>
+                                        </span>
+                                    </el-radio>
                                 </el-radio-group>
                             </el-form-item>
                         </Field>
                     </el-col>
                     <el-col :xs="24" :sm="12">
                         <Field name="amount" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item label="Amount" label-position="top" :error="errorMessage">
-                                <el-input-number style="width: 100%;" :model-value="field.value"
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                                <template #label>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <BanknotesIcon class="h-3.5 w-3.5" />
+                                        Amount
+                                    </span>
+                                </template>
+                                <el-input-number class="!w-full" :model-value="field.value"
                                     @update:model-value="handleChange" :precision="2" :step="1" :formatter="formatted"
                                     :parser="parsed" :max="100000000" />
                             </el-form-item>
                         </Field>
                     </el-col>
-                    <el-col :xs="24" :md="12">
+                    <el-col :xs="24" :sm="12">
+                        <Field name="transaction_date" v-slot="{ field, errorMessage, handleChange }">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                                <template #label>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <CalendarDaysIcon class="h-3.5 w-3.5" />
+                                        Date
+                                    </span>
+                                </template>
+                                <el-date-picker class="!w-full [&_.el-input__wrapper]:w-full" :model-value="field.value"
+                                    @update:model-value="handleChange" type="date" placeholder="Pick a day"
+                                    :shortcuts="shortcuts" value-format="YYYY-MM-DD" />
+                            </el-form-item>
+                        </Field>
+                    </el-col>
+                    <el-col :span="24">
                         <Field name="note" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label="Note" label-position="top" :error="errorMessage">
-                                <el-input :model-value="field.value" @update:model-value="handleChange" type="textarea"
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                                <template #label>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <PencilSquareIcon class="h-3.5 w-3.5" />
+                                        Note
+                                    </span>
+                                </template>
+                                <el-input :model-value="field.value" @update:model-value="handleChange"
                                     placeholder="e.g. Lunch with friends" />
                             </el-form-item>
                         </Field>
                     </el-col>
-                    <el-col :xs="24" :md="12">
-                        <Field name="transaction_date" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label="Date" label-position="top" :error="errorMessage">
-                                <el-date-picker :model-value="field.value" @update:model-value="handleChange"
-                                    type="date" placeholder="Pick a day" :shortcuts="shortcuts"
-                                    value-format="YYYY-MM-DD" />
-                            </el-form-item>
-                        </Field>
-                    </el-col>
-                    <el-col :xs="24">
+                    <el-col :span="24">
                         <Field name="category_id" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item label="Categories" label-position="top" :error="errorMessage">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                                <template #label>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <TagIcon class="h-3.5 w-3.5" />
+                                        Categories
+                                    </span>
+                                </template>
                                 <el-skeleton animated v-if="categoriesLoader">
                                     <template #template>
-                                        <div class="flex flex-wrap items-center gap-3">
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-                                            <el-skeleton-item variant="p" style="width: 20%;" />
-
+                                        <div class="flex h-[88px] flex-wrap content-start gap-2 overflow-hidden">
+                                            <el-skeleton-item variant="rect" class="!h-7 !w-20 !rounded-full" />
+                                            <el-skeleton-item variant="rect" class="!h-7 !w-24 !rounded-full" />
+                                            <el-skeleton-item variant="rect" class="!h-7 !w-16 !rounded-full" />
+                                            <el-skeleton-item variant="rect" class="!h-7 !w-28 !rounded-full" />
+                                            <el-skeleton-item variant="rect" class="!h-7 !w-20 !rounded-full" />
                                         </div>
                                     </template>
                                 </el-skeleton>
-                                <div class="flex items-center flex-wrap gap-2" v-else>
-                                    <el-check-tag type="primary" :checked="field.value === category.id"
-                                        @change="handleChange(field.value === category.id ? null : category.id)"
-                                        v-for="category in categories" :key="category.id" class="!text-xs !px-2 !py-1">
-                                        {{ category.name }}
-                                    </el-check-tag>
-                                    <div>
-                                        <div v-if="newCategoryInputVisible" class="flex items-center gap-2">
-                                            <el-input ref="newCategoryInputRef" v-model="newCategoryVal" class="w-10"
-                                                size="small" @keyup.enter="handleNewCategory" />
-                                            <div class="flex">
-                                                <el-button type="success" size="small" :icon="Check" circle
-                                                    @click="handleNewCategory" />
-                                                <el-button type="danger" size="small" :icon="Close" circle
-                                                    @click="clearCategoryVal" class="ml-2" />
+                                <div v-else class="h-[88px] overflow-y-auto">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <el-check-tag type="primary" :checked="field.value === category.id"
+                                            @change="handleChange(field.value === category.id ? null : category.id)"
+                                            v-for="category in categories" :key="category.id"
+                                            class="!rounded-full !px-3 !py-1 !text-xs">
+                                            {{ category.name }}
+                                        </el-check-tag>
+                                        <div>
+                                            <div v-if="newCategoryInputVisible" class="flex items-center gap-2">
+                                                <el-input ref="newCategoryInputRef" v-model="newCategoryVal"
+                                                    class="w-36" size="small" placeholder="Category name"
+                                                    @keyup.enter="handleNewCategory"
+                                                    :disabled="newCategoryInputLoader" />
+                                                <div class="flex items-center gap-1">
+                                                    <el-button type="success" size="small" :icon="Check" circle
+                                                        @click="handleNewCategory"
+                                                        :disabled="newCategoryInputLoader" />
+                                                    <el-button type="danger" size="small" :icon="Close" circle
+                                                        @click="clearCategoryVal"
+                                                        :disabled="newCategoryInputLoader" />
+                                                </div>
                                             </div>
+                                            <el-button v-else size="small" @click="showNewCategoryInput">
+                                                + New
+                                            </el-button>
                                         </div>
-                                        <el-button v-else class="button-new-tag" size="small"
-                                            @click="showNewCategoryInput">
-                                            + New
-                                        </el-button>
                                     </div>
                                 </div>
                             </el-form-item>

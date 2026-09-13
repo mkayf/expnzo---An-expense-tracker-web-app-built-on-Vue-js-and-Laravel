@@ -55,6 +55,7 @@ Route::prefix('/api')->group(function () {
 
         // Dashboard routes:
         Route::get('/dashboard/stats-summary', [DashboardController::class, 'getSummary'])->name('dashboard.stats');
+        Route::get('/dashboard/income-expense', [DashboardController::class, 'getIncomeExpense']);
 
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
@@ -63,6 +64,7 @@ Route::prefix('/api')->group(function () {
         // Category routes:
         Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
         Route::post('/create-custom-category', [CategoryController::class, 'createCustomCategory'])->name('category.store');
+
     });
 
 

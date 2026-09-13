@@ -116,7 +116,7 @@ const chartConfig = computed(() => {
                 stroke: {
                     width: 0
                 },
-                colors: props.type === 'balance' ? ['var(--el-color-primary)', '#F59E0B'] : ['var(--el-color-primary)', '#F59E0B'],
+                colors: props.type === 'balance' ? ['var(--el-color-primary)', 'var(--yellow-color)'] : ['var(--el-color-primary)', 'var(--yellow-color)'],
                 labels: props.type === 'balance' ? ['Total Income', 'Total Expense'] : ['Remaining Budget', 'Used Budget'],
                 tooltip: {
                     fixed: {
@@ -124,7 +124,12 @@ const chartConfig = computed(() => {
                         position: 'topRight',
                         offsetX: 0,
                         offsetY: 0,
-                    }
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return `${userCurrency} ` + formatAmount(val)
+                        },
+                    },
                 }
             },
             series: props.type === 'balance' ? [props.data?.chart_data?.total_incomes, props.data?.chart_data?.total_expense] : [props.data?.chart_data?.remaining_budget, props.data?.chart_data?.used_budget]
@@ -154,13 +159,18 @@ const chartConfig = computed(() => {
                 type: 'gradient'
             },
             tooltip: {
-            fixed: {
-                enabled: true,
-                position: 'topRight',
-                offsetX: 0,
-                offsetY: 0,
+                fixed: {
+                    enabled: true,
+                    position: 'topRight',
+                    offsetX: 0,
+                    offsetY: 0,
+                },
+                y: {
+                    formatter: function (val) {
+                        return `${userCurrency} ` + formatAmount(val)
+                    },
+                },
             }
-        }
         },
         series: [
             {
