@@ -14,6 +14,7 @@ import BudgetForm from "../../components/BudgetForm.vue";
 import { getBudgetData } from "../../services/budget.service.js";
 import TransactionForm from "../../components/TransactionForm.vue";
 import IncomeExpense from "./components/IncomeExpense.vue";
+import ExpenseByCategories from "./components/ExpenseByCategories.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -144,6 +145,7 @@ onMounted(() => {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <IncomeExpense />
+                <ExpenseByCategories />
             </div>
         </div>
 

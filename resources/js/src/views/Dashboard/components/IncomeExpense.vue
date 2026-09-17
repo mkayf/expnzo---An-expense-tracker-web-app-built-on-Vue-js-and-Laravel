@@ -35,7 +35,7 @@ const chartConfig = computed(() => {
         options: {
             chart: {
                 type: 'bar',
-                height: 250,
+                height: '100%',
                 toolbar: {
                     tools: {
                         download: false
@@ -146,16 +146,32 @@ onMounted(() => {
 <template>
     <Card>
         <template #header>
-            Income vs Expense • Last {{ selectedLastMonths }} Months
+            <div v-if="loading" class="w-[60%]">
+                <el-skeleton :loading="loading" animated>
+                    <template #template>
+                        <el-skeleton-item variant="rect" style="height: 20px;" />
+                    </template>
+                </el-skeleton>
+            </div>
+            <span v-else>
+                Income vs Expense • Last {{ selectedLastMonths }} Months
+            </span>
         </template>
         <template #addons>
-            <el-select v-model="selectedLastMonths" placeholder="Select months" style="width: 140px" size="small"
+            <div v-if="loading" class="w-[140px]">
+                <el-skeleton :loading="loading" animated>
+                    <template #template>
+                        <el-skeleton-item variant="rect" style="width: 100%; height: 24px;" />
+                    </template>
+                </el-skeleton>
+            </div>
+            <el-select v-else v-model="selectedLastMonths" placeholder="Select months" style="width: 140px" size="small"
                 @change="fetchIncomeExpense">
                 <el-option v-for="item in lastMonthOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </template>
         <template #body>
-            <div class="relative h-[250px]">
+            <div class="relative aspect-[16/10] max-h-[230px] md:aspect-auto md:h-[320px] md:max-h-none">
                 <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
                     <el-skeleton :loading="loading" animated class="w-full h-full px-6">
                         <template #template>
