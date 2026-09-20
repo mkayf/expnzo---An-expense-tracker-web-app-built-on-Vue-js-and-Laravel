@@ -67,7 +67,7 @@ class FinancialSummaryService
                 'transaction_date',
                 [
                     $current_date->copy()->startOfMonth(),
-                    $current_date->copy()->endOfMonth() 
+                    $current_date->copy()->endOfMonth()
                 ]
             )
             ->selectRaw('transaction_date, SUM(amount) as amount')
@@ -88,8 +88,10 @@ class FinancialSummaryService
         $expenseDirection = null;
 
         if ($last_month_expense != 0) {
-            $expensePercentage = round((($current_month_expense - $last_month_expense) / $last_month_expense) * 100,
-             2);
+            $expensePercentage = round(
+                (($current_month_expense - $last_month_expense) / $last_month_expense) * 100,
+                2
+            );
 
             if ($expensePercentage == 0) {
                 $expenseDirection = 'neutral';
@@ -162,7 +164,7 @@ class FinancialSummaryService
                     'total_incomes' => $total_incomes,
                     'total_expense' => $total_expenses
                 ]
-            ],                  
+            ],
             'income' => [
                 'amount' => $current_month_income,
                 'trend' => [
@@ -201,21 +203,25 @@ class FinancialSummaryService
 
     }
 
-    public function incomeVsExpense($user, $months = 6){
+    public function incomeVsExpense($user, $months = 6)
+    {
         $start_date = Carbon::now()->subMonthsNoOverflow($months - 1)->startOfMonth();
+
+        $end_date = Carbon::now()->endOfMonth();
 
         // Get the existing months data:
         $existing_months_data = $user?->transactions()
-        ->selectRaw("DATE_FORMAT(transaction_date, '%Y-%m') as month_key")
-        ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
-        ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
-        ->where('transaction_date', '>=', $start_date)
-        ->groupBy('month_key')
-        ->get()
-        ->keyBy('month_key');
+            ->selectRaw("DATE_FORMAT(transaction_date, '%Y-%m') as month_key")
+            ->selectRaw("SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) as income")
+            ->selectRaw("SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) as expense")
+            ->where('transaction_date', '>=', $start_date)
+            ->where('transaction_date', '<=', $end_date)
+            ->groupBy('month_key')
+            ->get()
+            ->keyBy('month_key');
 
         // generate months when there was no transactions:
-        $data = collect(range(0, $months - 1))->map(function (int $i) use ($start_date, $existing_months_data){
+        $data = collect(range(0, $months - 1))->map(function (int $i) use ($start_date, $existing_months_data) {
             $date = $start_date->copy()->addMonths($i);
             $key = $date->format('Y-m');
             $row = $existing_months_data->get($key);
@@ -228,5 +234,51 @@ class FinancialSummaryService
         });
 
         return $data;
+    }
+
+    public function expenseByCategories($user, $months)
+    {
+        $current_date = Carbon::now();
+
+        if ($months == 0) {
+            $from = $current_date->copy()->startOfMonth();
+            $to = $current_date->copy()->endOfMonth();
+        } else if ($months == 1) {
+            $from = $current_date->copy()->subMonthNoOverflow()->startOfMonth();
+            $to = $current_date->copy()->subMonthNoOverflow()->endOfMonth();
+        } else {
+            $from = $current_date->copy()->subMonthsNoOverflow($months - 1)->startOfMonth();
+            $to = $current_date->copy()->endOfMonth();
+        }
+
+        $data = $user?->transactions()
+            ->join('categories', 'transactions.category_id', '=', 'categories.id')
+            ->select('categories.name')
+            ->selectRaw('SUM(transactions.amount) AS amount')
+            ->where('transactions.type', 'expense')
+            ->where('categories.type', 'expense')
+            ->whereBetween('transactions.transaction_date', [$from, $to])
+            ->groupBy('categories.name')
+            ->orderByDesc('amount')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'amount' => (float) $item->amount
+                ];
+            });
+
+        if ($data->count() > 7) {
+            $top = $data->take(7);
+            $otherCategoriesAmount = $data->slice(7)->sum('amount');
+
+            $data = $top->push([
+                'name' => 'Other',
+                'amount' => $otherCategoriesAmount
+            ]);
+        }
+
+        return $data->values();
+
     }
 }

@@ -57,4 +57,30 @@ class DashboardController extends Controller
         }
     }
 
+    public function getExpenseByCategories(Request $request)
+    {
+        $validated = $request->validate([
+            'months' => ['required', 'in:0,1,3,6,12']
+        ]);
+
+        try {
+            $data = $this->financialSummaryService->expenseByCategories($request->user(), $validated['months']);
+
+            if($data){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'expense by categories data fetched successfully',
+                    'data' => $data
+                ]);
+            }
+
+        } catch (\Throwable $th) {
+            Log::error('Error occured while fetching expense by categories', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting expense by categories'
+            ], 500);
+        }
+    }
+
 }

@@ -56,6 +56,7 @@ Route::prefix('/api')->group(function () {
         // Dashboard routes:
         Route::get('/dashboard/stats-summary', [DashboardController::class, 'getSummary'])->name('dashboard.stats');
         Route::get('/dashboard/income-expense', [DashboardController::class, 'getIncomeExpense']);
+        Route::get('/dashboard/expense-by-categories', [DashboardController::class, 'getExpenseByCategories']);
 
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');

@@ -4,13 +4,15 @@ import { ref, onMounted, computed } from 'vue';
 import useAuthStore from '../../../stores/auth.js';
 import VueApexCharts from 'vue3-apexcharts';
 import { formatAmount } from '../../../utils/helpers.js';
+import { getExpenseByCategories } from '../../../services/dashboard.service.js';
 
-const selectedLastMonths = ref(0);
+const selectedMonths = ref(0);
 const loading = ref(false);
 const authStore = useAuthStore();
 const userCurrency = authStore.user.preferences.currency;
+const expenseCategoriesData = ref([]);
 
-const lastMonthOptions = [
+const monthOptions = [
     {
         value: 0,
         label: 'This Month'
@@ -59,25 +61,16 @@ const chartConfig = computed(() => {
                 width: 0
             },
             colors: [
-                '#B45309', // amber 700
-                '#C2680D', // amber 650
-                '#D97706', // amber 600
-                '#EA8E0C', // amber 550
-                '#F59E0B', // amber 500 — aapka base secondary color
-                '#F0AD2E', // amber 450
-                '#E8A63C', // muted amber — same depth, thora desaturated
-                '#D9954A', // warm muted tan-amber — depth match primary jaisi
+                '#B45309', 
+                '#C2680D',
+                '#D97706',
+                '#EA8E0C', 
+                '#F59E0B', 
+                '#F0AD2E', 
+                '#E8A63C', 
+                '#D9954A',
             ],
-            labels: [
-                'Food',
-                'Transport',
-                'Bills',
-                'Shopping',
-                'Health',
-                'Entertainment',
-                'Education',
-                'Other'
-            ],
+            labels: expenseCategoryChartData.value.labels,
             legend: {
                 position: 'right'
             },
@@ -89,8 +82,44 @@ const chartConfig = computed(() => {
                 }
             }
         },
-        series: [18500, 9200, 12500, 6100, 3000, 4500, 2500, 1800]
+        series: expenseCategoryChartData.value.amounts
     }
+})
+
+
+const fetchExpenseByCategories = async () => {
+    try {
+        const response = await getExpenseByCategories(selectedMonths.value);
+        if(response.data?.success){
+            expenseCategoriesData.value = response.data?.data;
+            console.log(response.data?.data);
+        }
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+const expenseCategoryChartData = computed(() => {
+    if(!expenseCategoriesData.  value || !expenseCategoriesData.value.length){
+        return {
+            labels: [],
+            amounts: []
+        }
+    }
+
+    return {
+        labels: expenseCategoriesData.value.map(item => item.name),
+        amounts: expenseCategoriesData.value.map(item => item.amount)
+    }
+})
+
+onMounted(() => {
+    fetchExpenseByCategories();
+
+    setTimeout(() => {
+        console.log(expenseCategoriesData.value);
+        console.log(expenseCategoryChartData.value);
+    }, 4000)
 })
 
 </script>
@@ -101,8 +130,8 @@ const chartConfig = computed(() => {
             Expense By Categories
         </template>
         <template #addons>
-            <el-select v-model="selectedLastMonths" placeholder="Select months" style="width: 140px" size="small">
-                <el-option v-for="item in lastMonthOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <el-select v-model="selectedMonths" placeholder="Select months" style="width: 140px" size="small" @change="fetchExpenseByCategories">
+                <el-option v-for="item in monthOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </template>
         <template #body>
