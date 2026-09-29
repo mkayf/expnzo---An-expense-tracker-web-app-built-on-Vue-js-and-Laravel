@@ -127,7 +127,7 @@ const chartConfig = computed(() => {
                     },
                     y: {
                         formatter: function (val) {
-                            return `${userCurrency} ` + formatAmount(val)
+                            return `${userCurrency} ` + formatAmount(val, userCurrencyIso)
                         },
                     },
                 }
@@ -167,7 +167,7 @@ const chartConfig = computed(() => {
                 },
                 y: {
                     formatter: function (val) {
-                        return `${userCurrency} ` + formatAmount(val)
+                        return `${userCurrency} ` + formatAmount(val, userCurrencyIso)
                     },
                 },
             }

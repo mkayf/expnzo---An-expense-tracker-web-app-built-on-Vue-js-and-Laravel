@@ -12,6 +12,7 @@ const selectedLastMonths = ref(6);
 
 const authStore = useAuthStore();
 const userCurrency = authStore.user.preferences.currency;
+const userCurrencyIso = authStore.user.preferences.currency_iso;
 const incomeExpenseData = ref([]);
 const loading = ref(false);
 
@@ -86,7 +87,7 @@ const chartConfig = computed(() => {
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        return `${userCurrency} ` + formatAmount(val)
+                        return `${userCurrency} ` + formatAmount(val, userCurrencyIso)
                     },
                 },
             },

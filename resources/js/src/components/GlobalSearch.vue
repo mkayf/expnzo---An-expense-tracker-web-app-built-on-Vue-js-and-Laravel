@@ -4,8 +4,7 @@
     :fetch-suggestions="querySearchAsync"
     placeholder="Search"
     clearable
-     :prefix-icon="Search"
-    @select="handleSelect"
+     :prefix-icon="Search"  
   />
 </template>
 
@@ -51,10 +50,6 @@ const createFilter = (queryString: string) => {
       restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
     )
   }
-}
-
-const handleSelect = (item: Record<string, any>) => {
-  console.log(item)
 }
 
 onMounted(() => {

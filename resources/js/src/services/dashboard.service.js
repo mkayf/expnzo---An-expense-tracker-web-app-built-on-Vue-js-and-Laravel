@@ -11,3 +11,7 @@ export const getIncomeExpense = (months) => {
 export const getExpenseByCategories = (months) => {
     return api.get(`/dashboard/expense-by-categories?months=${months}`);
 }
+
+export const getRecentTransactions = () => {
+    return api.get('/dashboard/recent-transactions');
+}

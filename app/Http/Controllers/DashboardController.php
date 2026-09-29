@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\FinancialSummaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Stmt\TryCatch;
 
 class DashboardController extends Controller
 {
@@ -66,7 +67,7 @@ class DashboardController extends Controller
         try {
             $data = $this->financialSummaryService->expenseByCategories($request->user(), $validated['months']);
 
-            if($data){
+            if ($data) {
                 return response()->json([
                     'success' => true,
                     'message' => 'expense by categories data fetched successfully',
@@ -79,6 +80,27 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while getting expense by categories'
+            ], 500);
+        }
+    }
+
+    public function getRecentTransactions(Request $request)
+    {   
+        try {
+            $data = $this->financialSummaryService->recentTransactions($request->user());
+
+            if($data){
+                return response()->json([
+                    'success' => true,
+                    'message' => 'recent transactions fetched successfully.',
+                    'data' => $data
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            Log::error('Error occured while fetching recent transactions', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting recent transactions'
             ], 500);
         }
     }

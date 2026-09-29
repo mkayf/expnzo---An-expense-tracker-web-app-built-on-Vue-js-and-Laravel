@@ -15,6 +15,8 @@ import { getBudgetData } from "../../services/budget.service.js";
 import TransactionForm from "../../components/TransactionForm.vue";
 import IncomeExpense from "./components/IncomeExpense.vue";
 import ExpenseByCategories from "./components/ExpenseByCategories.vue";
+import FinancialInsights from "./components/FinancialInsights.vue";
+import RecentTransactions from "./components/RecentTransactions.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -45,7 +47,6 @@ const fetchStatsSummary = async () => {
     }
     catch (e) {
         handleError(e);
-        console.log(e);
     }
     finally {
         statsLoading.value = false;
@@ -62,7 +63,6 @@ const fetchBudgetdata = async () => {
         }
     } catch (e) {
         handleError(e);
-        console.log(e);
     }
     finally {
         budgetDataLoader.value = false;
@@ -105,7 +105,6 @@ onMounted(() => {
                     <StatShimmerCard />
                     <StatShimmerCard />
                     <StatShimmerCard />
-
                     <StatShimmerCard />
                 </template>
                 <template v-else>
@@ -143,9 +142,13 @@ onMounted(() => {
                     </StatCard>
                 </template>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <IncomeExpense />
                 <ExpenseByCategories />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-5">
+                <FinancialInsights />
+                <RecentTransactions />
             </div>
         </div>
 

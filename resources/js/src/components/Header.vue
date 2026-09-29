@@ -35,7 +35,6 @@ const logoutUser = async () => {
     }
     catch(e){
         handleError(e);
-        console.log(e);
     }
 }
 </script>

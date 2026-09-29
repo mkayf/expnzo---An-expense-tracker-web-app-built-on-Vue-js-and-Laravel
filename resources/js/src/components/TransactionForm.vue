@@ -90,7 +90,6 @@ const fetchCategories = async (type = 'expense') => {
         if (response.data.success) {
             // categories.value = response.data.data;
             categoryStore.setCategories(type, response.data.data);
-            console.log('fetchCategories chala api call keliye')
         }
     }
     catch (e) {
@@ -362,11 +361,12 @@ watch(() => props.visible, (val) => {
                                                     class="w-36" size="small" placeholder="Category name"
                                                     @keyup.enter="handleNewCategory"
                                                     :disabled="newCategoryInputLoader" />
-                                                <div class="flex items-center gap-1">
-                                                    <el-button type="success" size="small" :icon="Check" circle
+                                                <div class="flex items-center">
+                                                    <el-button plain type="primary" size="small" :icon="Check" circle
                                                         @click="handleNewCategory"
                                                         :disabled="newCategoryInputLoader" />
-                                                    <el-button type="danger" size="small" :icon="Close" circle
+                                                    <el-button size="small" 
+                                                    plain type="danger" :icon="Close" circle
                                                         @click="clearCategoryVal"
                                                         :disabled="newCategoryInputLoader" />
                                                 </div>

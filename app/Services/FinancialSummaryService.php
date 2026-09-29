@@ -281,4 +281,20 @@ class FinancialSummaryService
         return $data->values();
 
     }
+
+    public function recentTransactions($user)
+    {
+        $transactions = $user->transactions()->with(['category:id,name'])->latest()->take(5)->get()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'type' => $item->type,
+                'amount' => (float) $item->amount,
+                'note' => $item->note,
+                'transaction_date' => $item->transaction_date,
+                'category' => $item->category,
+            ];
+        });
+
+        return $transactions;
+    }
 }

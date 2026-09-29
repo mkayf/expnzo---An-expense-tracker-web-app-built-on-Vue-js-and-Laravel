@@ -69,17 +69,28 @@ export function getCurrentDate() {
         day: "2-digit",
     });
 
-    const [{ value: month }, , { value: day }, , { value: year }] = dtf.formatToParts(date);
+    const [{ value: month }, , { value: day }, , { value: year }] =
+        dtf.formatToParts(date);
 
     return `${year}-${month}-${day}`;
 }
 
-export function debounce(func, timeout = 300){
+export function debounce(func, timeout = 300) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             func(...args);
         }, timeout);
-    }
+    };
+}
+
+export function formatDate(value) {
+    if (!value) return "";
+    return new Date(value).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+    });
 }

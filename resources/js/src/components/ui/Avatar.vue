@@ -16,7 +16,6 @@ const avatar = ref(props.avatarURL);
 
 watch(() => props.avatarURL, (val) => {
     if(val){
-        console.log('Avatar URL updated:', val);
         avatar.value = val;
     }
 })

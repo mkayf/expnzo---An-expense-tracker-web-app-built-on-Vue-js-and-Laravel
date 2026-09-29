@@ -11,6 +11,7 @@ import "element-plus/theme-chalk/dark/css-vars.css";
 window.Apex = {
     chart: {
         fontFamily: "Montserrat, sans-serif",
+        redrawOnParentResize: false,
     },
     dataLabels: {
         style: {

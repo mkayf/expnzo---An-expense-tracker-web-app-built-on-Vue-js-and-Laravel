@@ -38,7 +38,6 @@ const startLoading = (text = 'Loading') => {
 const handleUploadSuccess = (res) => {
     const response = JSON.parse(res);
     if (response && response.success) {
-        console.log("uploaded avatar url:", response.url);
         authStore.updateAvatar(response.url);
         authStore.user.has_custom_avatar = true;
         ElMessage({

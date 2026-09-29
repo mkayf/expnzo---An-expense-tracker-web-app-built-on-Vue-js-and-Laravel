@@ -31,7 +31,6 @@ const loginUser = async (formData) => {
         }
     } catch (e) {
         handleError(e);
-        console.log(e);
     } finally {
         loading.value = false;
     }

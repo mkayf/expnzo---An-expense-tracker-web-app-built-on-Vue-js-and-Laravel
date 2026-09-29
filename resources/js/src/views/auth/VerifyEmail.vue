@@ -58,7 +58,6 @@ const handleVerifyEmail = async (data) => {
         }
     } catch (e) {
         handleError(e);
-        console.log(e);
     } finally {
         loading.value = false;
     }
@@ -76,7 +75,6 @@ const canResendOTP = async () => {
             disableResend.value = true;
         }
         handleError(e);
-        console.log(e);
     }
 };
 
@@ -92,7 +90,6 @@ const handleResendOTP = async () => {
             disableResend.value = true;
         }
         handleError(e);
-        console.log(e);
     }
 };
 

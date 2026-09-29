@@ -31,6 +31,7 @@ const budgetAmount = ref(0);
 const setBudgetLoader = ref(false);
 
 const userCurrency = authStore.user?.preferences?.currency ?? 'PKR';
+const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
 const dialogVisible = computed({
     get: () => props.visible,
@@ -130,7 +131,7 @@ watch(() => props.data, (data) => {
                         </div>
                         <p
                             class="text-xs @[110px]:text-sm @[150px]:text-base @[190px]:text-lg font-bold text-(--text-charcoal)! leading-tight break-words">
-                            {{ formatAmount(props.data?.current_budget ?? 0) }}</p>
+                            {{ formatAmount(props.data?.current_budget ?? 0, userCurrencyIso) }}</p>
                     </div>
                 </el-col>
     
@@ -145,7 +146,7 @@ watch(() => props.data, (data) => {
                         </div>
                         <p
                             class="text-xs @[110px]:text-sm @[150px]:text-base @[190px]:text-lg font-bold text-(--text-charcoal)! leading-tight break-words">
-                            {{ formatAmount(props.data?.used_budget ?? 0) }}
+                            {{ formatAmount(props.data?.used_budget ?? 0, userCurrencyIso) }}
                         </p>
                     </div>
                 </el-col>
@@ -161,7 +162,7 @@ watch(() => props.data, (data) => {
                         </div>
                         <p
                             class="text-sm sm:text-xs sm:@[110px]:text-sm sm:@[150px]:text-base sm:@[190px]:text-lg font-bold text-(--primary-green)! leading-tight break-words">
-                            {{ formatAmount(props.data?.remaining_budget ?? 0) }}
+                            {{ formatAmount(props.data?.remaining_budget ?? 0, userCurrencyIso) }}
                         </p>
                     </div>
                 </el-col>
