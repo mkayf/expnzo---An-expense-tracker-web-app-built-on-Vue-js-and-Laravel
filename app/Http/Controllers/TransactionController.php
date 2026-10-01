@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TransactionRequest;
 use App\Services\TransactionService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -100,27 +101,30 @@ class TransactionController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request, $id)
     {
-
-        $validated = $request->validate([
-            'id' => ['required', 'exists:transactions,id'],
-        ]);
-
         try {
-            $transaction = $this->transactionService->deleteTransaction($request->user(), $validated['id']);
+            $this->transactionService->deleteTransaction($request->user(), $id);
 
-            if ($transaction) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Transaction deleted succesfully',
-                ], 200);
-            }
-        } catch (\Throwable $th) {
-            Log::error('Error occured while deleting transaction', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction deleted successfully',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Something went wrong while deleting transaction, please try again'
+                'message' => 'Transaction not found',
+            ], 404);
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while deleting transaction', [
+                'transaction_id' => $id,
+                'user_id' => $request->user()->id,
+                'error' => $th->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while deleting transaction, please try again',
             ], 500);
         }
     }

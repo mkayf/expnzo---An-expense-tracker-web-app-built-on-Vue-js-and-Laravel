@@ -6,6 +6,7 @@ import handleError from '../../../utils/handleError.js';
 import { formatAmount, formatDate } from '../../../utils/helpers.js';
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import useAuthStore from '../../../stores/auth.js';
+import { deleteTransaction } from '../../../services/transaction.service.js';
 
 const loading = ref(false);
 const transactions = ref([]);
@@ -33,6 +34,7 @@ const transactionsTableData = computed(() => {
 
     return transactions.value.map((item, i) => {
         return {
+            id: item.id,
             number: i + 1,
             amount: item.amount ?? 0,
             type: item.type ?? '-',
@@ -41,6 +43,28 @@ const transactionsTableData = computed(() => {
         }
     })
 });
+
+const handleDeleteTransaction = async (id) => {
+    try {
+        const confirmed = await ElMessageBox.confirm('Do you want to delete this transaction?', 'Confirm', {
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+        }).catch(() => false);
+
+        if(!confirmed) return;
+
+        const response = await deleteTransaction(id);
+
+        if(response.data?.success){
+            transactions.value = transactions.value.filter(item => item.id !== id);
+        }
+
+    } catch (e) {
+        handleError(e)
+    }
+
+}
 
 onMounted(() => {
     fetchRecentTransactions();
@@ -92,9 +116,10 @@ onMounted(() => {
                     <el-table-column prop="category_name" label="Category" width="180" />
                     <el-table-column prop="transaction_date" label="Date" width="140" />
                     <el-table-column label="Action" width="100">
-                        <template #default>
+                        <template #default="scope">
                             <el-button plain type="info" :icon="PencilIcon" size="small" circle />
-                            <el-button plain type="danger" :icon="TrashIcon" size="small" circle />
+                            <el-button plain type="danger" :icon="TrashIcon" size="small" circle
+                                @click="handleDeleteTransaction(scope.row.id)" />
                         </template>
                     </el-table-column>
                 </el-table>

@@ -43,6 +43,15 @@ const chartConfig = computed(() => {
             chart: {
                 type: "donut",
             },
+            noData: {
+                text: 'No data available',
+                align: 'center',
+                verticalAlign: 'middle',
+                style: {
+                    color: '#999',
+                    fontSize: '14px'
+                }
+            },
             dataLabels: {
                 formatter: function (val) {
                     return val.toFixed(1) + '%'
@@ -158,8 +167,8 @@ onMounted(() => {
                         </div>
                     </template>
                 </el-skeleton>
-                <VueApexCharts :class="{ 'opacity-0': loading }" class="transition-opacity duration-200"
-                    height="100%" :options="chartConfig.options" :series="chartConfig.series" />
+                <VueApexCharts :class="{ 'opacity-0': loading }" class="transition-opacity duration-200" height="100%"
+                    :options="chartConfig.options" :series="chartConfig.series" />
             </div>
         </template>
     </Card>

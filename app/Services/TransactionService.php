@@ -24,6 +24,6 @@ class TransactionService
     }
 
     public function deleteTransaction(User $user, $id){
-        return $user->transactions()->where('id', $id)->delete();
+        return $user->transactions()->findOrFail($id)->delete();
     }
 }

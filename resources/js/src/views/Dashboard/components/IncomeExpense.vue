@@ -6,7 +6,6 @@ import useAuthStore from '../../../stores/auth.js';
 import { formatAmount } from '../../../utils/helpers.js';
 import { getIncomeExpense } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
-import StatShimmerCard from '../../../components/ui/StatShimmerCard.vue';
 
 const selectedLastMonths = ref(6);
 
@@ -15,6 +14,7 @@ const userCurrency = authStore.user.preferences.currency;
 const userCurrencyIso = authStore.user.preferences.currency_iso;
 const incomeExpenseData = ref([]);
 const loading = ref(false);
+const hasChartData = ref(false);
 
 const lastMonthOptions = [
     {
@@ -44,7 +44,7 @@ const chartConfig = computed(() => {
                 }
             },
             noData: {
-                text: 'Loading...',
+                text: 'No data available',
                 align: 'center',
                 verticalAlign: 'middle',
                 style: {
@@ -80,6 +80,12 @@ const chartConfig = computed(() => {
             ],
             xaxis: {
                 categories: incomeExpenseChartData.value.months,
+                labels: { show: hasChartData.value },
+                axisBorder: { show: hasChartData.value },
+                axisTicks: { show: hasChartData.value },
+            },
+            yaxis: {
+                show: hasChartData.value
             },
             fill: {
                 opacity: 1,
@@ -123,12 +129,26 @@ const fetchIncomeExpense = async () => {
 
 const incomeExpenseChartData = computed(() => {
     if (!incomeExpenseData.value || !incomeExpenseData.value.length) {
+        hasChartData.value = false;
         return {
             months: [],
             income: [],
             expense: []
         }
     }
+
+    const isAmountsEmpty = incomeExpenseData.value.every(item => item.income === 0 && item.expense === 0);
+
+    if (isAmountsEmpty) {
+        hasChartData.value = false;
+        return {
+            months: [],
+            income: [],
+            expense: []
+        }
+    }
+
+    hasChartData.value = true;
 
     return {
         months: incomeExpenseData.value.map(item => item.month),
