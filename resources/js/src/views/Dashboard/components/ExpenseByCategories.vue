@@ -1,10 +1,16 @@
 <script setup>
 import Card from '../../../components/ui/Card.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import useAuthStore from '../../../stores/auth.js';
 import VueApexCharts from 'vue3-apexcharts';
 import { formatAmount } from '../../../utils/helpers.js';
 import { getExpenseByCategories } from '../../../services/dashboard.service.js';
+
+const props = defineProps({
+    update: {
+        type: Number,
+    }
+});
 
 const selectedMonths = ref(0);
 const loading = ref(false);
@@ -122,6 +128,12 @@ const expenseCategoryChartData = computed(() => {
     return {
         labels: expenseCategoriesData.value.map(item => item.name),
         amounts: expenseCategoriesData.value.map(item => item.amount)
+    }
+})
+
+watch(() => props.update, (val) => {
+    if (val) {
+        fetchExpenseByCategories();
     }
 })
 

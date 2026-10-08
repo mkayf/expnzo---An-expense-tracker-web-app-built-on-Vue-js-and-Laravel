@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import Card from '../../../components/ui/Card.vue';
 import { getRecentTransactions } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
@@ -7,6 +7,14 @@ import { formatAmount, formatDate } from '../../../utils/helpers.js';
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import useAuthStore from '../../../stores/auth.js';
 import { deleteTransaction } from '../../../services/transaction.service.js';
+
+const props = defineProps({
+    update: {
+        type: Number,
+    }    
+});
+
+const emits = defineEmits(['edit-transaction', 'delete-transaction'])
 
 const loading = ref(false);
 const transactions = ref([]);
@@ -55,16 +63,26 @@ const handleDeleteTransaction = async (id) => {
         if(!confirmed) return;
 
         const response = await deleteTransaction(id);
-
         if(response.data?.success){
             transactions.value = transactions.value.filter(item => item.id !== id);
+            emits('delete-transaction');
         }
 
     } catch (e) {
         handleError(e)
     }
-
 }
+
+const handleEditTransaction = (id) => {
+    emits('edit-transaction', id);
+}
+
+watch(() => props.update, (val) => {
+    if(val){
+        fetchRecentTransactions();
+    }
+});
+
 
 onMounted(() => {
     fetchRecentTransactions();
@@ -117,7 +135,7 @@ onMounted(() => {
                     <el-table-column prop="transaction_date" label="Date" width="140" />
                     <el-table-column label="Action" width="100">
                         <template #default="scope">
-                            <el-button plain type="info" :icon="PencilIcon" size="small" circle />
+                            <el-button plain type="info" :icon="PencilIcon" size="small" circle @click="handleEditTransaction(scope.row.id)" />
                             <el-button plain type="danger" :icon="TrashIcon" size="small" circle
                                 @click="handleDeleteTransaction(scope.row.id)" />
                         </template>

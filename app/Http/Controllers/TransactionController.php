@@ -35,23 +35,22 @@ class TransactionController extends Controller
         }
     }
 
-    public function show(Request $request)
+    public function show(Request $request, $id)
     {
-        $validated = $request->validated([
-            'id' => ['required', 'exists:transactions,id']
-        ]);
-
         try {
-            $transaction = $this->transactionService->showTransaction($request->user, $validated['id']);
+            $transaction = $this->transactionService->showTransaction($request->user(), $id);
 
-            if ($transaction) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Transaction fetched succesfully',
-                    'data' => $transaction
-                ], 200);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaction fetched succesfully',
+                'data' => $transaction
+            ], 200);
 
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaction not found'
+            ], 404);
         } catch (\Throwable $th) {
             Log::error('Error occured while fetching single transcation', ['error' => $th->getMessage()]);
             return response()->json([

@@ -1,11 +1,17 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import Card from '../../../components/ui/Card.vue';
 import VueApexCharts from "vue3-apexcharts";
 import useAuthStore from '../../../stores/auth.js';
 import { formatAmount } from '../../../utils/helpers.js';
 import { getIncomeExpense } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
+
+const props = defineProps({
+    update: {
+        type: Number,
+    }
+});
 
 const selectedLastMonths = ref(6);
 
@@ -157,6 +163,12 @@ const incomeExpenseChartData = computed(() => {
     }
 })
 
+
+watch(() => props.update, (val) => {
+    if(val){
+        fetchIncomeExpense();
+    }
+})
 
 onMounted(() => {
     fetchIncomeExpense();

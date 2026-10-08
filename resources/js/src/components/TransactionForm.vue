@@ -5,7 +5,7 @@ import { transactionSchema } from '../utils/validationSchema.js';
 import { createCategory, getCategories } from '../services/category.service.js';
 import SubmitButton from './ui/SubmitButton.vue';
 import { debounce, getCurrentDate } from '../utils/helpers.js';
-import { storeTransaction } from '../services/transaction.service.js';
+import { showTransaction, storeTransaction, updateTransaction } from '../services/transaction.service.js';
 import { ElMessage } from 'element-plus';
 import { ArrowTrendingDownIcon, ArrowTrendingUpIcon, ArrowsRightLeftIcon, BanknotesIcon, CalendarDaysIcon, PencilSquareIcon, TagIcon } from '@heroicons/vue/24/outline';
 import { Check, Close } from '@element-plus/icons-vue'
@@ -16,26 +16,22 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    loading: {
-        type: Boolean,
-        default: false
-    },
-    editMode: {
-        type: Boolean,
-        default: false
+    editId: {
+        type: Number,
+        default: null
     }
 });
 
 const emit = defineEmits(['close-dialog', 'transaction-saved']);
 
-
 const saveTransactionLoader = ref(false);
+const showTransactionLoader = ref(false);
 const transactionAmount = ref(0);
 const transactionType = ref('expense');
 
 const initialValues = {
     type: 'expense',
-    amount: 0,
+    amount: null,
     transaction_date: getCurrentDate(),
     category_id: null,
     note: null
@@ -67,7 +63,11 @@ const dialogVisible = computed({
     set: () => {
         closeDialog();
     }
-})
+});
+
+const closeDialog = () => {
+    emit('close-dialog');
+}
 
 const categories = computed(() => {
     return transactionTypeForCategory.value === 'expense' ? categoryStore.expenseCategories : categoryStore.incomeCategories;
@@ -131,9 +131,16 @@ const showNewCategoryInput = () => {
     })
 }
 
+const clearSelectedCategory = () => {
+    formRef.value?.setFieldValue('category_id', null);
+    newCategoryInputVisible.value = false;
+    newCategoryVal.value = '';
+}
+
 const transactionTypeChanged = (type) => {
     if (type !== 'expense' && type !== 'income') return;
     transactionTypeForCategory.value = type;
+    clearSelectedCategory();
     fetchCategories(type);
 }
 
@@ -183,13 +190,22 @@ const saveTransaction = async (formData, { resetForm }) => {
     try {
         if (!formData) return;
         saveTransactionLoader.value = true;
-        const response = await storeTransaction(formData);
+
+        const payload = {
+            ...formData,
+            ...(props.editId ? { id: props.editId } : {})
+        };
+
+        const response = props.editId
+            ? await updateTransaction(payload)
+            : await storeTransaction(payload);
+
         if (response.data.success) {
             resetForm({ value: initialValues })
             closeDialog();
             ElMessage({
                 type: 'success',
-                message: response.data.message
+                message: props.editId ? 'Transaction updated successfully' : response.data.message
             });
             emit('transaction-saved');
         }
@@ -203,16 +219,53 @@ const saveTransaction = async (formData, { resetForm }) => {
 
 }
 
+const handleShowTransaction = async () => {
+    try {
+        showTransactionLoader.value = true;
+        const response = await showTransaction(props.editId);
+        if (response.data?.success) {
+            const selectedType = response.data?.data?.type ?? 'expense';
+            transactionTypeForCategory.value = selectedType;
+            await fetchCategories(selectedType);
 
-const closeDialog = () => {
-    emit('close-dialog');
+            formRef.value?.setValues({
+                type: selectedType,
+                amount: response.data?.data?.amount ?? null,
+                transaction_date: response.data?.data?.transaction_date ?? getCurrentDate(),
+                category_id: response.data?.data?.category_id ?? null,
+                note: response.data?.data?.note ?? null
+            })
+        }
+    } catch (e) {
+        handleError(e);
+    } finally{
+        showTransactionLoader.value = false;
+    }
 }
 
-watch(() => props.visible, (val) => {
-    if (val) {
-        fetchCategories();
+
+watch(() => props.visible, async (val) => {
+    if (!val) return;
+
+    if (props.editId) {
+        await handleShowTransaction();
+        return;
     }
-})
+
+    transactionTypeForCategory.value = 'expense';
+    formRef.value?.resetForm({ value: initialValues });
+    fetchCategories('expense');
+});
+
+watch(() => props.editId, (val) => {
+    if (val) {
+        handleShowTransaction();
+    } else {
+        transactionTypeForCategory.value = 'expense';
+        formRef.value?.resetForm({ value: initialValues });
+    }
+});
+
 
 
 </script>
@@ -220,12 +273,12 @@ watch(() => props.visible, (val) => {
 <template>
     <el-dialog v-model="dialogVisible" align-center :width="700">
         <template #header>
-            <h2 class="text-md sm:text-lg font-semibold" v-if="!editMode">Add Transaction</h2>
+            <h2 class="text-md sm:text-lg font-semibold" v-if="!editId">Add Transaction</h2>
             <h2 class="text-md sm:text-lg font-semibold" v-else>Edit Transaction</h2>
-            <p class="text-xs" v-if="!editMode">Record your income or expenses with the details below.</p>
+            <p class="text-xs" v-if="!editId">Record your income or expenses with the details below.</p>
             <p class="text-xs" v-else>Update the transaction details below.</p>
         </template>
-        <div v-loading="loading">
+        <div v-loading="showTransactionLoader">
             <Form ref="formRef" @submit="saveTransaction" :validation-schema="transactionSchema"
                 :initial-values="initialValues" v-slot="{ resetForm }">
                 <el-row :gutter="20">
@@ -247,16 +300,18 @@ watch(() => props.visible, (val) => {
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300'">
                                         <span class="flex min-w-0 items-center gap-2.5">
-                                            <span
-                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
                                                 :class="field.value === 'expense'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
                                                 <ArrowTrendingDownIcon class="h-4 w-4" />
                                             </span>
                                             <span class="min-w-0 leading-tight">
-                                                <span class="block text-sm font-semibold text-(--text-charcoal)">Expense</span>
-                                                <span class="block text-[11px] font-normal text-(--secondary-gray)">Money out</span>
+                                                <span
+                                                    class="block text-sm font-semibold text-(--text-charcoal)">Expense</span>
+                                                <span
+                                                    class="block text-[11px] font-normal text-(--secondary-gray)">Money
+                                                    out</span>
                                             </span>
                                         </span>
                                     </el-radio>
@@ -266,16 +321,18 @@ watch(() => props.visible, (val) => {
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300'">
                                         <span class="flex min-w-0 items-center gap-2.5">
-                                            <span
-                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
                                                 :class="field.value === 'income'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
                                                 <ArrowTrendingUpIcon class="h-4 w-4" />
                                             </span>
                                             <span class="min-w-0 leading-tight">
-                                                <span class="block text-sm font-semibold text-(--text-charcoal)">Income</span>
-                                                <span class="block text-[11px] font-normal text-(--secondary-gray)">Money in</span>
+                                                <span
+                                                    class="block text-sm font-semibold text-(--text-charcoal)">Income</span>
+                                                <span
+                                                    class="block text-[11px] font-normal text-(--secondary-gray)">Money
+                                                    in</span>
                                             </span>
                                         </span>
                                     </el-radio>
@@ -294,7 +351,7 @@ watch(() => props.visible, (val) => {
                                 </template>
                                 <el-input-number class="!w-full" :model-value="field.value"
                                     @update:model-value="handleChange" :precision="2" :step="1" :formatter="formatted"
-                                    :parser="parsed" :max="100000000" />
+                                    :parser="parsed" :max="100000000" :value-on-clear="null" placeholder="0.00" />
                             </el-form-item>
                         </Field>
                     </el-col>
@@ -363,12 +420,9 @@ watch(() => props.visible, (val) => {
                                                     :disabled="newCategoryInputLoader" />
                                                 <div class="flex items-center">
                                                     <el-button plain type="primary" size="small" :icon="Check" circle
-                                                        @click="handleNewCategory"
-                                                        :disabled="newCategoryInputLoader" />
-                                                    <el-button size="small" 
-                                                    plain type="danger" :icon="Close" circle
-                                                        @click="clearCategoryVal"
-                                                        :disabled="newCategoryInputLoader" />
+                                                        @click="handleNewCategory" :disabled="newCategoryInputLoader" />
+                                                    <el-button size="small" plain type="danger" :icon="Close" circle
+                                                        @click="clearCategoryVal" :disabled="newCategoryInputLoader" />
                                                 </div>
                                             </div>
                                             <el-button v-else size="small" @click="showNewCategoryInput">
@@ -386,7 +440,7 @@ watch(() => props.visible, (val) => {
         <template #footer>
             <div>
                 <el-button @click="closeDialog">Cancel</el-button>
-                <SubmitButton text="Save" @click="handleFormSubmit" :is-loading="saveTransactionLoader" />
+                <SubmitButton :text="editId ? 'Update' : 'Save'" @click="handleFormSubmit" :is-loading="saveTransactionLoader" />
             </div>
         </template>
     </el-dialog>

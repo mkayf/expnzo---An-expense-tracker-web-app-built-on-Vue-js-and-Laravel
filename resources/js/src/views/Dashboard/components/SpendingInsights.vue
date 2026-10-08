@@ -1,13 +1,26 @@
 <script setup>
-import {ref, onMounted} from "vue";
+import {ref, onMounted, watch} from "vue";
 import Card from "../../../components/ui/Card.vue";
+
+const props = defineProps({
+    update: {
+        type: Number,
+    }
+});
+
+watch(() => props.update, (val) => {
+    if(val){
+        // fire fetch
+    }
+});
+
 </script>
 
 <template>
     <Card>
         <template #header>
             <span>
-                Financial Insights
+                Spending Insights
             </span>
         </template>
         <template #body>

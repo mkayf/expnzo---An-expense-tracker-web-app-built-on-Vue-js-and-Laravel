@@ -15,13 +15,15 @@ import { getBudgetData } from "../../services/budget.service.js";
 import TransactionForm from "../../components/TransactionForm.vue";
 import IncomeExpense from "./components/IncomeExpense.vue";
 import ExpenseByCategories from "./components/ExpenseByCategories.vue";
-import FinancialInsights from "./components/FinancialInsights.vue";
+import SpendingInsights from "./components/SpendingInsights.vue";
 import RecentTransactions from "./components/RecentTransactions.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
 const budgetDataLoader = ref(false);
 const showBudgetBtn = ref(false);
+const transactionEditId = ref(null);
+const dashboardUpdate = ref(0);
 
 const statsSummary = ref({
     balance: {},
@@ -69,7 +71,20 @@ const fetchBudgetdata = async () => {
     }
 }
 
+const openAddTransaction = () => {
+    isTransactionModalOpen.value = true;
+    transactionEditId.value = null;
+}
 
+const openEditTransaction = (id) => {
+    isTransactionModalOpen.value = true;
+    transactionEditId.value = id;
+}
+
+const handleDashboardUpdate = () => {
+    fetchStatsSummary();
+    dashboardUpdate.value++;
+}
 
 
 onMounted(() => {
@@ -94,7 +109,7 @@ onMounted(() => {
                 Welcome Back, <span class="text-[var(--primary-color)]">{{ username }}</span>
             </h1>
             <div class="flex flex-wrap items-center gap-4">
-                <el-button color="var(--el-color-primary)" @click="isTransactionModalOpen = true">Add
+                <el-button color="var(--el-color-primary)" @click="openAddTransaction">Add
                     Transaction</el-button>
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
@@ -143,20 +158,20 @@ onMounted(() => {
                 </template>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                <IncomeExpense />
-                <ExpenseByCategories />
+                <IncomeExpense :update="dashboardUpdate" />
+                <ExpenseByCategories :update="dashboardUpdate" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-5">
-                <FinancialInsights />
-                <RecentTransactions />
+                <SpendingInsights :update="dashboardUpdate" />
+                <RecentTransactions @edit-transaction="openEditTransaction" @delete-transaction="handleDashboardUpdate" :update="dashboardUpdate" />
             </div>
         </div>
 
         <BudgetForm v-model:visible="isBudgetModalOpen" @close-dialog="isBudgetModalOpen = false"
-            :loading="budgetDataLoader" :data="budgetData" @budget-saved="fetchStatsSummary" />
+            :loading="budgetDataLoader" :data="budgetData" @budget-saved="handleDashboardUpdate" />
 
         <TransactionForm v-model:visible="isTransactionModalOpen" @close-dialog="isTransactionModalOpen = false"
-            @transaction-saved="fetchStatsSummary" />
+            @transaction-saved="handleDashboardUpdate" :edit-id="transactionEditId"  />
     </div>
 </template>
 
