@@ -43,6 +43,8 @@ const chartConfig = computed(() => {
             chart: {
                 type: 'bar',
                 height: '100%',
+                redrawOnParentResize: true,
+                redrawOnWindowResize: true,
                 toolbar: {
                     tools: {
                         download: false
@@ -177,7 +179,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Card>
+    <Card class="min-w-0">
         <template #header>
             <div v-if="loading" class="w-[60%]">
                 <el-skeleton :loading="loading" animated>
@@ -204,7 +206,7 @@ onMounted(() => {
             </el-select>
         </template>
         <template #body>
-            <div class="relative aspect-[16/10] max-h-[230px] md:aspect-auto md:h-[320px] md:max-h-none">
+            <div class="relative aspect-[16/10] max-h-[230px] w-full min-w-0 overflow-hidden md:aspect-auto md:h-[320px] md:max-h-none">
                 <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
                     <el-skeleton :loading="loading" animated class="w-full h-full px-6">
                         <template #template>
@@ -220,7 +222,8 @@ onMounted(() => {
                     </el-skeleton>
                 </div>
 
-                <VueApexCharts :class="{ 'opacity-0': loading }" class="transition-opacity duration-200"
+                <VueApexCharts :class="{ 'opacity-0': loading }" class="w-full min-w-0 transition-opacity duration-200"
+                    width="100%" height="100%"
                     :options="chartConfig.options" :series="chartConfig.series" />
             </div>
         </template>

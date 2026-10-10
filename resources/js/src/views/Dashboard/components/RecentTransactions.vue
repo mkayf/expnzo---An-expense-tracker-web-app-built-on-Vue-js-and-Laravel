@@ -4,17 +4,13 @@ import Card from '../../../components/ui/Card.vue';
 import { getRecentTransactions } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
 import { formatAmount, formatDate } from '../../../utils/helpers.js';
-import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import useAuthStore from '../../../stores/auth.js';
-import { deleteTransaction } from '../../../services/transaction.service.js';
 
 const props = defineProps({
     update: {
         type: Number,
-    }    
+    }
 });
-
-const emits = defineEmits(['edit-transaction', 'delete-transaction'])
 
 const loading = ref(false);
 const transactions = ref([]);
@@ -38,7 +34,7 @@ const fetchRecentTransactions = async () => {
 }
 
 const transactionsTableData = computed(() => {
-    if (!transactions.value || !transactions.value.length) return;
+    if (!transactions.value || !transactions.value.length) return [];
 
     return transactions.value.map((item, i) => {
         return {
@@ -52,33 +48,15 @@ const transactionsTableData = computed(() => {
     })
 });
 
-const handleDeleteTransaction = async (id) => {
-    try {
-        const confirmed = await ElMessageBox.confirm('Do you want to delete this transaction?', 'Confirm', {
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel',
-            type: 'warning'
-        }).catch(() => false);
-
-        if(!confirmed) return;
-
-        const response = await deleteTransaction(id);
-        if(response.data?.success){
-            transactions.value = transactions.value.filter(item => item.id !== id);
-            emits('delete-transaction');
-        }
-
-    } catch (e) {
-        handleError(e)
-    }
-}
-
-const handleEditTransaction = (id) => {
-    emits('edit-transaction', id);
-}
+const tagStyle = (type) => ({
+    '--el-tag-border-color':
+        type === 'income'
+            ? 'var(--el-color-primary-light-5)'
+            : 'var(--el-color-warning-light-5)',
+});
 
 watch(() => props.update, (val) => {
-    if(val){
+    if (val) {
         fetchRecentTransactions();
     }
 });
@@ -91,7 +69,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Card :body_x_padding="false">
+    <Card class="min-w-0" :body_x_padding="false">
         <template #header>
             <el-skeleton :loading="loading" animated :throttle="300">
                 <template #template>
@@ -116,32 +94,94 @@ onMounted(() => {
 
         <template #body>
             <el-skeleton :loading="loading" :rows="5" animated :throttle="300" class="p-4">
-                <el-table :data="transactionsTableData" style="width: 100%" class="app-table">
-                    <el-table-column prop="number" label="#" width="60" />
-                    <el-table-column prop="amount" label="Amount" width="180">
-                        <template #default="scope">
-                            {{ userCurrency + " " + formatAmount(scope.row.amount, userCurrencyIso) }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="type" label="Type" width="120">
-                        <template #default="scope">
-                            <el-tag effect="light" round :type="scope.row.type === 'expense' ? 'warning' : 'primary'"
-                                :style="{ '--el-tag-border-color': scope.row.type === 'income' ? 'var(--el-color-primary-light-5)' : 'var(--el-color-warning-light-5)' }">
-                                {{ scope.row.type }}
-                            </el-tag>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="category_name" label="Category" width="180" />
-                    <el-table-column prop="transaction_date" label="Date" width="140" />
-                    <el-table-column label="Action" width="100">
-                        <template #default="scope">
-                            <el-button plain type="info" :icon="PencilIcon" size="small" circle @click="handleEditTransaction(scope.row.id)" />
-                            <el-button plain type="danger" :icon="TrashIcon" size="small" circle
-                                @click="handleDeleteTransaction(scope.row.id)" />
-                        </template>
-                    </el-table-column>
-                </el-table>
+                <template #default>
+                    <div class="transactions-container w-full min-w-0">
+                        <div class="transactions-table w-full min-w-0">
+                            <el-table :data="transactionsTableData" class="app-table" style="width: 100%"
+                                table-layout="fixed" :show-header="true">
+                                <el-table-column prop="number" label="#" width="60" align="center" />
+
+                                <el-table-column prop="amount" label="Amount" min-width="130">
+                                    <template #default="scope">
+                                        <span class="whitespace-nowrap font-semibold">
+                                            {{ userCurrency + " " + formatAmount(scope.row.amount, userCurrencyIso) }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+
+                                <el-table-column prop="type" label="Type" min-width="90">
+                                    <template #default="scope">
+                                        <el-tag effect="light" round
+                                            :type="scope.row.type === 'expense' ? 'warning' : 'primary'"
+                                            :style="tagStyle(scope.row.type)">
+                                            {{ scope.row.type }}
+                                        </el-tag>
+                                    </template>
+                                </el-table-column>
+
+                                <el-table-column prop="category_name" label="Category" min-width="140"
+                                    show-overflow-tooltip />
+
+                                <el-table-column prop="transaction_date" label="Date" min-width="110"
+                                    show-overflow-tooltip />
+
+                            </el-table>
+                        </div>
+
+                        <div class="transactions-list divide-y divide-gray-100 px-3">
+                            <div v-for="row in transactionsTableData" :key="row.id"
+                                class="flex min-w-0 items-start justify-between gap-2 py-3">
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-sm font-semibold">{{ row.category_name }}</p>
+                                    <p class="text-xs text-gray-500">{{ row.transaction_date }}</p>
+                                </div>
+
+                                <div class="flex max-w-[55%] shrink-0 flex-col items-end gap-1">
+                                    <span class="max-w-full text-right text-sm font-semibold [overflow-wrap:anywhere]">
+                                        {{ userCurrency + " " + formatAmount(row.amount, userCurrencyIso) }}
+                                    </span>
+                                    <el-tag size="small" effect="light" round
+                                        :type="row.type === 'expense' ? 'warning' : 'primary'"
+                                        :style="tagStyle(row.type)">
+                                        {{ row.type }}
+                                    </el-tag>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </el-skeleton>
         </template>
     </Card>
 </template>
+
+<style scoped>
+.transactions-container {
+    container-type: inline-size;
+}
+
+.transactions-table {
+    display: none;
+}
+
+@container (min-width: 600px) {
+    .transactions-table {
+        display: block;
+    }
+
+    .transactions-list {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .app-table .el-table__cell {
+        padding: 8px 0;
+    }
+
+    .app-table .cell {
+        padding: 0 8px;
+        font-size: 13px;
+    }
+}
+</style>

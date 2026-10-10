@@ -15,30 +15,41 @@ class BudgetService
         ]);
     }
 
-    public function deleteBudget($user, $id){
+    public function deleteBudget($user, $id)
+    {
         $budget = $user->budgets()->findOrFail($id);
         return $budget->delete();
     }
 
-    public function getBudgetData($user){
+    public function getBudgetData($user)
+    {
         $current_budget = (float) ($user?->budgets()->where('period', $this->getCurrentPeriod())->value('limit_amount') ?? 0);
 
-        $used_budget = (float) ($user?->transactions()->where('type', 'expense')->whereBetween('transaction_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()->format('Y-m-d')])->sum('amount') ?? 0);
+        $used_budget = $used_budget = $current_budget != 0
+            ? (float) ($user?->transactions()
+                ->where('type', 'expense')
+                ->whereBetween('transaction_date', [
+                    Carbon::now()->startOfMonth()->toDateString(),
+                    Carbon::now()->endOfMonth()->toDateString(),
+                ])
+                ->sum('amount') ?? 0)
+            : 0;
 
-        $remaining_budget = $current_budget !== 0 ? $current_budget - $used_budget : 0;
+        $remaining_budget = $current_budget != 0 ? $current_budget - $used_budget : 0;
 
         $last_budget = (float) ($user?->budgets()->where('period', '<', $this->getCurrentPeriod())->latest()->first()->limit_amount ?? 0);
 
         return [
             'current_budget' => $current_budget,
-            'usedBudget' => $used_budget,
+            'used_budget' => $used_budget,
             'remaining_budget' => $remaining_budget,
-            'last_budget' => $last_budget
+            'last_budget' => $last_budget,
         ];
     }
 
-    protected function getCurrentPeriod(){
-        return Carbon::now()->format('Y-m');       
+    protected function getCurrentPeriod()
+    {
+        return Carbon::now()->format('Y-m');
     }
 
 }

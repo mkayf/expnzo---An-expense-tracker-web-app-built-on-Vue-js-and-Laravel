@@ -85,11 +85,11 @@ class DashboardController extends Controller
     }
 
     public function getRecentTransactions(Request $request)
-    {   
+    {
         try {
             $data = $this->financialSummaryService->recentTransactions($request->user());
 
-            if($data){
+            if ($data) {
                 return response()->json([
                     'success' => true,
                     'message' => 'recent transactions fetched successfully.',
@@ -101,6 +101,27 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while getting recent transactions'
+            ], 500);
+        }
+    }
+
+    public function getSpendingInsights(Request $request)
+    {
+        try {
+            $data = $this->financialSummaryService->spendingInsights($request->user());
+
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'spending insights fetched successfully.',
+                    'data' => $data
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            Log::error('Error occured while fetching spending insights', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting spending insights'
             ], 500);
         }
     }

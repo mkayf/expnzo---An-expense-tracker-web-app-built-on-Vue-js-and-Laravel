@@ -76,11 +76,6 @@ const openAddTransaction = () => {
     transactionEditId.value = null;
 }
 
-const openEditTransaction = (id) => {
-    isTransactionModalOpen.value = true;
-    transactionEditId.value = id;
-}
-
 const handleDashboardUpdate = () => {
     fetchStatsSummary();
     dashboardUpdate.value++;
@@ -114,7 +109,7 @@ onMounted(() => {
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
         </div>
-        <div class="dashboard-body mt-6">
+        <div class="dashboard-body mt-6 min-w-0">
             <div class="grid grid-cols-1 md:grid-cols-2 xl:!grid-cols-4 gap-5 mb-5">
                 <template v-if="statsLoading">
                     <StatShimmerCard />
@@ -157,13 +152,13 @@ onMounted(() => {
                     </StatCard>
                 </template>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            <div class="grid min-w-0 grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <IncomeExpense :update="dashboardUpdate" />
                 <ExpenseByCategories :update="dashboardUpdate" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-5">
                 <SpendingInsights :update="dashboardUpdate" />
-                <RecentTransactions @edit-transaction="openEditTransaction" @delete-transaction="handleDashboardUpdate" :update="dashboardUpdate" />
+                <RecentTransactions :update="dashboardUpdate" />
             </div>
         </div>
 

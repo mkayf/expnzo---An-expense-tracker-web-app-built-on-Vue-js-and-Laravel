@@ -14,10 +14,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
-Route::get('test', function () {
-    return view('test');
-});
-
 
 Route::prefix('/api')->group(function () {
     // Auth routes for guest users:
@@ -55,9 +51,10 @@ Route::prefix('/api')->group(function () {
 
         // Dashboard routes:
         Route::get('/dashboard/stats-summary', [DashboardController::class, 'getSummary'])->name('dashboard.stats');
-        Route::get('/dashboard/income-expense', [DashboardController::class, 'getIncomeExpense']);
-        Route::get('/dashboard/expense-by-categories', [DashboardController::class, 'getExpenseByCategories']);
-        Route::get('/dashboard/recent-transactions', [DashboardController::class, 'getRecentTransactions']);
+        Route::get('/dashboard/income-expense', [DashboardController::class, 'getIncomeExpense'])->name('dashboard.income_expense');
+        Route::get('/dashboard/expense-by-categories', [DashboardController::class, 'getExpenseByCategories'])->name('dashboard.expense_by_categories');
+        Route::get('/dashboard/recent-transactions', [DashboardController::class, 'getRecentTransactions'])->name('dashboard.recent_transactions');
+        Route::get('/dashboard/spending-insights', [DashboardController::class, 'getSpendingInsights'])->name('dashboard.spending_insights');
 
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
@@ -66,7 +63,7 @@ Route::prefix('/api')->group(function () {
         // Category routes:
         Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
         Route::post('/create-custom-category', [CategoryController::class, 'createCustomCategory'])->name('category.store');
-
+        
     });
 
 
