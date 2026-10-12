@@ -5,6 +5,8 @@ import useAuthStore from '../../../stores/auth.js';
 import VueApexCharts from 'vue3-apexcharts';
 import { formatAmount } from '../../../utils/helpers.js';
 import { getExpenseByCategories } from '../../../services/dashboard.service.js';
+import useThemeStore from '../../../stores/theme';
+import { withChartTheme } from '../../../utils/chartTheme';
 
 const props = defineProps({
     update: {
@@ -15,6 +17,7 @@ const props = defineProps({
 const selectedMonths = ref(0);
 const loading = ref(false);
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 const userCurrency = authStore.user.preferences.currency;
 const userCurrencyIso = authStore.user.preferences.currency_iso;
 const expenseCategoriesData = ref([]);
@@ -45,7 +48,7 @@ const monthOptions = [
 
 const chartConfig = computed(() => {
     return {
-        options: {
+        options: withChartTheme({
             chart: {
                 type: "donut",
                 redrawOnParentResize: true,
@@ -99,7 +102,7 @@ const chartConfig = computed(() => {
                     }
                 }
             }
-        },
+        }, themeStore.isDark),
         series: expenseCategoryChartData.value.amounts
     }
 })

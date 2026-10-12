@@ -115,12 +115,12 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="bg-white p-6 rounded-2xl shadow-lg w-full sm:w-100">
+    <div class="bg-[var(--app-surface)] p-6 rounded-2xl shadow-lg w-full sm:w-100 dark:border dark:border-[var(--el-border-color)]">
         <Form @submit="handleVerifyEmail" :validation-schema="emailOTPSchema">
             <div class="flex items-center justify-between">
                 <h2 class="text-xl">Verify Email</h2>
             </div>
-            <span class="text-gray-700 text-xs inline-block mb-3"
+            <span class="text-gray-700 dark:text-[var(--el-text-color-regular)] text-xs inline-block mb-3"
                 >Enter the OTP which is sent to your email {{ userEmail }}</span
             >
             <div class="otp-container mb-4">
@@ -166,7 +166,7 @@ onMounted(() => {
                 </Field>
             </div>
             <div>
-                <span class="text-xs text-gray-700 inline-block mb-2"
+                <span class="text-xs text-gray-700 dark:text-[var(--el-text-color-regular)] inline-block mb-2"
                     >Didn’t get it? Wait for the timer.</span
                 >
             </div>
@@ -177,7 +177,7 @@ onMounted(() => {
                     :class="[
                         'w-full transition-all duration-500',
                         formattedTime > 0 || disableResend
-                            ? '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none'
+                            ? '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none dark:!bg-[var(--app-muted)] dark:hover:!bg-[var(--el-fill-color-dark)] dark:!text-[var(--el-text-color-secondary)]'
                             : '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white',
                     ]"
                 >
@@ -239,6 +239,16 @@ onMounted(() => {
     color: #303133;
     background: white;
     transition: all 0.3s;
+}
+
+:global(html.dark) .otp-box {
+    border-color: var(--el-border-color);
+    color: var(--text-charcoal);
+    background: var(--app-muted);
+}
+
+:global(html.dark) .otp-box.is-active::after {
+    background-color: var(--el-color-primary);
 }
 
 @keyframes blink {

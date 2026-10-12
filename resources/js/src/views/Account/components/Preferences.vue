@@ -90,7 +90,7 @@ onMounted(() => {
                                             selectedCountry.currency) ||
                                         authStore.user.preferences.currency
                                     "
-                                    class="font-semibold text-xl bg-gray-100 p-2 rounded-lg"
+                                    class="font-semibold text-xl bg-gray-100 dark:bg-[var(--app-muted)] p-2 rounded-lg"
                                     >{{
                                         selectedCountry?.currency ??
                                         authStore.user.preferences.currency

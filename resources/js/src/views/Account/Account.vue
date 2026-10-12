@@ -43,7 +43,7 @@ const navigate = (routeName) => {
                     
                 </el-menu>
             </div>
-            <div class=" bg-white border border-[var(--el-border-color)] rounded-md">
+            <div class=" bg-[var(--app-surface)] border border-[var(--el-border-color)] rounded-md">
                 <RouterView />
             </div>
         </div>

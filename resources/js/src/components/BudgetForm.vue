@@ -105,14 +105,14 @@ watch(() => props.data, (data) => {
         <div v-loading="loading">
             <div class="flex justify-between">
                 <el-tag class="font-semibold"
-                    style="--el-tag-bg-color: #f0f9ff; --el-tag-border-color: #e0f2fe; --el-tag-text-color: var(--accent-sky-blue);">
+                    style="--el-tag-bg-color: var(--tag-info-bg); --el-tag-border-color: var(--tag-info-border); --el-tag-text-color: var(--accent-sky-blue);">
                     Period: {{ getCurrentPeriod() }}
                 </el-tag>
                 <el-button size="small" type="primary" plain v-if="props.data?.last_budget && props.data?.last_budget > 0" @click="useLastBudget">Use Last Budget</el-button>
             </div>
             <div class="py-4 flex items-center">
                 <div class="flex-1">
-                    <span class="font-semibold text-xl text-black">{{ userCurrency }}</span>
+                    <span class="font-semibold text-xl text-black dark:text-[var(--text-charcoal)]">{{ userCurrency }}</span>
                 </div>
                 <div class="flex-4">
                     <el-input-number style="width: 100%;" v-model="budgetAmount" :precision="2" :step="1"
@@ -122,9 +122,9 @@ watch(() => props.data, (data) => {
             <el-row class="flex" :gutter="8">
                 <el-col :xs="12" :sm="8" class="min-w-0 mb-2 sm:mb-0">
                     <div
-                        class="@container bg-white rounded-xl border border-gray-100 p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-col gap-1 sm:gap-2 min-w-0">
+                        class="@container bg-white dark:bg-[var(--app-muted)] rounded-xl border border-gray-100 dark:border-[var(--el-border-color)] p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-col gap-1 sm:gap-2 min-w-0">
                         <div
-                            class="inline-flex items-center gap-1 self-start bg-gray-100 rounded-full pl-1.5 pr-2 py-0.5 max-w-full">
+                            class="inline-flex items-center gap-1 self-start bg-gray-100 dark:bg-[var(--el-fill-color-dark)] rounded-full pl-1.5 pr-2 py-0.5 max-w-full">
                             <WalletIcon class="w-3 h-3 shrink-0 text-(--secondary-gray)!" />
                             <span
                                 class="text-[9px] @[110px]:text-[10px] font-bold uppercase tracking-wide text-(--secondary-gray)! whitespace-nowrap">Current</span>
@@ -137,9 +137,9 @@ watch(() => props.data, (data) => {
     
                 <el-col :xs="12" :sm="8" class="min-w-0 mb-2 sm:mb-0">
                     <div
-                        class="@container bg-white rounded-xl border border-gray-100 p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-col gap-1 sm:gap-2 min-w-0">
+                        class="@container bg-white dark:bg-[var(--app-muted)] rounded-xl border border-gray-100 dark:border-[var(--el-border-color)] p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-col gap-1 sm:gap-2 min-w-0">
                         <div
-                            class="inline-flex items-center gap-1 self-start bg-sky-50 rounded-full pl-1.5 pr-2 py-0.5 max-w-full">
+                            class="inline-flex items-center gap-1 self-start bg-sky-50 dark:bg-[var(--tag-info-bg)] rounded-full pl-1.5 pr-2 py-0.5 max-w-full">
                             <ReceiptPercentIcon class="w-3 h-3 shrink-0 text-(--accent-sky-blue)!" />
                             <span
                                 class="text-[9px] @[110px]:text-[10px] font-bold uppercase tracking-wide text-(--accent-sky-blue)! whitespace-nowrap">Used</span>
@@ -153,7 +153,7 @@ watch(() => props.data, (data) => {
     
                 <el-col :xs="24" :sm="8" class="min-w-0">
                     <div
-                        class="@container bg-white rounded-xl border border-gray-100 p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-row items-center justify-between sm:flex-col sm:items-stretch sm:justify-normal gap-1 sm:gap-2 min-w-0">
+                        class="@container bg-white dark:bg-[var(--app-muted)] rounded-xl border border-gray-100 dark:border-[var(--el-border-color)] p-2 sm:p-3 shadow hover:shadow-md transition-shadow duration-200 h-full flex flex-row items-center justify-between sm:flex-col sm:items-stretch sm:justify-normal gap-1 sm:gap-2 min-w-0">
                         <div
                             class="inline-flex items-center gap-1 self-start bg-(--el-color-primary-light-9) rounded-full pl-1.5 pr-2 py-0.5 max-w-full">
                             <BanknotesIcon class="w-3 h-3 shrink-0 text-(--primary-green)!" />

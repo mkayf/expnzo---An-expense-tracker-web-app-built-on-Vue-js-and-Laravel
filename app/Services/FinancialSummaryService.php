@@ -305,12 +305,14 @@ class FinancialSummaryService
         $current_month = $today->copy()->startOfMonth();
         $current_month_key = $current_month->format('Y-m');
         $previous_month_keys = collect(range(3, 1))
-            ->map(fn (int $monthsAgo) => $current_month->copy()->subMonthsNoOverflow($monthsAgo)->format('Y-m'));
+            ->map(fn(int $monthsAgo) => $current_month->copy()->subMonthsNoOverflow($monthsAgo)->format('Y-m'));
 
-        $comparison_periods = collect([$current_month_key => [
-            $current_month,
-            $today->copy()->endOfDay()
-        ]]);
+        $comparison_periods = collect([
+            $current_month_key => [
+                $current_month,
+                $today->copy()->endOfDay()
+            ]
+        ]);
 
         $average_transaction_size_insights = collect();
         if ($user) {
@@ -389,10 +391,12 @@ class FinancialSummaryService
         }
 
         $highest_spending_day_insights = collect();
-        if ($daily_expenses
+        if (
+            $daily_expenses
             && $daily_expenses->sum('transaction_count') >= 3
-            && $daily_expenses->count() >= 2) {
-            $highest_daily_amount = $daily_expenses->max(fn ($day) => (float) $day->amount);
+            && $daily_expenses->count() >= 2
+        ) {
+            $highest_daily_amount = $daily_expenses->max(fn($day) => (float) $day->amount);
             $highest_spending_days = $daily_expenses->filter(function ($day) use ($highest_daily_amount) {
                 return (float) $day->amount === $highest_daily_amount;
             })->values();
@@ -422,7 +426,7 @@ class FinancialSummaryService
             if ($category_transaction_counts->sum('transaction_count') >= 3) {
                 $highest_category_count = (int) $category_transaction_counts->max('transaction_count');
                 $most_frequent_categories = $category_transaction_counts
-                    ->filter(fn ($category) => (int) $category->transaction_count === $highest_category_count)
+                    ->filter(fn($category) => (int) $category->transaction_count === $highest_category_count)
                     ->pluck('name')
                     ->values()
                     ->all();
@@ -495,7 +499,7 @@ class FinancialSummaryService
 
                         return $expense ? (float) $expense->amount : null;
                     })
-                    ->filter(fn ($amount) => $amount !== null)
+                    ->filter(fn($amount) => $amount !== null)
                     ->avg();
                 $increase_percentage = $average_previous_month_expense > 0
                     ? (($current_month_expense->amount ?? 0) - $average_previous_month_expense) / $average_previous_month_expense * 100
@@ -547,4 +551,11 @@ class FinancialSummaryService
             ->concat($small_purchases_impact_insights)
             ->values();
     }
+
+    public function spendingCalendar($user, $month)
+    {
+        
+    }
+
+
 }

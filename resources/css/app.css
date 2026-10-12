@@ -1,11 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 @import "tailwindcss";
+@import "element-plus/theme-chalk/dark/css-vars.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../**/*.vue';
 
 @theme {
     --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
@@ -15,6 +19,7 @@
 }
 
 :root {
+    color-scheme: light;
     --el-color-primary: #328e6e !important;
     --el-color-primary-light-3: #6ee7b7 !important;
     --el-color-primary-light-5: #a7f3d0 !important;
@@ -24,6 +29,7 @@
     --el-color-primary-dark-2: #059669 !important;
     
     --primary-green: #328e6e;
+    --primary-color: var(--primary-green);
     --green-hover: #29755a;
     --secondary-gray: #374151;
     --accent-sky-blue: #3b82f6;
@@ -31,10 +37,78 @@
     --text-charcoal: #111827;
     --body-color: rgb(245, 245, 245);
     --yellow-color: #F59E0B;
+
+    --app-page-bg: #f9fafb;
+    --app-surface: #ffffff;
+    --app-muted: #f3f4f6;
+    --app-hover: #f3f4f6;
+    --app-overlay: rgba(255, 255, 255, 0.6);
+    --app-divide: #f3f4f6;
+    --tag-info-bg: #f0f9ff;
+    --tag-info-border: #e0f2fe;
+}
+
+html.dark {
+    color-scheme: dark;
+    --el-color-primary: #3db98a !important;
+    --el-color-primary-light-3: #2f9a73 !important;
+    --el-color-primary-light-5: #24785a !important;
+    --el-color-primary-light-7: #1b5c45 !important;
+    --el-color-primary-light-8: #164b39 !important;
+    --el-color-primary-light-9: #12382c !important;
+    --el-color-primary-dark-2: #10b981 !important;
+
+    --el-bg-color: #161c19;
+    --el-bg-color-page: #0d1210;
+    --el-bg-color-overlay: #1c2420;
+    --el-text-color-primary: #e8eee9;
+    --el-text-color-regular: #c5d0cb;
+    --el-text-color-secondary: #9aa8a0;
+    --el-text-color-placeholder: #7a8a83;
+    --el-border-color: #2e3a35;
+    --el-border-color-light: #27322e;
+    --el-border-color-lighter: #222c28;
+    --el-border-color-extra-light: #1d2623;
+    --el-fill-color: #1c2420;
+    --el-fill-color-light: #222b27;
+    --el-fill-color-lighter: #1a211e;
+    --el-fill-color-extra-light: #181f1c;
+    --el-fill-color-blank: #161c19;
+    --el-fill-color-dark: #2a3530;
+    --el-mask-color: rgba(8, 12, 10, 0.72);
+    --el-box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    --el-box-shadow-light: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --el-disabled-bg-color: #1c2420;
+    --el-disabled-text-color: #6b7a74;
+    --el-menu-hover-bg-color: rgba(61, 185, 138, 0.12);
+    --el-menu-bg-color: #161c19;
+
+    --primary-green: #3db98a;
+    --primary-color: var(--primary-green);
+    --green-hover: #4ec99a;
+    --secondary-gray: #9aa8a0;
+    --bg-light-gray: #222b27;
+    --text-charcoal: #e8eee9;
+    --body-color: #0d1210;
+    --yellow-color: #fbbf24;
+
+    --app-page-bg: #0d1210;
+    --app-surface: #161c19;
+    --app-muted: #222b27;
+    --app-hover: rgba(255, 255, 255, 0.06);
+    --app-overlay: rgba(13, 18, 16, 0.7);
+    --app-divide: #2a3530;
+    --tag-info-bg: rgba(59, 130, 246, 0.16);
+    --tag-info-border: rgba(59, 130, 246, 0.28);
+}
+
+html.dark {
+    scrollbar-color: #3a4741 #0d1210;
 }
 
 body {
     background-color: var(--body-color);
+    color: var(--text-charcoal);
     font-family: "Montserrat", sans-serif;
     font-style: normal;
 }
@@ -80,6 +154,10 @@ small {
     background-color: var(--el-menu-hover-bg-color);
 }
 
+html.dark .el-menu-item.is-active {
+    color: var(--el-color-primary) !important;
+}
+
 .account-menu-item.el-menu-item.is-active::after{
     content: '';
     position: absolute;
@@ -95,7 +173,19 @@ small {
   --el-table-text-color: #374151;
   --el-table-border-color: #eef0f4;
   --el-table-row-hover-bg-color: #f8f9fc;
+  --el-table-bg-color: #ffffff;
+  --el-table-tr-bg-color: #ffffff;
   font-size: 14px;
+}
+
+html.dark .el-table.app-table {
+  --el-table-header-bg-color: #1c2420;
+  --el-table-header-text-color: #c5d0cb;
+  --el-table-text-color: #e8eee9;
+  --el-table-border-color: #2a3530;
+  --el-table-row-hover-bg-color: #222b27;
+  --el-table-bg-color: #161c19;
+  --el-table-tr-bg-color: #161c19;
 }
 
 .el-table.app-table::before,
@@ -127,4 +217,78 @@ small {
 
 .el-table.app-table .el-table__body tr:last-child td.el-table__cell {
   border-bottom: none;
+}
+
+html.dark .el-table.app-table th.el-table__cell {
+  background-color: #1c2420;
+  border-bottom-color: #2a3530;
+}
+
+html.dark .el-table.app-table th.el-table__cell .cell {
+  color: #c5d0cb;
+}
+
+html.dark .el-table.app-table td.el-table__cell {
+  border-bottom-color: #2a3530;
+}
+
+html.dark .app-loader {
+  background-color: rgba(13, 18, 16, 0.94) !important;
+}
+
+html.dark .el-dropdown-menu,
+html.dark .el-popper.is-light,
+html.dark .el-select-dropdown,
+html.dark .el-picker-panel,
+html.dark .el-dialog {
+  --el-bg-color-overlay: #1c2420;
+}
+
+html.dark .el-card,
+html.dark .el-message-box {
+  --el-bg-color: #161c19;
+}
+
+html.dark .el-breadcrumb__inner,
+html.dark .el-breadcrumb__inner a,
+html.dark .el-breadcrumb__inner.is-link {
+  color: var(--el-text-color-regular) !important;
+}
+
+html.dark .el-breadcrumb__separator {
+  color: var(--el-text-color-placeholder);
+}
+
+html.dark .el-menu {
+  --el-menu-bg-color: var(--app-surface);
+  --el-menu-text-color: var(--text-charcoal);
+  --el-menu-hover-text-color: var(--el-color-primary);
+}
+
+html.dark .el-radio {
+  --el-radio-text-color: var(--text-charcoal);
+}
+
+html.dark .apexcharts-tooltip {
+  background: #1c2420 !important;
+  border-color: #2e3a35 !important;
+  color: #e8eee9 !important;
+}
+
+html.dark .apexcharts-tooltip-title {
+  background: #222b27 !important;
+  border-color: #2e3a35 !important;
+}
+
+html.dark .apexcharts-legend-text {
+  color: #9aa8a0 !important;
+}
+
+html.dark .apexcharts-yaxis-label,
+html.dark .apexcharts-xaxis-label {
+  fill: #9aa8a0 !important;
+}
+
+html.dark .apexcharts-gridline {
+  stroke: #2a3530 !important;
 }

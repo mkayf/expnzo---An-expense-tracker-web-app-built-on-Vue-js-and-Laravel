@@ -51,7 +51,7 @@ watch(
             <div class="flex lg:hidden items-center justify-between px-5 pt-6 pb-4 w-full box-border shrink-0 h-[68px]">
                 <img src="../assets/logo/logo.png" alt="Logo" class="h-7 w-auto max-w-none object-contain" />
                 <button type="button" aria-label="Close menu"
-                    class="flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                    class="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--el-text-color-regular)] hover:bg-[var(--app-hover)] active:bg-[var(--app-muted)] transition-colors"
                     @click="emit('close')">
                     <XMarkIcon class="w-6 h-6" />
                 </button>

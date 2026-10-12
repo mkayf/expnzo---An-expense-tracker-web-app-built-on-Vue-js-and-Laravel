@@ -6,6 +6,8 @@ import useAuthStore from '../../../stores/auth.js';
 import { formatAmount } from '../../../utils/helpers.js';
 import { getIncomeExpense } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
+import useThemeStore from '../../../stores/theme';
+import { withChartTheme } from '../../../utils/chartTheme';
 
 const props = defineProps({
     update: {
@@ -16,6 +18,7 @@ const props = defineProps({
 const selectedLastMonths = ref(6);
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 const userCurrency = authStore.user.preferences.currency;
 const userCurrencyIso = authStore.user.preferences.currency_iso;
 const incomeExpenseData = ref([]);
@@ -39,7 +42,7 @@ const lastMonthOptions = [
 
 const chartConfig = computed(() => {
     return {
-        options: {
+        options: withChartTheme({
             chart: {
                 type: 'bar',
                 height: '100%',
@@ -106,7 +109,7 @@ const chartConfig = computed(() => {
                 },
             },
 
-        },
+        }, themeStore.isDark),
         series: [
             {
                 name: 'Income',
@@ -207,7 +210,7 @@ onMounted(() => {
         </template>
         <template #body>
             <div class="relative aspect-[16/10] max-h-[230px] w-full min-w-0 overflow-hidden md:aspect-auto md:h-[320px] md:max-h-none">
-                <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
+                <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-[var(--app-overlay)] z-10">
                     <el-skeleton :loading="loading" animated class="w-full h-full px-6">
                         <template #template>
                             <div class="flex items-end justify-around w-full h-full gap-3 pb-6">

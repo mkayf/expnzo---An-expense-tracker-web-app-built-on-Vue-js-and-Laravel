@@ -151,4 +151,13 @@
   opacity: 8%;
 }
 
+html.dark .gsi-material-button {
+  background-color: #222b27;
+  color: #e8eee9;
+}
+
+html.dark .gsi-material-button:not(:disabled):hover {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.45), 0 1px 3px 1px rgba(0, 0, 0, 0.25);
+}
+
 </style>

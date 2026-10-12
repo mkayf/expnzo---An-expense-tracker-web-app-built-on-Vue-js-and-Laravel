@@ -49,7 +49,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="bg-white p-6 rounded-2xl shadow-lg w-80">
+    <div class="bg-[var(--app-surface)] p-6 rounded-2xl shadow-lg w-80 dark:border dark:border-[var(--el-border-color)]">
         <img :src="logo" alt="Logo" class="h-[40px] mx-auto my-3" />
         <Form @submit="loginUser" :validation-schema="loginSchema">
             <h2 class="text-xl my-3 text-center">Login to your account</h2>

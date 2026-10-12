@@ -298,7 +298,7 @@ watch(() => props.editId, (val) => {
                                         class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
                                         :class="field.value === 'expense'
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
-                                            : '!border-gray-200 bg-white hover:!border-gray-300'">
+                                            : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
                                         <span class="flex min-w-0 items-center gap-2.5">
                                             <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
                                                 :class="field.value === 'expense'
@@ -319,7 +319,7 @@ watch(() => props.editId, (val) => {
                                         class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
                                         :class="field.value === 'income'
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
-                                            : '!border-gray-200 bg-white hover:!border-gray-300'">
+                                            : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
                                         <span class="flex min-w-0 items-center gap-2.5">
                                             <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
                                                 :class="field.value === 'income'

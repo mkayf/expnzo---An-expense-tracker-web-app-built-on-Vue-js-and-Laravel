@@ -12,10 +12,10 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="border border-[var(--el-border-color)] rounded-2xl bg-white w-full"
+    <div class="border border-[var(--el-border-color)] rounded-2xl bg-[var(--app-surface)] w-full"
         :class="{ 'flex h-full flex-col': full_height }">
         <div class="flex flex-wrap justify-between items-center gap-2 px-3 py-3">
-            <h3 class="font-semibold text-sm text-slate-700 flex-1 min-w-[150px]">
+            <h3 class="font-semibold text-sm text-slate-700 dark:text-[var(--el-text-color-regular)] flex-1 min-w-[150px]">
                 <slot name="header"></slot>
             </h3>
             <div class="flex flex-wrap items-center justify-between gap-2">

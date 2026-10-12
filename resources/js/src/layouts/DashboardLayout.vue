@@ -51,13 +51,13 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-    <div class="flex h-screen overflow-hidden bg-gray-50">
+    <div class="flex h-screen overflow-hidden bg-[var(--app-page-bg)]">
         <!-- Mobile overlay -->
         <div v-if="isMobile && isMobileOpen" @click="isMobileOpen = false" class="fixed inset-0 bg-black/50 z-20"></div>
 
         <!-- Sidebar Container with Right Border & Smooth Transition -->
         <aside
-            class="h-full bg-white border-r border-gray-200 overflow-hidden shrink-0 z-30 transition-[width,transform] duration-300 ease-in-out"
+            class="h-full bg-[var(--app-surface)] border-r border-[var(--el-border-color)] overflow-hidden shrink-0 z-30 transition-[width,transform] duration-300 ease-in-out"
             :class="isMobile
                 ? [
                     'fixed left-0 top-0 w-[230px]',

@@ -99,22 +99,22 @@ const computedInsights = computed(() => insights.value.map((insight) => {
 
 const severityMap = {
     warning: {
-        wrap: 'border-amber-100 bg-amber-50/60',
-        iconBox: 'bg-amber-100 text-amber-600',
+        wrap: 'border-amber-100 bg-amber-50/60 dark:border-amber-500/20 dark:bg-amber-500/10',
+        iconBox: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400',
         icon: ExclamationTriangleIcon,
         tagType: 'warning',
         label: 'Warning',
     },
     neutral: {
-        wrap: 'border-gray-200 bg-gray-50',
-        iconBox: 'bg-gray-200 text-gray-600',
+        wrap: 'border-gray-200 bg-gray-50 dark:border-[var(--el-border-color)] dark:bg-[var(--app-muted)]',
+        iconBox: 'bg-gray-200 text-gray-600 dark:bg-[var(--el-fill-color-dark)] dark:text-[var(--el-text-color-regular)]',
         icon: InformationCircleIcon,
         tagType: 'info',
         label: 'Neutral',
     },
     positive: {
-        wrap: 'border-emerald-100 bg-emerald-50/60',
-        iconBox: 'bg-emerald-100 text-emerald-600',
+        wrap: 'border-emerald-100 bg-emerald-50/60 dark:border-emerald-500/20 dark:bg-emerald-500/10',
+        iconBox: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
         icon: CheckCircleIcon,
         tagType: 'success',
         label: 'Positive',
@@ -171,18 +171,18 @@ onMounted(() => {
                     <!-- Content -->
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-2">
-                            <h4 class="truncate text-xs font-semibold text-gray-900">{{ insight.title }}</h4>
+                            <h4 class="truncate text-xs font-semibold text-gray-900 dark:text-[var(--text-charcoal)]">{{ insight.title }}</h4>
                         </div>
-                        <p class="mt-1 text-[10px] leading-relaxed text-gray-600">{{ insight.message }}</p>
+                        <p class="mt-1 text-[10px] leading-relaxed text-gray-600 dark:text-[var(--el-text-color-secondary)]">{{ insight.message }}</p>
                     </div>
                 </div>
                 <div v-if="computedInsights.length === 0"
-                    class="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/70 px-4 py-6 text-center">
-                    <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-600">
+                    class="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 dark:border-[var(--el-border-color)] bg-gray-50/70 dark:bg-[var(--app-muted)] px-4 py-6 text-center">
+                    <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-600 dark:bg-[var(--el-fill-color-dark)] dark:text-[var(--el-text-color-regular)]">
                         <InformationCircleIcon class="h-6 w-6" aria-hidden="true" />
                     </div>
-                    <h4 class="text-sm font-semibold text-gray-800">No insights to show</h4>
-                    <p class="mt-1 max-w-xs text-xs leading-relaxed text-gray-500">
+                    <h4 class="text-sm font-semibold text-gray-800 dark:text-[var(--text-charcoal)]">No insights to show</h4>
+                    <p class="mt-1 max-w-xs text-xs leading-relaxed text-gray-500 dark:text-[var(--el-text-color-secondary)]">
                         Helpful spending insights will appear here when available.
                     </p>
                 </div>

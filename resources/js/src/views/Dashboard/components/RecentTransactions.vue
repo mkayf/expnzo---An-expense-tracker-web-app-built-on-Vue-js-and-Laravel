@@ -128,12 +128,12 @@ onMounted(() => {
                             </el-table>
                         </div>
 
-                        <div class="transactions-list divide-y divide-gray-100 px-3">
+                        <div class="transactions-list divide-y divide-gray-100 dark:divide-[var(--app-divide)] px-3">
                             <div v-for="row in transactionsTableData" :key="row.id"
                                 class="flex min-w-0 items-start justify-between gap-2 py-3">
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-sm font-semibold">{{ row.category_name }}</p>
-                                    <p class="text-xs text-gray-500">{{ row.transaction_date }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-[var(--el-text-color-secondary)]">{{ row.transaction_date }}</p>
                                 </div>
 
                                 <div class="flex max-w-[55%] shrink-0 flex-col items-end gap-1">

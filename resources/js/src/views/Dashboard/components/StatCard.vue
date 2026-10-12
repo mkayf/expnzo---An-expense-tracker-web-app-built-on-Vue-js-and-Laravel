@@ -4,6 +4,8 @@ import useAuthStore from "../../../stores/auth";
 import { formatAmount } from "../../../utils/helpers";
 import VueApexCharts from "vue3-apexcharts";
 import { getCurrentPeriod } from "../../../utils/helpers";
+import useThemeStore from "../../../stores/theme";
+import { withChartTheme } from "../../../utils/chartTheme";
 
 const props = defineProps({
     type: {
@@ -23,6 +25,7 @@ const props = defineProps({
 const emit = defineEmits(['open-budget-form']);
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
 
@@ -90,20 +93,20 @@ const showTrendText = computed(() => {
 const trendTextClass = computed(() => {
     switch (trendTextColor.value) {
         case 'green':
-            return 'text-green-700'
+            return 'text-green-700 dark:text-emerald-400'
         case 'red':
-            return 'text-red-700'
+            return 'text-red-700 dark:text-red-400'
         case 'yellow':
-            return 'text-yellow-700'
+            return 'text-yellow-700 dark:text-amber-400'
         default:
-            return 'text-gray-700'
+            return 'text-gray-700 dark:text-gray-400'
     }
 })
 
 const chartConfig = computed(() => {
     if (props.type === 'balance' || props.type === 'budget') {
         return {
-            options: {
+            options: withChartTheme({
                 chart: {
                     type: "donut",
                 },
@@ -131,13 +134,13 @@ const chartConfig = computed(() => {
                         },
                     },
                 }
-            },
+            }, themeStore.isDark),
             series: props.type === 'balance' ? [props.data?.chart_data?.total_incomes, props.data?.chart_data?.total_expense] : [props.data?.chart_data?.remaining_budget, props.data?.chart_data?.used_budget]
         }
     }
 
     return {
-        options: {
+        options: withChartTheme({
             xaxis: {
                 categories: props.data?.chart_data?.dates,
             },
@@ -171,7 +174,7 @@ const chartConfig = computed(() => {
                     },
                 },
             }
-        },
+        }, themeStore.isDark),
         series: [
             {
                 name: props.type === "income" ? 'Daily Income' : 'Daily Expense',
@@ -184,14 +187,14 @@ const chartConfig = computed(() => {
 
 </script>
 <template>
-    <div class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3">
+    <div class="border border-[var(--el-border-color)] rounded-2xl bg-[var(--app-surface)] p-3">
         <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
                 <span class="p-2 bg-[var(--el-color-primary-dark-2)] text-white rounded-2xl"
                     style="box-shadow: rgba(100, 100, 111, 0.5) 0px 4px 8px 0px;">
                     <slot name="icon"></slot>
                 </span>
-                <span class="font-semibold text-sm text-slate-700">
+                <span class="font-semibold text-sm text-slate-700 dark:text-[var(--el-text-color-regular)]">
                     <slot name="label"></slot> {{ showMonth }}
                 </span>
             </div>
@@ -200,7 +203,7 @@ const chartConfig = computed(() => {
             <div class="col-span-3">
                 <div class="mt-3 flex items-center justify-between">
                     <div>
-                        <span class="text-md font-medium text-slate-700">{{
+                        <span class="text-md font-medium text-slate-700 dark:text-[var(--el-text-color-regular)]">{{
                             userCurrency ?? ""
                         }}</span>
                         <span class="ml-1 text-2xl font-semibold">

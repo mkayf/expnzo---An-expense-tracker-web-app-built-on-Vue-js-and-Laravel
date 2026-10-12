@@ -4,6 +4,7 @@ import { Bars3Icon, MagnifyingGlassIcon, UserIcon, ArrowRightEndOnRectangleIcon 
 import GlobalSearch from "./GlobalSearch.vue"; 
 import Avatar from "./ui/Avatar.vue";
 import NotificationBell from "./ui/NotificationBell.vue";
+import ThemeToggle from "./ui/ThemeToggle.vue";
 import { ArrowRight } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import { logout } from "../services/auth.service.js";
@@ -41,12 +42,12 @@ const logoutUser = async () => {
 
 <template>
     <div
-        class="mt-4 mx-4 md:mx-6 bg-white px-4 py-2 rounded-md border border-[var(--el-border-color)] flex items-center justify-between relative"
+        class="mt-4 mx-4 md:mx-6 bg-[var(--app-surface)] px-4 py-2 rounded-md border border-[var(--el-border-color)] flex items-center justify-between relative"
     >
         <div class="flex items-center gap-3">
             <button
                 @click="$emit('toggle-menu')"
-                class="lg:hidden px-2 -ml-2 rounded-md hover:bg-gray-100 text-gray-600"
+                class="lg:hidden px-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-[var(--app-hover)] text-gray-600 dark:text-[var(--el-text-color-regular)]"
             >
                 <Bars3Icon class="w-6 h-6" />
             </button>
@@ -72,23 +73,15 @@ const logoutUser = async () => {
         </div>
 
         <div class="flex items-center gap-2">
-            <button
-                v-if="!showSearchInput"
-                @click="showSearchInput = true"
-                class="lg:hidden text-[var(--el-text-color-regular)]"
-            >
-                <MagnifyingGlassIcon class="w-5 h-5" />
-            </button>   
 
             <div class="hidden lg:block w-64">
-                <GlobalSearch />
             </div>
-            <div class="flex items-center gap-6">
-                <NotificationBell />
+            <div class="flex items-center gap-2 sm:gap-2">
+                <ThemeToggle />
                 <el-dropdown placement="bottom-end">
                     <div class="flex items-center gap-2 outline-none cursor-pointer">
                         <avatar :avatarURL="authStore.user?.avatar" />
-                        <span v-if="authStore.user.name" class="hidden md:block text-md font-medium">{{ authStore.user.name }}</span>
+                        <span v-if="authStore.user.name" class="hidden md:block text-md font-medium text-[var(--text-charcoal)]">{{ authStore.user.name }}</span>
                     </div>
                     <template #dropdown>
                         <el-dropdown-menu>
@@ -108,18 +101,6 @@ const logoutUser = async () => {
             </div>
         </div>
 
-        <div
-            v-if="showSearchInput"
-            class="absolute inset-0 bg-white z-20 flex items-center px-4 rounded-md lg:hidden"
-        >
-            <GlobalSearch class="flex-1 mr-2" />
-            <button
-                @click="showSearchInput = false"
-                class="text-sm text-gray-500 font-medium whitespace-nowrap"
-            >
-                Cancel
-            </button>
-        </div>
     </div>
 </template>
 

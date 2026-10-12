@@ -1,7 +1,7 @@
 <template>
     <el-skeleton animated>
         <template #template>
-            <div class="border border-[var(--el-border-color)] rounded-2xl bg-white p-3">
+            <div class="border border-[var(--el-border-color)] rounded-2xl bg-[var(--app-surface)] p-3">
                 <div class="flex items-center gap-2">
                     <el-skeleton-item variant="circle" style="--el-skeleton-circle-size: 32px"/>
                     <el-skeleton-item variant="h3" style="width: 50%;" />

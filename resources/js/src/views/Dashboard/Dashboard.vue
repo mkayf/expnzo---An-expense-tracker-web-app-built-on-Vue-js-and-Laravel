@@ -17,6 +17,7 @@ import IncomeExpense from "./components/IncomeExpense.vue";
 import ExpenseByCategories from "./components/ExpenseByCategories.vue";
 import SpendingInsights from "./components/SpendingInsights.vue";
 import RecentTransactions from "./components/RecentTransactions.vue";
+import SpendingCalendar from "./components/SpendingCalendar.vue";
 
 const monthFilter = ref(null);
 const statsLoading = ref(true);
@@ -156,9 +157,12 @@ onMounted(() => {
                 <IncomeExpense :update="dashboardUpdate" />
                 <ExpenseByCategories :update="dashboardUpdate" />
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-[1.5fr_2.5fr] gap-5 mb-5">
                 <SpendingInsights :update="dashboardUpdate" />
                 <RecentTransactions :update="dashboardUpdate" />
+            </div>
+            <div>
+                <SpendingCalendar />
             </div>
         </div>
 

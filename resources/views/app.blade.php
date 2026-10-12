@@ -6,6 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Expnzo</title>
     <link rel="icon" type="image/png" href="/fav.ico" />
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('expnzo-theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                }
+            } catch (e) {}
+        })();
+    </script>
     @vite(['resources/css/app.css'])
     @vite(['resources/js/app.js'])
 </head>

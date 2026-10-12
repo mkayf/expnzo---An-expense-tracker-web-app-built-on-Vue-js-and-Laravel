@@ -6,6 +6,7 @@ use App\Services\FinancialSummaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use PhpParser\Node\Stmt\TryCatch;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -113,7 +114,7 @@ class DashboardController extends Controller
             if ($data) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'spending insights fetched successfully.',
+                    'message' => 'spending insights data fetched successfully',
                     'data' => $data
                 ], 200);
             }
@@ -125,5 +126,40 @@ class DashboardController extends Controller
             ], 500);
         }
     }
+
+    public function getSpendingCalendarData(Request $request)
+    {
+
+        if ($request->filled($request->query('month'))) {
+            $validated = $request->validate([
+                'month' => ['date', 'date_format:Y-m']
+            ]);
+
+            $month = $validated['month'];
+        } else {
+            $month = Carbon::now()->format('Y-m');
+        }
+
+        try {
+            $data = $this->financialSummaryService->spendingCalendar($request->user(), $month);
+
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'spending calendar data fetched successfully',
+                    'data' => $data
+                ], 200);
+            }
+
+        } catch (\Throwable $th) {
+            Log::error('Error occured while fetching spending calendar data', ['error' => $th->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting spending calendar data'
+            ], 500);
+        }
+    }
+
+        
 
 }

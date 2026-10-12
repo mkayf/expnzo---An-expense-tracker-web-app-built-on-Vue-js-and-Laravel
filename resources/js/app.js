@@ -7,7 +7,7 @@ import useAuthStore from "./src/stores/auth";
 import { ElLoading } from "element-plus";
 import "element-plus/es/components/loading/style/css";
 import "./src/assets/logo/logo.png";
-import "element-plus/theme-chalk/dark/css-vars.css";
+import useThemeStore from "./src/stores/theme";
 window.Apex = {
     chart: {
         fontFamily: "Montserrat, sans-serif",
@@ -39,9 +39,10 @@ window.Apex = {
 };
 
 async function initializeApp() {
+    const isDark = document.documentElement.classList.contains("dark");
     const loading = ElLoading.service({
         lock: true,
-        background: "white",
+        background: isDark ? "rgba(13, 18, 16, 0.94)" : "white",
         customClass: "app-loader",
     });
 
@@ -49,6 +50,7 @@ async function initializeApp() {
     const pinia = createPinia();
     app.use(pinia);
 
+    useThemeStore(pinia).init();
     const authStore = useAuthStore(pinia);
 
     try {
