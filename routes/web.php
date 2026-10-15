@@ -56,6 +56,7 @@ Route::prefix('/api')->group(function () {
         Route::get('/dashboard/recent-transactions', [DashboardController::class, 'getRecentTransactions'])->name('dashboard.recent_transactions');
         Route::get('/dashboard/spending-insights', [DashboardController::class, 'getSpendingInsights'])->name('dashboard.spending_insights');
         Route::get('/dashboard/spending-calendar', [DashboardController::class, 'getSpendingCalendarData'])->name('dashbaord.spending_calendar');
+        Route::get('/dashboard/spending-calendar/day-transactions', [DashboardController::class, 'getSpendingCalendarDayTransactions'])->name('dashboard.spending_calendar.day_transactions');
 
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
@@ -73,4 +74,3 @@ Route::prefix('/api')->group(function () {
 Route::get('/{any?}', function () {
     return view('app');
 })->where('any', '.*');
-

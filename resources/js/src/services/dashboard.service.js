@@ -19,3 +19,13 @@ export const getRecentTransactions = () => {
 export const getSpendingInsights = () => {
     return api.get('/dashboard/spending-insights');
 }
+
+export const getSpendingCalendar = (month) => {
+    return api.get('/dashboard/spending-calendar', {params: {
+        month
+    }})
+}
+
+export const getSpendingCalendarDayTransactions = (date) => {
+    return api.get('/dashboard/spending-calendar/day-transactions', { params: { date } });
+}

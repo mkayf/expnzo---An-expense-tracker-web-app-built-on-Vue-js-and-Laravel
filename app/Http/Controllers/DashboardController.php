@@ -160,6 +160,35 @@ class DashboardController extends Controller
         }
     }
 
-        
+    public function getSpendingCalendarDayTransactions(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => ['required', 'date_format:Y-m-d'],
+        ]);
+
+        try {
+            $data = $this->financialSummaryService->spendingCalendarDayTransactions(
+                $request->user(),
+                $validated['date']
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'spending calendar day transactions fetched successfully',
+                'data' => $data,
+            ], 200);
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while fetching spending calendar day transactions', [
+                'date' => $validated['date'],
+                'user_id' => $request->user()->id,
+                'error' => $th->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting spending calendar day transactions',
+            ], 500);
+        }
+    }
 
 }

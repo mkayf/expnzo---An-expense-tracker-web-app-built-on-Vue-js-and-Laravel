@@ -554,8 +554,44 @@ class FinancialSummaryService
 
     public function spendingCalendar($user, $month)
     {
-        
+        $date = Carbon::parse($month);
+        $startDate = $date->copy()->startOfMonth()->startOfWeek(Carbon::MONDAY)->format('Y-m-d');
+        $endDate = $date->copy()->endOfMonth()->endOfWeek(Carbon::SUNDAY)->format('Y-m-d');
+
+        $transactions = $user->transactions()
+        ->selectRaw('transaction_date, SUM(amount) as amount')
+        ->where('type', 'expense')
+        ->whereBetween('transaction_date', [$startDate, $endDate])
+        ->groupBy('transaction_date')
+        ->get()
+        ->map(function($item){
+            return [
+                'transaction_date' => $item->transaction_date,
+                'amount' => (float) $item->amount
+            ];
+        });
+
+        return $transactions;
     }
 
+    public function spendingCalendarDayTransactions($user, $date)
+    {
+        return $user->transactions()
+            ->with(['category:id,name'])
+            ->where('type', 'expense')
+            ->whereDate('transaction_date', $date)
+            ->orderByDesc('id')
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'type' => $transaction->type,
+                    'amount' => (float) $transaction->amount,
+                    'note' => $transaction->note,
+                    'transaction_date' => $transaction->transaction_date,
+                    'category' => $transaction->category,
+                ];
+            });
+    }
 
 }

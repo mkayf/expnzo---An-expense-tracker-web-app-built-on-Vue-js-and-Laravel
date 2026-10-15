@@ -6,7 +6,7 @@ import { useRoute } from "vue-router";
 
 const isCollapsed = ref(false);
 const isMobileOpen = ref(false);
-const isMobile = ref(false);
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth < 1024);
 
 const checkScreenSize = () => {
     isMobile.value = window.innerWidth < 1024;
@@ -51,27 +51,27 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-    <div class="flex h-screen overflow-hidden bg-[var(--app-page-bg)]">
+    <div class="flex min-h-screen bg-[var(--app-page-bg)]">
         <!-- Mobile overlay -->
         <div v-if="isMobile && isMobileOpen" @click="isMobileOpen = false" class="fixed inset-0 bg-black/50 z-20"></div>
 
         <!-- Sidebar Container with Right Border & Smooth Transition -->
         <aside
-            class="h-full bg-[var(--app-surface)] border-r border-[var(--el-border-color)] overflow-hidden shrink-0 z-30 transition-[width,transform] duration-300 ease-in-out"
+            class="h-screen bg-[var(--app-surface)] border-r border-[var(--el-border-color)] overflow-hidden z-30 transition-[width,transform] duration-300 ease-in-out"
             :class="isMobile
                 ? [
                     'fixed left-0 top-0 w-[230px]',
                     isMobileOpen ? 'translate-x-0' : '-translate-x-full',
                 ]
-                : isCollapsed
-                    ? 'w-[64px]'
-                    : 'w-[230px]'
-                " @transitionend="onSidebarTransitionEnd">
+                : [
+                    'sticky top-0 shrink-0',
+                    isCollapsed ? 'w-[64px]' : 'w-[230px]',
+                ]" @transitionend="onSidebarTransitionEnd">
             <Sidebar :collapsed="isCollapsed && !isMobile" @collapse-change="isCollapsed = $event"
                 @close="isMobileOpen = false" />
         </aside>
 
-        <div class="flex-1 min-w-0 h-full flex flex-col overflow-y-auto">
+        <div class="flex-1 min-w-0 flex flex-col">
             <Header @toggle-menu="toggleSidebar" />
 
             <main class="px-4 md:px-6 py-6">

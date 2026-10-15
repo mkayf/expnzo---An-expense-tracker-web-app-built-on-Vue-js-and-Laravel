@@ -162,7 +162,7 @@ onMounted(() => {
                 <RecentTransactions :update="dashboardUpdate" />
             </div>
             <div>
-                <SpendingCalendar />
+                <SpendingCalendar :update="dashboardUpdate" />
             </div>
         </div>
 
