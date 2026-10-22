@@ -8,21 +8,12 @@ export default [
         }
     },
     {
-        path: 'income',
-        name: 'Income',
-        component: () => import('../views/Income.vue'),
+        path: 'transactions',
+        name: 'Transactions',
+        component: () => import('../views/Transactions.vue'),
         meta: {
             requiresAuth: true,
-            breadcrumb: 'Income'
-        }
-    },
-    {
-        path: 'expenses',
-        name: 'Expenses',
-        component: () => import('../views/Expenses.vue'),
-        meta: {
-            requiresAuth: true,
-            breadcrumb: 'Expenses'
+            breadcrumb: 'Transactions'
         }
     },
     {

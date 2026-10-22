@@ -86,7 +86,7 @@ onMounted(() => {
                 <template #template>
                     <el-skeleton-item variant="button" style="width: 80px; height: 24px" />
                 </template>
-                <template #default>
+                <template #default> 
                     <el-button size="small" type="primary" plain>View more</el-button>
                 </template>
             </el-skeleton>
@@ -95,8 +95,8 @@ onMounted(() => {
         <template #body>
             <el-skeleton :loading="loading" :rows="5" animated :throttle="300" class="p-4">
                 <template #default>
-                    <div class="transactions-container w-full min-w-0">
-                        <div class="transactions-table w-full min-w-0">
+                    <div class="responsive-table-container w-full min-w-0">
+                        <div class="responsive-table-desktop w-full min-w-0">
                             <el-table :data="transactionsTableData" class="app-table" style="width: 100%"
                                 table-layout="fixed" :show-header="true">
                                 <el-table-column prop="number" label="#" width="60" align="center" />
@@ -128,7 +128,7 @@ onMounted(() => {
                             </el-table>
                         </div>
 
-                        <div class="transactions-list divide-y divide-gray-100 dark:divide-[var(--app-divide)] px-3">
+                        <div class="responsive-table-mobile divide-y divide-gray-100 dark:divide-[var(--app-divide)] px-3">
                             <div v-for="row in transactionsTableData" :key="row.id"
                                 class="flex min-w-0 items-start justify-between gap-2 py-3">
                                 <div class="min-w-0 flex-1">
@@ -154,34 +154,3 @@ onMounted(() => {
         </template>
     </Card>
 </template>
-
-<style scoped>
-.transactions-container {
-    container-type: inline-size;
-}
-
-.transactions-table {
-    display: none;
-}
-
-@container (min-width: 600px) {
-    .transactions-table {
-        display: block;
-    }
-
-    .transactions-list {
-        display: none;
-    }
-}
-
-@media (max-width: 1024px) {
-    .app-table .el-table__cell {
-        padding: 8px 0;
-    }
-
-    .app-table .cell {
-        padding: 0 8px;
-        font-size: 13px;
-    }
-}
-</style>

@@ -1,10 +1,8 @@
 import {
-    BanknotesIcon,
     ChartBarSquareIcon,
-    Cog6ToothIcon,
-    CurrencyDollarIcon,
     DocumentCurrencyDollarIcon,
     Square3Stack3DIcon,
+    ArrowsRightLeftIcon 
 } from "@heroicons/vue/24/outline";
 
 const menus = [
@@ -14,14 +12,9 @@ const menus = [
         icon: ChartBarSquareIcon
     },
     {
-        name: 'Income',
-        path: '/app/income',
-        icon: CurrencyDollarIcon
-    },
-    {
-        name: 'Expenses',
-        path: '/app/expenses',
-        icon: BanknotesIcon
+        name: 'Transactions',
+        path: '/app/transactions',
+        icon: ArrowsRightLeftIcon
     },
     {
         name: 'Categories',

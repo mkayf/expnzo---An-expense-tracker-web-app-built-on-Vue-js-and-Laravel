@@ -12,10 +12,11 @@
 @source '../**/*.vue';
 
 @theme {
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+    --font-sans:
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
-        --breakpoint-lg: 1024px;
+    --breakpoint-lg: 1024px;
 }
 
 :root {
@@ -27,7 +28,7 @@
     --el-color-primary-light-8: #ecfdf5 !important;
     --el-color-primary-light-9: #f0fdf4 !important;
     --el-color-primary-dark-2: #059669 !important;
-    
+
     --primary-green: #328e6e;
     --primary-color: var(--primary-green);
     --green-hover: #29755a;
@@ -36,7 +37,7 @@
     --bg-light-gray: #f9fafb;
     --text-charcoal: #111827;
     --body-color: rgb(245, 245, 245);
-    --yellow-color: #F59E0B;
+    --yellow-color: #f59e0b;
 
     --app-page-bg: #f9fafb;
     --app-surface: #ffffff;
@@ -145,12 +146,12 @@ small {
     margin-bottom: 2px !important;
 }
 
-.el-menu-item{
+.el-menu-item {
     font-weight: 500;
     color: var(--text-charcoal) !important;
 }
 
-.el-menu-item.is-active{
+.el-menu-item.is-active {
     background-color: var(--el-menu-hover-bg-color);
 }
 
@@ -158,8 +159,8 @@ html.dark .el-menu-item.is-active {
     color: var(--el-color-primary) !important;
 }
 
-.account-menu-item.el-menu-item.is-active::after{
-    content: '';
+.account-menu-item.el-menu-item.is-active::after {
+    content: "";
     position: absolute;
     right: 0;
     width: 6px;
@@ -168,72 +169,72 @@ html.dark .el-menu-item.is-active {
 }
 
 .el-table.app-table {
-  --el-table-header-bg-color: #f3f4f6;
-  --el-table-header-text-color: #374151;
-  --el-table-text-color: #374151;
-  --el-table-border-color: #eef0f4;
-  --el-table-row-hover-bg-color: #f8f9fc;
-  --el-table-bg-color: #ffffff;
-  --el-table-tr-bg-color: #ffffff;
-  font-size: 14px;
+    --el-table-header-bg-color: #f3f4f6;
+    --el-table-header-text-color: #374151;
+    --el-table-text-color: #374151;
+    --el-table-border-color: #eef0f4;
+    --el-table-row-hover-bg-color: #f8f9fc;
+    --el-table-bg-color: #ffffff;
+    --el-table-tr-bg-color: #ffffff;
+    font-size: 14px;
 }
 
 html.dark .el-table.app-table {
-  --el-table-header-bg-color: #1c2420;
-  --el-table-header-text-color: #c5d0cb;
-  --el-table-text-color: #e8eee9;
-  --el-table-border-color: #2a3530;
-  --el-table-row-hover-bg-color: #222b27;
-  --el-table-bg-color: #161c19;
-  --el-table-tr-bg-color: #161c19;
+    --el-table-header-bg-color: #1c2420;
+    --el-table-header-text-color: #c5d0cb;
+    --el-table-text-color: #e8eee9;
+    --el-table-border-color: #2a3530;
+    --el-table-row-hover-bg-color: #222b27;
+    --el-table-bg-color: #161c19;
+    --el-table-tr-bg-color: #161c19;
 }
 
 .el-table.app-table::before,
 .el-table.app-table .el-table__inner-wrapper::before {
-  display: none;
+    display: none;
 }
 
 .el-table.app-table th.el-table__cell {
-  background-color: #f3f4f6;
-  height: 52px;
-  border-bottom: 1px solid #eef0f4;
+    background-color: #f3f4f6;
+    height: 52px;
+    border-bottom: 1px solid #eef0f4;
 }
 .el-table.app-table th.el-table__cell .cell {
-  padding: 0 20px;
-  font-weight: 700;
-  color: #374151;
-  white-space: nowrap;
+    padding: 0 20px;
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
 }
 
 .el-table.app-table td.el-table__cell {
-  height: 64px;
-  padding: 0;
-  border-bottom: 1px solid #eef0f4;
+    height: 64px;
+    padding: 0;
+    border-bottom: 1px solid #eef0f4;
 }
 .el-table.app-table td.el-table__cell .cell {
-  padding: 0 20px;
-  font-weight: 600;
+    padding: 0 20px;
+    font-weight: 600;
 }
 
 .el-table.app-table .el-table__body tr:last-child td.el-table__cell {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 html.dark .el-table.app-table th.el-table__cell {
-  background-color: #1c2420;
-  border-bottom-color: #2a3530;
+    background-color: #1c2420;
+    border-bottom-color: #2a3530;
 }
 
 html.dark .el-table.app-table th.el-table__cell .cell {
-  color: #c5d0cb;
+    color: #c5d0cb;
 }
 
 html.dark .el-table.app-table td.el-table__cell {
-  border-bottom-color: #2a3530;
+    border-bottom-color: #2a3530;
 }
 
 html.dark .app-loader {
-  background-color: rgba(13, 18, 16, 0.94) !important;
+    background-color: rgba(13, 18, 16, 0.94) !important;
 }
 
 html.dark .el-dropdown-menu,
@@ -241,54 +242,87 @@ html.dark .el-popper.is-light,
 html.dark .el-select-dropdown,
 html.dark .el-picker-panel,
 html.dark .el-dialog {
-  --el-bg-color-overlay: #1c2420;
+    --el-bg-color-overlay: #1c2420;
 }
 
 html.dark .el-card,
 html.dark .el-message-box {
-  --el-bg-color: #161c19;
+    --el-bg-color: #161c19;
 }
 
 html.dark .el-breadcrumb__inner,
 html.dark .el-breadcrumb__inner a,
 html.dark .el-breadcrumb__inner.is-link {
-  color: var(--el-text-color-regular) !important;
+    color: var(--el-text-color-regular) !important;
 }
 
 html.dark .el-breadcrumb__separator {
-  color: var(--el-text-color-placeholder);
+    color: var(--el-text-color-placeholder);
 }
 
 html.dark .el-menu {
-  --el-menu-bg-color: var(--app-surface);
-  --el-menu-text-color: var(--text-charcoal);
-  --el-menu-hover-text-color: var(--el-color-primary);
+    --el-menu-bg-color: var(--app-surface);
+    --el-menu-text-color: var(--text-charcoal);
+    --el-menu-hover-text-color: var(--el-color-primary);
 }
 
 html.dark .el-radio {
-  --el-radio-text-color: var(--text-charcoal);
+    --el-radio-text-color: var(--text-charcoal);
 }
 
 html.dark .apexcharts-tooltip {
-  background: #1c2420 !important;
-  border-color: #2e3a35 !important;
-  color: #e8eee9 !important;
+    background: #1c2420 !important;
+    border-color: #2e3a35 !important;
+    color: #e8eee9 !important;
 }
 
 html.dark .apexcharts-tooltip-title {
-  background: #222b27 !important;
-  border-color: #2e3a35 !important;
+    background: #222b27 !important;
+    border-color: #2e3a35 !important;
 }
 
 html.dark .apexcharts-legend-text {
-  color: #9aa8a0 !important;
+    color: #9aa8a0 !important;
 }
 
 html.dark .apexcharts-yaxis-label,
 html.dark .apexcharts-xaxis-label {
-  fill: #9aa8a0 !important;
+    fill: #9aa8a0 !important;
 }
 
 html.dark .apexcharts-gridline {
-  stroke: #2a3530 !important;
+    stroke: #2a3530 !important;
+}
+
+.responsive-table-container {
+    container-type: inline-size;
+}
+
+.responsive-table-desktop {
+    display: none;
+}
+
+.responsive-table-mobile {
+    display: block;
+}
+
+@container (min-width: 600px) {
+    .responsive-table-desktop {
+        display: block;
+    }
+
+    .responsive-table-mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .app-table .el-table__cell {
+        padding: 8px 0;
+    }
+
+    .app-table .cell {
+        padding: 0 8px;
+        font-size: 13px;
+    }
 }
