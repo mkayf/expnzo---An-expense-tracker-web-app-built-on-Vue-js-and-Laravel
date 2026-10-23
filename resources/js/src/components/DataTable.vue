@@ -2,14 +2,15 @@
 import { ref, onMounted, watch } from 'vue';
 import Card from './ui/Card.vue';
 import { DocumentChartBarIcon, DocumentTextIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
+import handleError from '../utils/handleError.js';
 
 const props = defineProps({
     columns: {
         type: Array,
         default: () => []
     },
-    api: {
-        type: String,
+    apiService: {
+        type: Function,
         default: null
     },
     exportPDF: {
@@ -22,80 +23,43 @@ const props = defineProps({
     }
 });
 
+const tableData = ref([]);
+const pagination = ref({
+    perPage: 20,
+    page: 1
+});
 
-const tableData = [
-    {
-        name: "kaif",
-        role: "developer",
-        age: 20,
-        company: "Murree Brewery",
-        city: "karachi"
-    },
-    {
-        name: "ali",
-        role: "designer",
-        age: 25,
-        company: "Systems Limited",
-        city: "lahore"
-    },
-    {
-        name: "ahmed",
-        role: "backend developer",
-        age: 28,
-        company: "10Pearls",
-        city: "karachi"
-    },
-    {
-        name: "usman",
-        role: "frontend developer",
-        age: 23,
-        company: "Folio3",
-        city: "islamabad"
-    },
-    {
-        name: "hamza",
-        role: "project manager",
-        age: 32,
-        company: "Contour Software",
-        city: "karachi"
-    },
-    {
-        name: "hassan",
-        role: "full stack developer",
-        age: 27,
-        company: "Systems Limited",
-        city: "lahore"
-    },
-    {
-        name: "bilal",
-        role: "QA engineer",
-        age: 26,
-        company: "10Pearls",
-        city: "islamabad"
-    },
-    {
-        name: "saad",
-        role: "UI/UX designer",
-        age: 24,
-        company: "Folio3",
-        city: "karachi"
-    },
-    {
-        name: "owais",
-        role: "DevOps engineer",
-        age: 30,
-        company: "Contour Software",
-        city: "lahore"
-    },
-    {
-        name: "zain",
-        role: "mobile developer",
-        age: 22,
-        company: "Techlogix",
-        city: "islamabad"
+const nextPage = () => {
+    pagination.value.page++;
+    fetchData();
+}
+
+const previousPage = () => {
+    if(pagination.value.page === 1) return;
+    pagination.value.page--;
+    fetchData;
+}
+
+const fetchData = async () => {
+    if (!props.apiService) return;
+    try {
+        const response = await props.apiService({
+            page: pagination.value.page,
+            per_page: pagination.value.perPage
+        });
+        if (response.data?.success) {
+            console.log('data: ', response.data?.data);
+        }
+    } catch (e) {
+        handleError(e);
+    } finally {
+
     }
-];
+}
 
+onMounted(() => {
+    fetchData();
+})
 </script>
 
 <template>
@@ -110,16 +74,19 @@ const tableData = [
                     <div class="flex items-center justify-start md:justify-end flex-wrap gap-3">
                         <slot name="addons"></slot>
 
-                        <el-button size="small" type="primary" :icon="DocumentChartBarIcon" v-if="exportExcel">Export Excel</el-button>
+                        <el-button size="small" type="primary" :icon="DocumentChartBarIcon" v-if="exportExcel">Export
+                            Excel</el-button>
 
-                        <el-button size="small" type="danger" :icon="DocumentTextIcon" v-if="exportPDF">Export PDF</el-button>
+                        <el-button size="small" type="danger" :icon="DocumentTextIcon" v-if="exportPDF">Export
+                            PDF</el-button>
                     </div>
                 </div>
 
                 <div class="responsive-table-desktop w-full min-w-0 mt-5">
                     <el-table class="app-table" :data="tableData" style="width: 100%" table-layout="fixed"
                         :show-header="true">
-                        <el-table-column v-for="column in columns" :key="column.label" :label="column.label" :prop="column.prop">
+                        <el-table-column v-for="column in columns" :key="column.label" :label="column.label"
+                            :prop="column.prop">
                             <template #default="scope">
                                 <slot :name="column.prop" :row="scope.row">
                                     {{ scope.row[column.prop] }}
@@ -131,6 +98,11 @@ const tableData = [
 
                 <div class="responsive-table-mobile divide-y divide-gray-100 dark:divide-[var(--app-divide)] px-3">
 
+                </div>
+
+                <div class="pagination flex items-center justify-center gap-3">
+                    <el-button size="small" @click="previousPage">Previous</el-button>
+                    <el-button size="small" @click="nextPage">Next</el-button>
                 </div>
             </div>
         </template>

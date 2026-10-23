@@ -7,8 +7,9 @@ use App\Models\User;
 
 class TransactionService
 {
-    public function listTransactions(User $user){
-        return $user->transactions;
+    public function listTransactions(User $user, $page, $per_page){
+        $offset = ($page - 1) * $per_page;
+        return $user->transactions()->with(['category:id,name'])->latest('transaction_date')->latest('id')->take($per_page)->skip($offset)->get();
     }
 
     public function showTransaction(User $user, $id){

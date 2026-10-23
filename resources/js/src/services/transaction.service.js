@@ -15,3 +15,11 @@ export function deleteTransaction(id){
 export function showTransaction(id){
     return api.get(`/transaction/${id}`)
 }
+
+export function listTransactions(params = {}){
+    return api.get('/transactions', {
+        params: {
+            ...params,
+        }
+    });
+}

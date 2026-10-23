@@ -16,8 +16,16 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
+        $validation = $request->validate([
+            'page' => 'sometimes|integer|min:1',
+            'per_page' => 'sometimes|integer|min:1|max:100'
+        ]);
+
+        $page = $validation['page'] ?? 1;
+        $per_page = $validation['per_page'] ?? 20;  
+
         try {
-            $transactions = $this->transactionService->listTransactions($request->user());
+            $transactions = $this->transactionService->listTransactions($request->user(), $page, $per_page);
 
             if ($transactions) {
                 return response()->json([

@@ -1,30 +1,33 @@
 <script setup>
 import DataTable from '../components/DataTable.vue';
+import { listTransactions } from '../services/transaction.service.js';
+
+const apiService = listTransactions;
 
 const columns = [
     {
-        label: 'Name',
+        label: '#',
+        prop: 'number',
+        sortable: true,
+    },
+    {
+        label: 'Amount',
+        prop: 'amount',
+        sortable: true,
+    },
+    {
+        label: 'Type',
+        prop: 'type',
+        sortable: false,
+    },
+    {
+        label: 'Category',
         prop: 'name',
         sortable: true,
     },
     {
-        label: 'Role',
-        prop: 'role',
-        sortable: true,
-    },
-    {
-        label: 'Age',
-        prop: 'age',
-        sortable: true,
-    },
-    {
-        label: 'Company',
-        prop: 'company',
-        sortable: true,
-    },
-    {
-        label: 'City',
-        prop: 'city',
+        label: 'Date',
+        prop: 'transaction_date',
         sortable: true,
     },
 ];
@@ -33,9 +36,9 @@ const columns = [
 
 <template>
     <h1 class="text-2xl font-semibold mb-4">Transactions</h1>
-    <DataTable :exportExcel="true" :exportPDF="true" :columns="columns">
-        <template #role="{row}">
+    <DataTable :exportExcel="true" :exportPDF="true" :columns="columns" :apiService="apiService">
+        <!-- <template #role="{row}">
             <el-tag>{{ row.role }}</el-tag>
-        </template>
+        </template> -->
     </DataTable>
 </template>
