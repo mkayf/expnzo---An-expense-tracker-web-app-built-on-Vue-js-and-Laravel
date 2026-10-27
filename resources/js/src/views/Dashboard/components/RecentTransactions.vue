@@ -5,6 +5,8 @@ import { getRecentTransactions } from '../../../services/dashboard.service.js';
 import handleError from '../../../utils/handleError.js';
 import { formatAmount, formatDate } from '../../../utils/helpers.js';
 import useAuthStore from '../../../stores/auth.js';
+import { useRouter } from 'vue-router';
+import { tagStyle } from '../../../utils/helpers.js';
 
 const props = defineProps({
     update: {
@@ -17,6 +19,7 @@ const transactions = ref([]);
 const authStore = useAuthStore();
 const userCurrency = authStore.user?.preferences?.currency;
 const userCurrencyIso = authStore.user?.preferences?.currency_iso;
+const router = useRouter();
 
 const fetchRecentTransactions = async () => {
     try {
@@ -48,12 +51,6 @@ const transactionsTableData = computed(() => {
     })
 });
 
-const tagStyle = (type) => ({
-    '--el-tag-border-color':
-        type === 'income'
-            ? 'var(--el-color-primary-light-5)'
-            : 'var(--el-color-warning-light-5)',
-});
 
 watch(() => props.update, (val) => {
     if (val) {
@@ -87,7 +84,7 @@ onMounted(() => {
                     <el-skeleton-item variant="button" style="width: 80px; height: 24px" />
                 </template>
                 <template #default> 
-                    <el-button size="small" type="primary" plain>View more</el-button>
+                    <el-button size="small" type="primary" plain @click="router.push('/app/transactions')">View more</el-button>
                 </template>
             </el-skeleton>
         </template>

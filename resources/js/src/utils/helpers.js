@@ -94,3 +94,10 @@ export function formatDate(value) {
         timeZone: "UTC",
     });
 }
+
+export const tagStyle = (type) => ({
+    '--el-tag-border-color':
+        type === 'income'
+            ? 'var(--el-color-primary-light-5)'
+            : 'var(--el-color-warning-light-5)',
+});
