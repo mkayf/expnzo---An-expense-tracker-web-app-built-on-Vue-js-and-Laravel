@@ -13,5 +13,5 @@ const props = defineProps({
 </script>
 
 <template>
-    <el-button :color="props.color !== undefined ? props.color : 'var(--el-color-primary)'"> <slot></slot> Add Expense</el-button>
+    <el-button :type="props.color ? undefined : 'primary'" :color="props.color"> <slot></slot> Add Expense</el-button>
 </template>

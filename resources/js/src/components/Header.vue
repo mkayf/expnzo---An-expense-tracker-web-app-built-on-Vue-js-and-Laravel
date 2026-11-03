@@ -11,10 +11,14 @@ import { logout } from "../services/auth.service.js";
 import { ElMessage } from "element-plus";
 import handleError from "../utils/handleError";
 import useAuthStore from "../stores/auth";
+import useThemeStore from "../stores/theme";
+import darkLogo from "../assets/logo/expnzo-dark-logo.png";
+import lightLogo from "../assets/logo/expnzo-light-logo.png";
 
 defineEmits(["toggle-menu"]);
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 
 const showSearchInput = ref(false);
 const route = useRoute();
@@ -54,8 +58,8 @@ const logoutUser = async () => {
 
             <div class="lg:hidden flex items-center">
                 <img
-                    src="../assets/logo/logo.png"
-                    alt="Logo"
+                    :src="themeStore.isDark ? darkLogo : lightLogo"
+                    alt="Expnzo"
                     class="h-6 w-auto object-contain"
                 />
             </div>

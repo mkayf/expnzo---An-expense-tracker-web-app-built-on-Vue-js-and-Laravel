@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TransactionsExport;
 use App\Http\Requests\TransactionRequest;
 use App\Services\TransactionService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TransactionController extends Controller
 {
@@ -18,14 +21,24 @@ class TransactionController extends Controller
     {
         $validation = $request->validate([
             'page' => 'sometimes|integer|min:1',
-            'per_page' => 'sometimes|integer|min:1|max:100'
+            'per_page' => 'sometimes|integer|min:1|max:100',
+            'search' => 'sometimes|nullable|string|max:255',
+            'sort_by' => ['sometimes', 'nullable', 'string', Rule::in(['amount', 'type', 'category.name', 'transaction_date'])],
+            'sort_direction' => ['sometimes', 'required_with:sort_by', Rule::in(['asc', 'desc'])],
         ]);
 
         $page = $validation['page'] ?? 1;
         $per_page = $validation['per_page'] ?? 20;  
 
         try {
-            $transactions = $this->transactionService->listTransactions($request->user(), $page, $per_page);
+            $transactions = $this->transactionService->listTransactions(
+                $request->user(),
+                $page,
+                $per_page,
+                $validation['sort_by'] ?? null,
+                $validation['sort_direction'] ?? null,
+                $validation['search'] ?? null
+            );
 
             if ($transactions) {
                 return response()->json([
@@ -41,6 +54,26 @@ class TransactionController extends Controller
                 'message' => 'Something went wrong while getting transactions, please try again'
             ], 500);
         }
+    }
+
+    public function export(Request $request)
+    {
+        $validation = $request->validate([
+            'columns' => 'required|array|min:1',
+            'columns.*' => ['required', 'string', 'distinct', Rule::in(array_keys(TransactionsExport::COLUMNS))],
+            'search' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        $transactions = $this->transactionService->transactionQuery(
+            $request->user(),
+            $validation['search'] ?? null
+        );
+
+        return Excel::download(
+            new TransactionsExport($transactions, $validation['columns']),
+            'transactions.xlsx',
+            \Maatwebsite\Excel\Excel::XLSX
+        );
     }
 
     public function show(Request $request, $id)
@@ -132,6 +165,43 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong while deleting transaction, please try again',
+            ], 500);
+        }
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validation = $request->validate([
+            'ids' => 'required|array|min:1|max:500',
+            'ids.*' => 'required|integer|min:1|distinct',
+        ]);
+
+        try {
+            $deletedCount = $this->transactionService->deleteTransactions(
+                $request->user(),
+                $validation['ids']
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => $deletedCount.' transactions deleted successfully',
+                'deleted_count' => $deletedCount,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'One or more transactions were not found',
+            ], 404);
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while bulk deleting transactions', [
+                'user_id' => $request->user()->id,
+                'transaction_ids' => $validation['ids'],
+                'error' => $th->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while deleting transactions, please try again',
             ], 500);
         }
     }

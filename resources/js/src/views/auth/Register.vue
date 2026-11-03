@@ -1,5 +1,6 @@
 <script setup>
-import logo from "@/assets/logo/logo.png";
+import darkLogo from "@/assets/logo/expnzo-dark-logo.png";
+import lightLogo from "@/assets/logo/expnzo-light-logo.png";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import { Form, Field } from "vee-validate";
 import { registerSchema } from "../../utils/validationSchema";
@@ -11,10 +12,12 @@ import useAuthStore from "../../stores/auth";
 import { useRouter } from "vue-router";
 import GoogleAuthButton from "../../components/ui/GoogleAuthButton.vue";
 import handleError from "../../utils/handleError";
+import useThemeStore from "../../stores/theme";
 
 let loading = ref(false);
 const authStore = useAuthStore();
 const router = useRouter();
+const themeStore = useThemeStore();
 
 const registerUser = async (formData) => {
     try {
@@ -38,7 +41,8 @@ const registerUser = async (formData) => {
 
 <template>
     <div class="bg-[var(--app-surface)] p-6 rounded-2xl shadow-xl w-80 dark:border dark:border-[var(--el-border-color)]">
-        <img :src="logo" alt="Logo" class="h-[40px] mx-auto my-3" />
+        <img :src="themeStore.isDark ? darkLogo : lightLogo" alt="Expnzo"
+            class="h-[40px] w-[160px] object-contain mx-auto my-3" />
         <Form @submit="registerUser" :validation-schema="registerSchema">
             <h2 class="text-xl my-3 text-center">Create account</h2>
             <div class="mb-4">

@@ -147,7 +147,7 @@ const saveProfile = async (formData) => {
                             type="primary"
                         >
                             <CameraIcon class="w-5 h-5 sm:mr-2" />
-                            <span class="text-sm hidden sm:block">Upload new</span>
+                            <span class="text-sm hidden sm:block text-inherit">Upload new</span>
                         </el-button>
                         <el-button
                             class=",:mr-2"
@@ -156,7 +156,7 @@ const saveProfile = async (formData) => {
                             @click="confirmDelete"
                         >
                             <TrashIcon class="w-5 h-5 sm:mr-2" />
-                            <span class="text-sm hidden sm:block">Delete Avatar</span>
+                            <span class="text-sm hidden sm:block text-inherit">Delete Avatar</span>
                         </el-button>
                     </div>
                 </el-col>

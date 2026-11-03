@@ -46,6 +46,8 @@ Route::prefix('/api')->group(function () {
         Route::post('/store-transaction', [TransactionController::class, 'store'])->name('transaction.store');
         Route::patch('/update-transaction', [TransactionController::class, 'update'])->name('transaction.update');
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
+        Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transaction.export');
+        Route::delete('/transactions', [TransactionController::class, 'bulkDelete'])->name('transaction.bulk-delete');
         Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');
         Route::delete('/transaction/{id}', [TransactionController::class, 'delete'])->name('transaction.delete');
 

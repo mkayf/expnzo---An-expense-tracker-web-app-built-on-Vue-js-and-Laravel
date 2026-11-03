@@ -23,7 +23,6 @@ const monthFilter = ref(null);
 const statsLoading = ref(true);
 const budgetDataLoader = ref(false);
 const showBudgetBtn = ref(false);
-const transactionEditId = ref(null);
 const dashboardUpdate = ref(0);
 
 const statsSummary = ref({
@@ -74,7 +73,6 @@ const fetchBudgetdata = async () => {
 
 const openAddTransaction = () => {
     isTransactionModalOpen.value = true;
-    transactionEditId.value = null;
 }
 
 const handleDashboardUpdate = () => {
@@ -105,7 +103,7 @@ onMounted(() => {
                 Welcome Back, <span class="text-[var(--primary-color)]">{{ username }}</span>
             </h1>
             <div class="flex flex-wrap items-center gap-4">
-                <el-button color="var(--el-color-primary)" @click="openAddTransaction">Add
+                <el-button type="primary" @click="openAddTransaction">Add
                     Transaction</el-button>
                 <el-button @click="fetchBudgetdata">Set budget</el-button>
             </div>
@@ -170,7 +168,7 @@ onMounted(() => {
             :loading="budgetDataLoader" :data="budgetData" @budget-saved="handleDashboardUpdate" />
 
         <TransactionForm v-model:visible="isTransactionModalOpen" @close-dialog="isTransactionModalOpen = false"
-            @transaction-saved="handleDashboardUpdate" :edit-id="transactionEditId"  />
+            @transaction-saved="handleDashboardUpdate"  />
     </div>
 </template>
 

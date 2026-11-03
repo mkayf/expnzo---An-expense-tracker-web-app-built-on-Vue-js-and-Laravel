@@ -172,14 +172,10 @@ onMounted(() => {
             </div>
             <div class="flex justify-between items-center">
                 <el-button
+                    type="primary"
+                    class="w-full"
                     @click="handleResendOTP"
                     :disabled="formattedTime > 0 || disableResend"
-                    :class="[
-                        'w-full transition-all duration-500',
-                        formattedTime > 0 || disableResend
-                            ? '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none dark:!bg-[var(--app-muted)] dark:hover:!bg-[var(--el-fill-color-dark)] dark:!text-[var(--el-text-color-secondary)]'
-                            : '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)] !text-white',
-                    ]"
                 >
                     <span v-if="formattedTime > 0">{{ formattedTime }}s</span>
                     <span v-else>Resend</span>

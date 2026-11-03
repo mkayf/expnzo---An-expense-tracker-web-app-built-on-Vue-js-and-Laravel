@@ -30,11 +30,15 @@ const authStore = useAuthStore();
     content: "";
     height: 50px;
     width: 200px;
-    background-image: url("@/assets/logo/logo.png");
+    background-image: url("@/assets/logo/expnzo-light-logo.png");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     margin-bottom: 12px;
+}
+
+html.dark .app-loader .el-loading-spinner::before {
+    background-image: url("@/assets/logo/expnzo-dark-logo.png");
 }
 
 .app-loader .el-loading-spinner .circular {

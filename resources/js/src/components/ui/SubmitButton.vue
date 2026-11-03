@@ -28,20 +28,12 @@ const emit = defineEmits(['click']);
 
 <template>
     <el-button
+        type="primary"
         :disabled="isDisabled"
         :loading="isLoading"
         native-type="submit"
         @click="emit('click', $event)"
-        class="transition-all duration-500"
-        :class="[
-            props.classes,
-            {
-                '!bg-[var(--primary-green)] !border-[var(--primary-green)] hover:!bg-[var(--green-hover)]  !text-white':
-                    isDisabled === false,
-                '!bg-gray-200 hover:!bg-gray-300 hover:!text-[#606266] !border-none dark:!bg-[var(--app-muted)] dark:hover:!bg-[var(--el-fill-color-dark)] dark:!text-[var(--el-text-color-secondary)]':
-                    isDisabled === true,
-            },
-        ]"
+        :class="props.classes"
     >
         <i v-if="props.icon" :class="props.icon"></i>
         {{ props.text }}

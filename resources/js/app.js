@@ -6,7 +6,6 @@ import { createPinia } from "pinia";
 import useAuthStore from "./src/stores/auth";
 import { ElLoading } from "element-plus";
 import "element-plus/es/components/loading/style/css";
-import "./src/assets/logo/logo.png";
 import useThemeStore from "./src/stores/theme";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";

@@ -3,11 +3,15 @@ import { Cog6ToothIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { computed, ref, watch } from "vue";
 import menus from "../utils/menu.config";
 import { useRoute, useRouter } from "vue-router";
+import useThemeStore from "../stores/theme";
+import darkLogo from "../assets/logo/expnzo-dark-logo.png";
+import lightLogo from "../assets/logo/expnzo-light-logo.png";
 
 const props = defineProps({
     collapsed: Boolean,
 });
 
+const themeStore = useThemeStore();
 const emit = defineEmits(["collapse-change", "close"]);
 
 const isLocked = ref(true);
@@ -49,7 +53,8 @@ watch(
             class="el-menu-vertical-demo h-full flex flex-col border-none w-full !bg-transparent" :collapse="false">
             <!-- Mobile header: logo + close button (top right) -->
             <div class="flex lg:hidden items-center justify-between px-5 pt-6 pb-4 w-full box-border shrink-0 h-[68px]">
-                <img src="../assets/logo/logo.png" alt="Logo" class="h-7 w-auto max-w-none object-contain" />
+                <img :src="themeStore.isDark ? darkLogo : lightLogo" alt="Expnzo"
+                    class="h-7 w-[130px] object-contain object-left" />
                 <button type="button" aria-label="Close menu"
                     class="flex items-center justify-center w-9 h-9 rounded-lg text-[var(--el-text-color-regular)] hover:bg-[var(--app-hover)] active:bg-[var(--app-muted)] transition-colors"
                     @click="emit('close')">
@@ -59,8 +64,8 @@ watch(
             <!-- Header: logo + lock toggle -->
             <div class="hidden lg:flex items-center justify-between px-5 pt-6 pb-4 w-full box-border shrink-0 h-[68px]">
                 <div class="relative h-7 w-[130px] shrink-0">
-                    <img src="../assets/logo/logo.png" alt="Logo"
-                        class="absolute left-0 top-0 h-7 w-auto max-w-none object-contain transition-opacity duration-300"
+                    <img :src="themeStore.isDark ? darkLogo : lightLogo" alt="Expnzo"
+                        class="absolute left-0 top-0 h-7 w-[130px] object-contain object-left transition-opacity duration-300"
                         :class="collapsed ? 'opacity-0' : 'opacity-100'" />
                     <img src="../assets/logo/monogram.png" alt="Monogram"
                         class="absolute left-0 top-0 h-7 w-7 object-contain transition-opacity duration-300"

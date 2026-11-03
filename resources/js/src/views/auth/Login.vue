@@ -1,5 +1,6 @@
 <script setup>
-import logo from "@/assets/logo/logo.png";
+import darkLogo from "@/assets/logo/expnzo-dark-logo.png";
+import lightLogo from "@/assets/logo/expnzo-light-logo.png";
 import SubmitButton from "../../components/ui/SubmitButton.vue";
 import { Field, Form } from "vee-validate";
 import { loginSchema } from "../../utils/validationSchema";
@@ -11,11 +12,13 @@ import { useRouter, useRoute } from "vue-router";
 import useAuthStore from "../../stores/auth";
 import handleError from "../../utils/handleError";
 import GoogleAuthButton from "../../components/ui/GoogleAuthButton.vue";
+import useThemeStore from "../../stores/theme";
 
 let loading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 
 const loginUser = async (formData) => {
     try {
@@ -50,7 +53,8 @@ onMounted(() => {
 
 <template>
     <div class="bg-[var(--app-surface)] p-6 rounded-2xl shadow-lg w-80 dark:border dark:border-[var(--el-border-color)]">
-        <img :src="logo" alt="Logo" class="h-[40px] mx-auto my-3" />
+        <img :src="themeStore.isDark ? darkLogo : lightLogo" alt="Expnzo"
+            class="h-[40px] w-[160px] object-contain mx-auto my-3" />
         <Form @submit="loginUser" :validation-schema="loginSchema">
             <h2 class="text-xl my-3 text-center">Login to your account</h2>
             <div class="mb-4">

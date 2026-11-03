@@ -12,6 +12,12 @@ export function deleteTransaction(id){
     return api.delete(`/transaction/${id}`);
 }
 
+export function bulkDeleteTransactions(ids) {
+    return api.delete('/transactions', {
+        data: { ids },
+    });
+}
+
 export function showTransaction(id){
     return api.get(`/transaction/${id}`)
 }
@@ -21,5 +27,12 @@ export function listTransactions(params = {}){
         params: {
             ...params,
         }
+    });
+}
+
+export function exportTransactions(params = {}) {
+    return api.get('/transactions/export', {
+        params,
+        responseType: 'blob',
     });
 }
