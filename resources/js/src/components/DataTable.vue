@@ -39,9 +39,25 @@ const props = defineProps({
         type: Function,
         default: null
     },
+    pdfExportService: {
+        type: Function,
+        default: null
+    },
     exportColumns: {
         type: Array,
         default: () => []
+    },
+    pdfExportColumns: {
+        type: Array,
+        default: () => []
+    },
+    excelFileName: {
+        type: String,
+        default: 'transactions.xlsx'
+    },
+    pdfFileName: {
+        type: String,
+        default: 'transactions.pdf'
     },
     bulkActions: {
         type: Array,
@@ -77,9 +93,13 @@ const sorting = ref({
             : null
 });
 const searchQuery = ref('');
+const emptyDescription = computed(() => searchQuery.value.trim()
+    ? 'No matches found. Try a different search.'
+    : 'Nothing to show just yet. Your records will appear here.');
 const exportDialogVisible = ref(false);
 const exporting = ref(false);
 const selectedExportColumns = ref([]);
+const exportFormat = ref('excel');
 let latestRequestId = 0;
 let searchDebounceTimer;
 
@@ -129,11 +149,15 @@ const runBulkAction = (action) => {
     emit('bulk-action', { key: action.key, ids: [...selectedIds.value] });
 };
 
-const selectableExportColumns = computed(() =>
-    props.exportColumns.length
-        ? props.exportColumns
+const selectableExportColumns = computed(() => {
+    const configuredColumns = exportFormat.value === 'pdf'
+        ? props.pdfExportColumns
+        : props.exportColumns;
+
+    return configuredColumns.length
+        ? configuredColumns
         : props.columns.filter((column) => column.prop !== 'actions')
-);
+});
 const allExportColumnsSelected = computed(() =>
     selectableExportColumns.value.length > 0
     && selectedExportColumns.value.length === selectableExportColumns.value.length
@@ -142,7 +166,8 @@ const exportColumnsIndeterminate = computed(() =>
     selectedExportColumns.value.length > 0 && !allExportColumnsSelected.value
 );
 
-const openExportDialog = () => {
+const openExportDialog = (format = 'excel') => {
+    exportFormat.value = format;
     selectedExportColumns.value = selectableExportColumns.value.map((column) => column.prop);
     exportDialogVisible.value = true;
 };
@@ -153,19 +178,26 @@ const toggleAllExportColumns = (selected) => {
         : [];
 };
 
-const exportExcelFile = async () => {
-    if (!props.exportService || selectedExportColumns.value.length === 0) return;
+const downloadExportFile = async () => {
+    const exportService = exportFormat.value === 'pdf'
+        ? props.pdfExportService
+        : props.exportService;
+    const fileName = exportFormat.value === 'pdf'
+        ? props.pdfFileName
+        : props.excelFileName;
+
+    if (!exportService || selectedExportColumns.value.length === 0) return;
 
     exporting.value = true;
     try {
-        const response = await props.exportService({
+        const response = await exportService({
             columns: selectedExportColumns.value,
             ...(searchQuery.value.trim() ? { search: searchQuery.value.trim() } : {})
         });
         const fileUrl = URL.createObjectURL(response.data);
         const link = document.createElement('a');
         link.href = fileUrl;
-        link.download = 'transactions.xlsx';
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -366,7 +398,8 @@ onBeforeUnmount(() => {
                                 v-if="exportExcel" @click="openExportDialog">Export
                                 Excel</el-button>
 
-                            <el-button size="small" type="danger" :icon="DocumentTextIcon" v-if="exportPDF">Export
+                            <el-button size="small" type="danger" :icon="DocumentTextIcon" v-if="exportPDF"
+                                @click="openExportDialog('pdf')">Export
                                 PDF</el-button>
                         </div>
                     </div>
@@ -395,6 +428,9 @@ onBeforeUnmount(() => {
                 <div class="responsive-table-desktop w-full min-w-0 mt-5">
                     <el-table class="app-table" :data="displayData" style="width: 100%" table-layout="fixed"
                         :show-header="true" :default-sort="props.defaultSort || {}" @sort-change="handleSortChange">
+                        <template #empty>
+                            <el-empty :description="emptyDescription" :image-size="80" />
+                        </template>
                         <el-table-column v-if="bulkActions.length" width="52" align="center"
                             class-name="bulk-select-column">
                             <template #default="scope">
@@ -511,26 +547,30 @@ onBeforeUnmount(() => {
                                 </div>
                             </div>
 
-                            <div v-if="columnsByRole('detail').length" class="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
-                                <div v-for="column in columnsByRole('detail')" :key="'d-' + column.prop"
-                                    class="min-w-0">
-                                    <p class="text-[11px] text-gray-500 dark:text-[var(--el-text-color-secondary)]">
-                                        {{ column.label }}
-                                    </p>
-                                    <div class="text-sm [overflow-wrap:anywhere]">
-                                        <slot :name="column.prop" :row="row">{{ getValue(row, column.prop) }}</slot>
+                            <div v-if="columnsByRole('detail').length || columnsByRole('actions').length"
+                                class="mt-2 flex min-w-0 items-start justify-between gap-3">
+                                <div v-if="columnsByRole('detail').length"
+                                    class="grid min-w-0 flex-1 grid-cols-2 gap-x-3 gap-y-2">
+                                    <div v-for="column in columnsByRole('detail')" :key="'d-' + column.prop"
+                                        class="min-w-0">
+                                        <p class="text-[11px] text-gray-500 dark:text-[var(--el-text-color-secondary)]">
+                                            {{ column.label }}
+                                        </p>
+                                        <div class="text-sm [overflow-wrap:anywhere]">
+                                            <slot :name="column.prop" :row="row">{{ getValue(row, column.prop) }}</slot>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div v-for="column in columnsByRole('actions')" :key="'a-' + column.prop"
-                                class="mt-2 flex flex-wrap items-center justify-end gap-2">
-                                <slot :name="column.prop" :row="row"></slot>
+                                <div v-for="column in columnsByRole('actions')" :key="'a-' + column.prop"
+                                    class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                                    <slot :name="column.prop" :row="row"></slot>
+                                </div>
                             </div>
                         </div>
 
-                        <div v-if="tableData.length === 0" class="py-6 text-center text-sm text-gray-500">
-                            No data
+                        <div v-if="tableData.length === 0" class="py-4">
+                            <el-empty :description="emptyDescription" :image-size="80" />
                         </div>
                     </template>
                 </div>
@@ -570,10 +610,10 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <el-dialog v-model="exportDialogVisible" title="Export Excel" width="520px"
+            <el-dialog v-model="exportDialogVisible" :title="exportFormat === 'pdf' ? 'Export PDF' : 'Export Excel'" width="520px"
                 :close-on-click-modal="!exporting" :close-on-press-escape="!exporting">
                 <p class="mb-3 text-sm text-gray-600 dark:text-[var(--el-text-color-secondary)]">
-                    Choose the columns to include in your Excel file.
+                    Choose the columns to include in your {{ exportFormat === 'pdf' ? 'PDF report' : 'Excel file' }}.
                 </p>
                 <el-checkbox :model-value="allExportColumnsSelected" :indeterminate="exportColumnsIndeterminate"
                     @change="toggleAllExportColumns">Select all</el-checkbox>
@@ -586,8 +626,8 @@ onBeforeUnmount(() => {
                     <div class="flex items-center gap-3 justify-end">
                         <el-button @click="exportDialogVisible = false" :disabled="exporting">Cancel</el-button>
                         <el-button type="primary" :loading="exporting"
-                            :disabled="selectedExportColumns.length === 0 || !exportService"
-                            @click="exportExcelFile">Download Excel</el-button>
+                            :disabled="selectedExportColumns.length === 0 || !(exportFormat === 'pdf' ? pdfExportService : exportService)"
+                            @click="downloadExportFile">Download {{ exportFormat === 'pdf' ? 'PDF' : 'Excel' }}</el-button>
                     </div>
                 </template>
             </el-dialog>

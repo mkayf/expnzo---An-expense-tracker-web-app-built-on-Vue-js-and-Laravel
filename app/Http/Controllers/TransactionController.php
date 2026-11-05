@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
+use RuntimeException;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Spatie\Browsershot\Browsershot;
 
 class TransactionController extends Controller
 {
@@ -28,7 +31,7 @@ class TransactionController extends Controller
         ]);
 
         $page = $validation['page'] ?? 1;
-        $per_page = $validation['per_page'] ?? 20;  
+        $per_page = $validation['per_page'] ?? 20;
 
         try {
             $transactions = $this->transactionService->listTransactions(
@@ -74,6 +77,62 @@ class TransactionController extends Controller
             'transactions.xlsx',
             \Maatwebsite\Excel\Excel::XLSX
         );
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $pdfColumns = array_diff_key(TransactionsExport::COLUMNS, ['note' => true]);
+        $validation = $request->validate([
+            'columns' => 'required|array|min:1',
+            'columns.*' => ['required', 'string', 'distinct', Rule::in(array_keys($pdfColumns))],
+            'search' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        $records = $this->transactionService
+            ->transactionQuery($request->user(), $validation['search'] ?? null)
+            ->with('category:id,name,type')
+            ->orderByDesc('transaction_date')
+            ->orderByDesc('id')
+            ->get();
+
+        $columns = array_map(fn(string $column) => [
+            'prop' => $column,
+            'label' => TransactionsExport::COLUMNS[$column],
+        ], $validation['columns']);
+        $rows = $records->map(fn($transaction) => array_map(
+            fn(string $column) => match ($column) {
+                'category.name' => $transaction->category?->name,
+                'created_at', 'updated_at' => $transaction->{$column}?->format('Y-m-d H:i:s'),
+                default => $transaction->{$column},
+            },
+            $validation['columns']
+        ));
+
+        $logoPath = resource_path('js/src/assets/logo/expnzo-light-logo.png');
+        $logo = file_get_contents($logoPath);
+        if ($logo === false) {
+            throw new RuntimeException('Unable to load the report logo.');
+        }
+
+        return Pdf::view('pdf.transactions', [
+            'columns' => $columns,
+            'rows' => $rows,
+            'recordCount' => $records->count(),
+            'incomeTotal' => $records->where('type', 'income')->sum(fn($transaction) => (float) $transaction->amount),
+            'expenseTotal' => $records->where('type', 'expense')->sum(fn($transaction) => (float) $transaction->amount),
+            'currency' => $request->user()->preferences?->currency_iso ?? 'USD',
+            'currencySymbol' => $request->user()->preferences?->currency ?? null,
+            'search' => $validation['search'] ?? null,
+            'generatedAt' => now(),
+            'logoDataUri' => 'data:image/png;base64,' . base64_encode($logo),
+        ])
+            ->withBrowsershot(function (Browsershot $browsershot) {
+                $browsershot->newHeadless()->waitUntilNetworkIdle();
+            })
+            ->format('a4')
+            ->landscape()
+            ->margins(12, 10, 14, 10)
+            ->download('transactions.pdf');
     }
 
     public function show(Request $request, $id)
@@ -184,7 +243,7 @@ class TransactionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => $deletedCount.' transactions deleted successfully',
+                'message' => $deletedCount . ' transactions deleted successfully',
                 'deleted_count' => $deletedCount,
             ]);
         } catch (ModelNotFoundException $e) {

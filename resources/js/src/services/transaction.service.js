@@ -36,3 +36,10 @@ export function exportTransactions(params = {}) {
         responseType: 'blob',
     });
 }
+
+export function exportTransactionsPdf(params = {}) {
+    return api.get('/transactions/export/pdf', {
+        params,
+        responseType: 'blob',
+    });
+}

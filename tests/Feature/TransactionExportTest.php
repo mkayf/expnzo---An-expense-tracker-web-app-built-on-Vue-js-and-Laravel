@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 uses(RefreshDatabase::class);
 
@@ -60,6 +61,56 @@ test('transaction export requires at least one valid column', function () {
 
     $this->actingAs($user)
         ->getJson('/api/transactions/export?columns[]=password')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('columns.0');
+});
+
+test('transaction PDF export downloads a branded report for selected columns and matching user transactions', function () {
+    Pdf::fake();
+
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $category = Category::create([
+        'user_id' => $user->id,
+        'name' => 'Dining Out',
+        'type' => 'expense',
+    ]);
+
+    Transaction::create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'type' => 'expense',
+        'amount' => 42.50,
+        'note' => 'Dinner',
+        'transaction_date' => '2026-03-16',
+    ]);
+    Transaction::create([
+        'user_id' => $otherUser->id,
+        'type' => 'expense',
+        'amount' => 42.50,
+        'note' => 'Private Dinner',
+        'transaction_date' => '2026-03-16',
+    ]);
+
+    $this->actingAs($user)
+        ->get('/api/transactions/export/pdf?columns[]=category.name&columns[]=note&search=Dinner')
+        ->assertOk();
+
+    Pdf::assertRespondedWithPdf(fn ($pdf) => $pdf->viewName === 'pdf.transactions'
+        && $pdf->isDownload()
+        && $pdf->downloadName === 'transactions.pdf'
+        && array_column($pdf->viewData['columns'], 'prop') === ['category.name', 'note']
+        && $pdf->viewData['rows']->count() === 1
+        && $pdf->viewData['rows']->first() === ['Dining Out', 'Dinner']
+        && str_starts_with($pdf->viewData['logoDataUri'], 'data:image/png;base64,')
+        && $pdf->contains(['Transaction Report', 'Dining Out', 'Dinner', 'Expnzo']));
+});
+
+test('transaction PDF export does not allow the note column', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/transactions/export/pdf?columns[]=note')
         ->assertUnprocessable()
         ->assertJsonValidationErrors('columns.0');
 });

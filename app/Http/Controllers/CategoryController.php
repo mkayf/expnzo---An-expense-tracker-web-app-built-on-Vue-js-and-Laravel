@@ -4,10 +4,75 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
+    public function list(Request $request)
+    {
+        $validated = $request->validate([
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'sort_by' => ['sometimes', 'nullable', 'string', Rule::in(['name', 'type', 'created_at'])],
+            'sort_direction' => ['sometimes', 'required_with:sort_by', Rule::in(['asc', 'desc'])],
+        ]);
+
+        $user = $request->user();
+        $page = $validated['page'] ?? 1;
+        $perPage = $validated['per_page'] ?? 20;
+
+        try {
+            $query = $user->customCategories();
+
+            if (!empty($validated['search'])) {
+                $search = mb_strtolower(trim($validated['search']));
+                $like = '%' . $search . '%';
+                $query->where(function ($query) use ($like) {
+                    $query->whereRaw('LOWER(name) LIKE ?', [$like])
+                        ->orWhereRaw('LOWER(type) LIKE ?', [$like]);
+                });
+            }
+
+            $total = (clone $query)->count();
+            $sortBy = $validated['sort_by'] ?? 'name';
+            $sortDirection = $validated['sort_direction'] ?? 'asc';
+            $categories = $query
+                ->orderBy($sortBy, $sortDirection)
+                ->orderBy('id')
+                ->skip(($page - 1) * $perPage)
+                ->take($perPage)
+                ->get(['id', 'name', 'type', 'created_at'])
+                ->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'type' => $category->type,
+                    'created_at' => $category->created_at,
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories fetched successfully',
+                'data' => [
+                    'items' => $categories,
+                    'total' => $total,
+                    'per_page' => (int) $perPage,
+                    'current_page' => (int) $page,
+                    'last_page' => max(1, (int) ceil($total / $perPage)),
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while listing categories', ['error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while getting categories, please try again',
+            ], 500);
+        }
+    }
+
     public function index(Request $request)
     {   
         $validated = $request->validate([
@@ -64,28 +129,122 @@ class CategoryController extends Controller
         }
     }
 
-    public function deleteCustomCategory(Request $request)
+    public function deleteCustomCategory(Request $request, int $id)
     {
-        $validated = $request->validate([
-            'id' => ['required', 'exists:categories,id']
-        ]);
-
         try {
+            $category = $request->user()->customCategories()->findOrFail($id);
+            if ($category->transactions()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This category is used by transactions and cannot be deleted',
+                ], 409);
+            }
 
-            $user = $request->user();
-            $user->customCategories()->where('id', $validated['id'])->delete();
+            $category->delete();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Your custom category has been deleted successfully'
             ], 200);
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Custom category not found',
+            ], 404);
         } catch (\Throwable $th) {
             Log::error('Error occured while deleting user custom category', ['error' => $th->getMessage()]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Somethin went wrong while deleting categories, please try again',
+            ], 500);
+        }
+    }
+
+    public function updateCustomCategory(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:5', 'max:50'],
+            'type' => ['required', 'string', Rule::in(['income', 'expense'])],
+        ]);
+
+        try {
+            $category = $request->user()->customCategories()->findOrFail($id);
+            if ($category->type !== $validated['type'] && $category->transactions()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The category type cannot be changed while it is used by transactions',
+                ], 409);
+            }
+
+            $category->update($validated);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category updated successfully',
+                'category' => $category,
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Custom category not found',
+            ], 404);
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while updating user custom category', ['error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating the category, please try again',
+            ], 500);
+        }
+    }
+
+    public function bulkDeleteCustomCategories(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:500'],
+            'ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+
+        try {
+            return DB::transaction(function () use ($request, $validated) {
+                $categories = $request->user()->customCategories()
+                    ->whereIn('id', $validated['ids'])
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($categories->count() !== count($validated['ids'])) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'One or more selected custom categories were not found',
+                    ], 404);
+                }
+
+                $categoryIds = $categories->modelKeys();
+                if (Category::query()->whereIn('id', $categoryIds)->whereHas('transactions')->exists()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected categories used by transactions cannot be deleted',
+                    ], 409);
+                }
+
+                $deletedCount = $request->user()->customCategories()
+                    ->whereIn('id', $categoryIds)
+                    ->delete();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "{$deletedCount} categories deleted successfully",
+                    'deleted_count' => $deletedCount,
+                ]);
+            });
+        } catch (\Throwable $th) {
+            Log::error('Error occurred while bulk deleting user custom categories', ['error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while deleting categories, please try again',
             ], 500);
         }
     }

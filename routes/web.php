@@ -46,6 +46,7 @@ Route::prefix('/api')->group(function () {
         Route::post('/store-transaction', [TransactionController::class, 'store'])->name('transaction.store');
         Route::patch('/update-transaction', [TransactionController::class, 'update'])->name('transaction.update');
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transaction.index');
+        Route::get('/transactions/export/pdf', [TransactionController::class, 'exportPdf'])->name('transaction.export.pdf');
         Route::get('/transactions/export', [TransactionController::class, 'export'])->name('transaction.export');
         Route::delete('/transactions', [TransactionController::class, 'bulkDelete'])->name('transaction.bulk-delete');
         Route::get('/transaction/{id}', [TransactionController::class, 'show'])->name('transaction.show');
@@ -65,8 +66,12 @@ Route::prefix('/api')->group(function () {
         Route::post('/set-budget', [BudgetController::class, 'setBudget'])->name('budget.set');
 
         // Category routes:
+        Route::get('/categories', [CategoryController::class, 'list'])->name('category.list');
         Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
         Route::post('/create-custom-category', [CategoryController::class, 'createCustomCategory'])->name('category.store');
+        Route::patch('/categories/{id}', [CategoryController::class, 'updateCustomCategory'])->name('category.update');
+        Route::delete('/categories', [CategoryController::class, 'bulkDeleteCustomCategories'])->name('category.bulk-delete');
+        Route::delete('/categories/{id}', [CategoryController::class, 'deleteCustomCategory'])->name('category.delete');
         
     });
 

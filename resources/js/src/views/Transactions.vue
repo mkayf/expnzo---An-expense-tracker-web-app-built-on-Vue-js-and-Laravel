@@ -1,6 +1,6 @@
 <script setup>
 import DataTable from '../components/DataTable.vue';
-import { bulkDeleteTransactions, deleteTransaction, exportTransactions, listTransactions } from '../services/transaction.service.js';
+import { bulkDeleteTransactions, deleteTransaction, exportTransactions, exportTransactionsPdf, listTransactions } from '../services/transaction.service.js';
 import { tagStyle } from '../utils/helpers.js';
 import { formatAmount } from '../utils/helpers.js';
 import useAuthStore from '../stores/auth.js';
@@ -17,6 +17,7 @@ import { computed, ref } from 'vue';
 
 const apiService = listTransactions;
 const excelExportService = exportTransactions;
+const pdfExportService = exportTransactionsPdf;
 const exportColumns = [
     { label: 'Transaction ID', prop: 'id' },
     { label: 'Amount', prop: 'amount' },
@@ -27,6 +28,7 @@ const exportColumns = [
     { label: 'Created At', prop: 'created_at' },
     { label: 'Updated At', prop: 'updated_at' },
 ];
+const pdfExportColumns = exportColumns.filter((column) => column.prop !== 'note');
 const isTransactionModalOpen = ref(false);
 const transactionEditId = ref(null);
 const refresh = ref(0);
@@ -146,7 +148,7 @@ const handleBulkAction = async ({ key, ids }) => {
 
 <template>
     <h1 class="text-2xl font-semibold mb-4">Transactions</h1>
-    <DataTable :columns="columns" :apiService="apiService" :default-sort="{ prop: 'transaction_date', order: 'descending' }" :exportExcel="true" :exportService="excelExportService" :exportColumns="exportColumns" :exportPDF="true" :bulkActions="bulkActions" :update="refresh" @bulk-action="handleBulkAction">
+    <DataTable :columns="columns" :apiService="apiService" :default-sort="{ prop: 'transaction_date', order: 'descending' }" :exportExcel="true" :exportService="excelExportService" :exportColumns="exportColumns" :exportPDF="true" :pdfExportService="pdfExportService" :pdfExportColumns="pdfExportColumns" :bulkActions="bulkActions" :update="refresh" @bulk-action="handleBulkAction">
         <template #addons>
             <el-button size="small" type="primary" @click="openTransactionForm()">
                 Add transaction
