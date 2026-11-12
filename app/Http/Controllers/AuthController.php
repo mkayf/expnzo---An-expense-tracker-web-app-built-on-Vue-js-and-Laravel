@@ -37,6 +37,7 @@ class AuthController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => $validatedData['password'],
+                'password_set_at' => now(),
                 'provider' => 'credentials',
             ]);
 
@@ -313,35 +314,43 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'min:8'],
-            'new_password' => ['required', 'min:8', 'confirmed'],
-        ]);
+        $user = $request->user();
+        $hasPassword = ! is_null($user->password_set_at);
+
+        $rules = [
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+            'new_password_confirmation' => ['required', 'string'],
+        ];
+
+        if ($hasPassword) {
+            $rules['current_password'] = ['required', 'string', 'min:8'];
+        }
+
+        $request->validate($rules);
 
         try {
-            $user = $request->user();
-
-            if (Hash::check($request->current_password, $user->password)) {
-                if($request->new_password == $request->current_password){
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'New password cannot be your current password, create a new one.'
-                    ], 422);
-                }
-
-                $user->password = $request->new_password;
-                $user->save();
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Password changed succesfully',
-                ], 200);
-            } else {
+            if ($hasPassword && ! Hash::check($request->current_password, $user->password)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Your current password is incorrect',
                 ], 422);
             }
+
+            if ($hasPassword && $request->new_password === $request->current_password) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'New password cannot be your current password, create a new one.'
+                ], 422);
+            }
+
+            $user->password = $request->new_password;
+            $user->password_set_at = now();
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => $hasPassword ? 'Password changed succesfully' : 'Password set successfully',
+            ], 200);
         } catch (\Throwable $th) {
             Log::error('Failed to change password', ['error' => $th->getMessage()]);
             return response()->json([

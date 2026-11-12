@@ -34,6 +34,7 @@ class GoogleAuthController extends Controller
                 ], [
                     'name' => $user->name,
                     'password' => Hash::make(Str::random(16)),
+                    'password_set_at' => null,
                     'email_verified_at' => Carbon::now(),
                     'email_verified' => true,
                     'provider' => 'google'

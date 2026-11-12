@@ -165,7 +165,7 @@ const saveProfile = async (formData) => {
                 <el-row :gutter="20">
                     <el-col :xs="24" :md="12" class="mb-4">
                         <Field name="name" v-slot="{field, handleChange, errorMessage}">
-                            <el-form-item label="Name" :error="errorMessage">
+                            <el-form-item label="Name" label-position="top" :error="errorMessage">
                                 <el-input type="text" 
                                 :model-value="field.value"
                                 @update:model-value="handleChange"
@@ -175,7 +175,7 @@ const saveProfile = async (formData) => {
                         </Field>
                     </el-col>
                     <el-col :xs="24" :md="12" class="">
-                            <el-form-item label="Email (cannot be changed)">
+                            <el-form-item label="Email (cannot be changed)" label-position="top">
                                 <el-input type="email" v-model="authStore.user.email" readonly />
                             </el-form-item>
                     </el-col>
@@ -195,5 +195,46 @@ const saveProfile = async (formData) => {
 
 .avatar-upload-root{
     z-index: 99;
+}
+
+html.dark .avatar-upload-root {
+    --au-text-color: var(--el-text-color-regular);
+    --au-btn-color: var(--el-color-primary);
+}
+
+html.dark .avatar-upload-root .avatar-upload {
+    background-color: var(--el-bg-color-overlay) !important;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 40%);
+    color: var(--el-text-color-primary);
+}
+
+html.dark .avatar-upload-root .avatar-upload-header,
+html.dark .avatar-upload-root .avatar-upload-close,
+html.dark .avatar-upload-root .avatar-upload-operation {
+    color: var(--el-text-color-primary);
+}
+
+html.dark .avatar-upload-root .avatar-upload-preview {
+    background-color: var(--app-muted);
+    color: var(--el-text-color-regular);
+}
+
+html.dark .avatar-upload-root .avatar-button.-regular {
+    background-color: var(--app-muted);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 25%);
+    color: var(--el-text-color-primary);
+}
+
+html.dark .avatar-upload-root .avatar-button.-regular:hover {
+    background-color: var(--app-hover);
+    color: var(--el-text-color-primary);
+}
+
+html.dark .avatar-upload-root .avatar-button.-regular:active {
+    background-color: var(--el-fill-color-dark);
+}
+
+html.dark .avatar-upload-root .avatar-upload-actions .avatar-button.-salmon {
+    box-shadow: none;
 }
 </style>

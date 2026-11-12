@@ -82,14 +82,6 @@ const handleDashboardUpdate = () => {
 
 
 onMounted(() => {
-    if (window.__FLASH__?.auth_success) {
-        ElMessage({
-            type: "success",
-            message: window.__FLASH__.auth_success,
-        });
-        delete window.__FLASH__.auth_success;
-    }
-
     fetchStatsSummary();
 
 });

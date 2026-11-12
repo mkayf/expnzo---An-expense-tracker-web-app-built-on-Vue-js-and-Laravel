@@ -1,24 +1,35 @@
 <script setup>
 import { Form, Field} from "vee-validate";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import SubmitButton from "../../../components/ui/SubmitButton.vue";
-import { changePasswordSchema } from "../../../utils/validationSchema";
+import { changePasswordSchema, setPasswordSchema } from "../../../utils/validationSchema";
 import { changePassword } from "../../../services/auth.service.js";
 import handleError from "../../../utils/handleError";
 import { ElMessage } from "element-plus";
 import 'element-plus/es/components/message/style/css'
+import useAuthStore from "../../../stores/auth";
 
 const buttonLoader = ref(false);
+const authStore = useAuthStore();
+const hasPassword = computed(() => Boolean(authStore.user?.password_set_at));
+const activePasswordSchema = computed(() =>
+    hasPassword.value ? changePasswordSchema : setPasswordSchema
+);
 
 const changeUserPassword = async (formData, {resetForm}) => {
     try{
         buttonLoader.value = true;
+        const wasPasswordSet = hasPassword.value;
         const response = await changePassword(formData);
         if(response.data.success){
+            if (!wasPasswordSet && authStore.user) {
+                authStore.user.password_set_at = new Date().toISOString();
+            }
+
             ElMessage({
                 type: "success",
                 message:
-                    response.data.message || "Password changed successfuly",
+                    response.data.message || (wasPasswordSet ? "Password changed successfully" : "Password set successfully"),
             });
             resetForm();
             return;
@@ -39,10 +50,10 @@ const changeUserPassword = async (formData, {resetForm}) => {
 
 <template>
     <div class="p-6">
-        <h4 class="text-xl font-medium mb-4">Change Password</h4>
-        <Form @submit="changeUserPassword" :validation-schema="changePasswordSchema" class="mt-4" v-slot="{resetForm}">
+        <h4 class="text-xl font-medium mb-4">{{ hasPassword ? "Change Password" : "Set Password" }}</h4>
+        <Form @submit="changeUserPassword" :validation-schema="activePasswordSchema" class="mt-4" v-slot="{resetForm}">
                 <el-row :gutter="20" class="flex flex-col">
-                    <el-col :md="12" class="mb-4">
+                    <el-col v-if="hasPassword" :md="12" class="mb-4">
                         <Field name="current_password" v-slot="{field, handleChange, errorMessage}">
                             <el-form-item label="Current Password" :error="errorMessage" label-position="top">
                                 <el-input type="password" 
@@ -80,7 +91,7 @@ const changeUserPassword = async (formData, {resetForm}) => {
                     </el-col>
                 </el-row>
                 <div>
-                    <SubmitButton classes="md:!w-[100px] mt-4" text="Change" :isLoading="buttonLoader" />
+                    <SubmitButton classes="md:!w-[100px] mt-4" :text="hasPassword ? 'Change' : 'Set'" :isLoading="buttonLoader" />
                 </div>
             </Form>
     </div>

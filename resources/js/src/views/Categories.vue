@@ -7,6 +7,8 @@ import {
     bulkDeleteCategories,
     createCategory,
     deleteCategory,
+    exportCategories,
+    exportCategoriesPdf,
     listCategories,
     updateCategory,
 } from '../services/category.service.js';
@@ -16,6 +18,8 @@ import { formatDate } from '../utils/helpers.js';
 
 const categoryStore = useCategoryStore();
 const apiService = listCategories;
+const excelExportService = exportCategories;
+const pdfExportService = exportCategoriesPdf;
 const refresh = ref(0);
 const isCategoryDialogOpen = ref(false);
 const isSaving = ref(false);
@@ -61,6 +65,14 @@ const columns = [
         prop: 'actions',
         sortable: false,
     },
+];
+
+const exportColumns = [
+    { label: 'Category ID', prop: 'id' },
+    { label: 'Category', prop: 'name' },
+    { label: 'Type', prop: 'type' },
+    { label: 'Created At', prop: 'created_at' },
+    { label: 'Updated At', prop: 'updated_at' },
 ];
 
 const openCategoryDialog = (category = null) => {
@@ -172,6 +184,14 @@ const handleBulkAction = async ({ key, ids }) => {
         :columns="columns"
         :api-service="apiService"
         :default-sort="{ prop: 'name', order: 'ascending' }"
+        :export-excel="true"
+        :export-service="excelExportService"
+        :export-columns="exportColumns"
+        excel-file-name="categories.xlsx"
+        :exportPDF="true"
+        :pdf-export-service="pdfExportService"
+        :pdf-export-columns="exportColumns"
+        pdf-file-name="categories.pdf"
         :bulk-actions="bulkActions"
         :update="refresh"
         @bulk-action="handleBulkAction"

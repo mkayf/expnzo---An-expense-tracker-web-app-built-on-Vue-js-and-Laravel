@@ -103,7 +103,7 @@ watch(
                 </span>
             </el-menu-item>
 
-            <el-menu-item index="/app/settings" title="Settings" @click="navigate('/app/settings')">
+            <el-menu-item index="/app/account/profile" title="Settings" @click="navigate('/app/account/profile')">
                 <Cog6ToothIcon class="w-6 h-6 mr-3 shrink-0" />
                 <span class="whitespace-nowrap transition-opacity duration-200"
                     :class="collapsed ? 'opacity-0' : 'opacity-100'">

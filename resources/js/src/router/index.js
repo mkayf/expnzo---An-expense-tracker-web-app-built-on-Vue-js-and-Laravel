@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import NProgress from "nprogress";
 import authRoutes from "./authRoutes";
 import appRoutes from "./appRoutes";
 import publicRoutes from "./publicRoutes";
@@ -34,6 +35,12 @@ const routes = [
 export const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+NProgress.configure({
+    showSpinner: false,
+    minimum: 0.1,
+    trickleSpeed: 200,
 });
 
 // // router.beforeEach((to, from, next) => {
@@ -74,6 +81,8 @@ export const router = createRouter({
 // });
 
 router.beforeEach((to, from, next) => {
+    NProgress.start();
+
     const authStore = useAuthStore();
     const isAuthenticated = authStore.isAuthenticated;
     const isVerified = authStore.user?.email_verified ?? false;
@@ -102,4 +111,12 @@ router.beforeEach((to, from, next) => {
     }
 
     return next();
+});
+
+router.afterEach(() => {
+    NProgress.done();
+});
+
+router.onError(() => {
+    NProgress.done();
 });

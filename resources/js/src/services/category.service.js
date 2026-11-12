@@ -8,6 +8,20 @@ export const listCategories = (params = {}) => {
     return api.get('/categories', { params });
 }
 
+export const exportCategories = (params = {}) => {
+    return api.get('/categories/export', {
+        params,
+        responseType: 'blob',
+    });
+}
+
+export const exportCategoriesPdf = (params = {}) => {
+    return api.get('/categories/export/pdf', {
+        params,
+        responseType: 'blob',
+    });
+}
+
 export const createCategory = (data) => {
     return api.post('/create-custom-category', data);
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -61,12 +62,19 @@ Route::prefix('/api')->group(function () {
         Route::get('/dashboard/spending-calendar', [DashboardController::class, 'getSpendingCalendarData'])->name('dashbaord.spending_calendar');
         Route::get('/dashboard/spending-calendar/day-transactions', [DashboardController::class, 'getSpendingCalendarDayTransactions'])->name('dashboard.spending_calendar.day_transactions');
 
+        // Report routes:
+        Route::get('/reports/financial', [ReportController::class, 'financialReport'])->name('reports.financial');
+        Route::get('/reports/financial/export', [ReportController::class, 'exportExcel'])->name('reports.financial.export');
+        Route::get('/reports/financial/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.financial.export.pdf');
+
         // Budget routes:
         Route::get('/get-budget-data', [BudgetController::class, 'show'])->name('budget.show');
         Route::post('/set-budget', [BudgetController::class, 'setBudget'])->name('budget.set');
 
         // Category routes:
         Route::get('/categories', [CategoryController::class, 'list'])->name('category.list');
+        Route::get('/categories/export/pdf', [CategoryController::class, 'exportPdf'])->name('category.export.pdf');
+        Route::get('/categories/export', [CategoryController::class, 'export'])->name('category.export');
         Route::get('/get-categories', [CategoryController::class, 'index'])->name('category.index');
         Route::post('/create-custom-category', [CategoryController::class, 'createCustomCategory'])->name('category.store');
         Route::patch('/categories/{id}', [CategoryController::class, 'updateCustomCategory'])->name('category.update');

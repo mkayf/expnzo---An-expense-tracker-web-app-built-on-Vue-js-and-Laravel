@@ -2,14 +2,105 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoriesExport;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use RuntimeException;
+use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class CategoryController extends Controller
 {
+    public function export(Request $request)
+    {
+        $validated = $request->validate([
+            'columns' => ['required', 'array', 'min:1'],
+            'columns.*' => ['required', 'string', 'distinct', Rule::in(array_keys(CategoriesExport::COLUMNS))],
+            'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+        ]);
+
+        $categories = $request->user()->customCategories();
+        $search = trim($validated['search'] ?? '');
+
+        if ($search !== '') {
+            $like = '%' . mb_strtolower($search) . '%';
+            $categories->where(function ($query) use ($like) {
+                $query->whereRaw('LOWER(name) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(type) LIKE ?', [$like]);
+            });
+        }
+
+        return Excel::download(
+            new CategoriesExport($categories, $validated['columns']),
+            'categories.xlsx',
+            \Maatwebsite\Excel\Excel::XLSX
+        );
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $validated = $request->validate([
+            'columns' => ['required', 'array', 'min:1'],
+            'columns.*' => ['required', 'string', 'distinct', Rule::in(array_keys(CategoriesExport::COLUMNS))],
+            'search' => ['sometimes', 'nullable', 'string', 'max:255'],
+        ]);
+
+        $categories = $request->user()->customCategories();
+        $search = trim($validated['search'] ?? '');
+
+        if ($search !== '') {
+            $like = '%' . mb_strtolower($search) . '%';
+            $categories->where(function ($query) use ($like) {
+                $query->whereRaw('LOWER(name) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(type) LIKE ?', [$like]);
+            });
+        }
+
+        $records = $categories
+            ->orderBy('name')
+            ->orderBy('id')
+            ->get();
+        $columns = array_map(fn (string $column) => [
+            'prop' => $column,
+            'label' => CategoriesExport::COLUMNS[$column],
+        ], $validated['columns']);
+        $rows = $records->map(fn (Category $category) => array_map(
+            fn (string $column) => match ($column) {
+                'created_at', 'updated_at' => $category->{$column}?->format('Y-m-d H:i:s'),
+                default => $category->{$column},
+            },
+            $validated['columns']
+        ));
+
+        $logoPath = resource_path('js/src/assets/logo/expnzo-light-logo.png');
+        $logo = file_get_contents($logoPath);
+        if ($logo === false) {
+            throw new RuntimeException('Unable to load the report logo.');
+        }
+
+        return Pdf::view('pdf.categories', [
+            'columns' => $columns,
+            'rows' => $rows,
+            'recordCount' => $records->count(),
+            'expenseCategoryCount' => $records->where('type', 'expense')->count(),
+            'incomeCategoryCount' => $records->where('type', 'income')->count(),
+            'search' => $validated['search'] ?? null,
+            'generatedAt' => now(),
+            'logoDataUri' => 'data:image/png;base64,' . base64_encode($logo),
+        ])
+            ->withBrowsershot(function (Browsershot $browsershot) {
+                $browsershot->newHeadless()->waitUntilNetworkIdle();
+            })
+            ->format('a4')
+            ->landscape()
+            ->margins(12, 10, 14, 10)
+            ->download('categories.pdf');
+    }
+
     public function list(Request $request)
     {
         $validated = $request->validate([
