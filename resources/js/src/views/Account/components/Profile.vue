@@ -17,7 +17,7 @@ import SubmitButton from "../../../components/ui/SubmitButton.vue";
 
 const authStore = useAuthStore();
 const showAvatarModal = ref(false);
-const uploadURL = `${import.meta.env.VITE_API_URL}/upload_avatar`;
+const uploadURL = `${import.meta.env.VITE_API_URL  || '/api'}/upload_avatar`;
 let loadingInstance = null;
 let buttonLoader = ref(false);
 
