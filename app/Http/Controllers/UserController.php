@@ -15,34 +15,32 @@ class UserController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,|max:2048',
         ]);
 
+        $disk = config('filesystems.avatar_disk');
         $user = $request->user();
+
         try {
-            Log::error('Trying to upload user profile');
             if ($request->hasFile('avatar')) {
-                if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                    Storage::disk('public')->delete($user->avatar);
+                $oldPath = $user->getRawOriginal('avatar');
+                if ($oldPath) {
+                    Storage::disk($disk)->delete($oldPath);
                 }
 
-                $path = $request->file('avatar')->store('avatars', 'public');
+                $path = $request->file('avatar')->store('avatars', $disk);
 
                 $user->avatar = $path;
                 $user->save();
 
-                Log::error('Profile uploaded successfully');
-
                 return response()->json([
                     'success' => true,
                     'message' => 'Profile uploaded successfully',
-                    'url' => asset('storage/' . $path),
+                    'url' => Storage::disk($disk)->url($path),
                 ], 200);
-            } else {
-                Log::error('Image not provided by frontend', ['file_came' => $request->avatar]);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Please upload a proper image file'
-                ], 400);
             }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Please upload a proper image file'
+            ], 400);
         } catch (\Throwable $th) {
             Log::error('Failed to upload avatar', ['error' => $th->getMessage()]);
             return response()->json([
@@ -55,13 +53,12 @@ class UserController extends Controller
     public function deleteAvatar(Request $request)
     {
         try {
+            $disk = config('filesystems.avatar_disk');
             $user = $request->user();
             $path = $user->getRawOriginal('avatar');
 
             if ($user->has_custom_avatar) {
-                if (Storage::disk('public')->exists($path)) {
-                    Storage::disk('public')->delete($path);
-                }
+                Storage::disk($disk)->delete($path);
 
                 $user->setAttribute('avatar', null);
                 $user->save();

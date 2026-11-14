@@ -62,14 +62,16 @@ class User extends Authenticatable
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? asset('storage/'.$value) : asset('media/default-avatar.avif')
+            get: fn($value) => $value
+                ? Storage::disk(config('filesystems.avatar_disk'))->url($value)
+                : asset('media/default-avatar.avif')
         );
     }
 
     public function hasCustomAvatar(): Attribute
     {
         return Attribute::make(
-            get: fn () => ! is_null($this->getRawOriginal('avatar')) && Storage::disk('public')->exists($this->getRawOriginal('avatar'))
+            get: fn() => !is_null($this->getRawOriginal('avatar'))
         );
     }
 
@@ -78,20 +80,23 @@ class User extends Authenticatable
         return $this->hasOne(UserPreference::class, 'user_id', 'id');
     }
 
-    public function transactions(){
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class, 'user_id');
     }
 
-    public function budgets(){
+    public function budgets()
+    {
         return $this->hasMany(Budget::class, 'user_id');
     }
-    
-    public function categories(){
+
+    public function categories()
+    {
         return $this->belongsToMany(Category::class);
     }
 
-    public function customCategories(){
+    public function customCategories()
+    {
         return $this->hasMany(Category::class, 'user_id');
     }
 }
-    
