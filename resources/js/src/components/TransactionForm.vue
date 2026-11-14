@@ -1,5 +1,5 @@
 <script setup>
-import { computed, handleError, nextTick, ref, watch } from 'vue';
+import { computed, handleError, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Form, Field } from 'vee-validate';
 import { transactionSchema } from '../utils/validationSchema.js';
 import { createCategory, getCategories } from '../services/category.service.js';
@@ -45,6 +45,10 @@ const newCategoryInputVisible = ref(false)
 const newCategoryInputRef = ref()
 const newCategoryInputLoader = ref(false);
 const transactionTypeForCategory = ref('expense');
+const categoryListRef = ref(null);
+const hasScrollableCategories = ref(false);
+const categoryScrollThumbHeight = ref(100);
+const categoryScrollThumbTop = ref(0);
 let categoriesTimer;
 const categoryStore = useCategoryStore();
 
@@ -73,6 +77,40 @@ const categories = computed(() => {
     return transactionTypeForCategory.value === 'expense' ? categoryStore.expenseCategories : categoryStore.incomeCategories;
 })
 
+const updateCategoryScrollIndicator = () => {
+    const list = categoryListRef.value;
+    if (!list) return;
+
+    const maxScroll = list.scrollHeight - list.clientHeight;
+    hasScrollableCategories.value = maxScroll > 1;
+    if (maxScroll <= 1) {
+        categoryScrollThumbHeight.value = 100;
+        categoryScrollThumbTop.value = 0;
+        return;
+    }
+
+    categoryScrollThumbHeight.value = Math.max(16, (list.clientHeight / list.scrollHeight) * 100);
+    categoryScrollThumbTop.value = (list.scrollTop / maxScroll)
+        * (100 - categoryScrollThumbHeight.value);
+};
+
+const handleCategoryListScroll = () => {
+    updateCategoryScrollIndicator();
+};
+
+watch(categories, async () => {
+    await nextTick();
+    updateCategoryScrollIndicator();
+}, { deep: true });
+
+onMounted(() => {
+    window.addEventListener('resize', updateCategoryScrollIndicator);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', updateCategoryScrollIndicator);
+});
+
 
 const getCachedCategories = (type) => {
     return type === 'expense' ? categoryStore.expenseCategories : categoryStore.incomeCategories;
@@ -97,6 +135,8 @@ const fetchCategories = async (type = 'expense') => {
     }
     finally {
         categoriesLoader.value = false;
+        await nextTick();
+        updateCategoryScrollIndicator();
     }
 }
 
@@ -249,12 +289,14 @@ watch(() => props.visible, async (val) => {
 
     if (props.editId) {
         await handleShowTransaction();
+        await nextTick();
+        updateCategoryScrollIndicator();
         return;
     }
 
     transactionTypeForCategory.value = 'expense';
     formRef.value?.resetForm({ value: initialValues });
-    fetchCategories('expense');
+    await fetchCategories('expense');
 });
 
 watch(() => props.editId, (val) => {
@@ -404,31 +446,54 @@ watch(() => props.editId, (val) => {
                                         </div>
                                     </template>
                                 </el-skeleton>
-                                <div v-else class="h-[88px] overflow-y-auto">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <el-check-tag type="primary" :checked="field.value === category.id"
-                                            @change="handleChange(field.value === category.id ? null : category.id)"
-                                            v-for="category in categories" :key="category.id"
-                                            class="!rounded-full !px-3 !py-1 !text-xs">
-                                            {{ category.name }}
-                                        </el-check-tag>
-                                        <div>
-                                            <div v-if="newCategoryInputVisible" class="flex items-center gap-2">
-                                                <el-input ref="newCategoryInputRef" v-model="newCategoryVal"
-                                                    class="w-36" size="small" placeholder="Category name"
-                                                    @keyup.enter="handleNewCategory"
-                                                    :disabled="newCategoryInputLoader" />
-                                                <div class="flex items-center">
-                                                    <el-button plain type="primary" size="small" :icon="Check" circle
-                                                        @click="handleNewCategory" :disabled="newCategoryInputLoader" />
-                                                    <el-button size="small" plain type="danger" :icon="Close" circle
-                                                        @click="clearCategoryVal" :disabled="newCategoryInputLoader" />
-                                                </div>
+                                <div v-else class="category-picker">
+                                    <div class="category-scroll-container">
+                                        <div
+                                            ref="categoryListRef"
+                                            class="category-scroll-area"
+                                            role="region"
+                                            aria-label="Available categories"
+                                            tabindex="0"
+                                            @scroll="handleCategoryListScroll"
+                                        >
+                                            <div class="flex flex-wrap content-start items-center gap-2">
+                                                <el-check-tag type="primary" :checked="field.value === category.id"
+                                                    @change="handleChange(field.value === category.id ? null : category.id)"
+                                                    v-for="category in categories" :key="category.id"
+                                                    class="!rounded-full !px-3 !py-1 !text-xs">
+                                                    {{ category.name }}
+                                                </el-check-tag>
                                             </div>
-                                            <el-button v-else size="small" @click="showNewCategoryInput">
-                                                + New
-                                            </el-button>
                                         </div>
+                                        <div v-if="hasScrollableCategories" class="category-scroll-track" aria-hidden="true">
+                                            <span
+                                                class="category-scroll-thumb"
+                                                :style="{
+                                                    height: `${categoryScrollThumbHeight}%`,
+                                                    top: `${categoryScrollThumbTop}%`,
+                                                }"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="category-picker-actions">
+                                        <div v-if="newCategoryInputVisible" class="flex flex-wrap items-center gap-2">
+                                            <el-input ref="newCategoryInputRef" v-model="newCategoryVal"
+                                                class="w-36" size="small" placeholder="Category name"
+                                                @keyup.enter="handleNewCategory"
+                                                :disabled="newCategoryInputLoader" />
+                                            <div class="flex items-center">
+                                                <el-button plain type="primary" size="small" :icon="Check" circle
+                                                    @click="handleNewCategory" :disabled="newCategoryInputLoader" />
+                                                <el-button size="small" plain type="danger" :icon="Close" circle
+                                                    @click="clearCategoryVal" :disabled="newCategoryInputLoader" />
+                                            </div>
+                                        </div>
+                                        <el-button v-else size="small" @click="showNewCategoryInput">
+                                            + New
+                                        </el-button>
+                                        <span v-if="hasScrollableCategories" class="category-scroll-hint">
+                                            Scroll to see more
+                                        </span>
                                     </div>
                                 </div>
                             </el-form-item>
@@ -445,3 +510,65 @@ watch(() => props.editId, (val) => {
         </template>
     </el-dialog>
 </template>
+
+<style scoped>
+.category-picker {
+    min-width: 0;
+}
+
+.category-scroll-container {
+    position: relative;
+    height: 88px;
+}
+
+.category-scroll-area {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 12px;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.category-scroll-area::-webkit-scrollbar {
+    display: none;
+}
+
+.category-scroll-track {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 6px;
+    border-radius: 9999px;
+    background-color: var(--el-fill-color-light);
+    pointer-events: none;
+}
+
+.category-scroll-thumb {
+    position: absolute;
+    right: 0;
+    left: 0;
+    min-height: 14px;
+    border-radius: 9999px;
+    background-color: var(--el-color-primary);
+}
+
+.category-picker-actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.category-scroll-hint {
+    color: var(--el-text-color-secondary);
+    font-size: 11px;
+}
+</style>

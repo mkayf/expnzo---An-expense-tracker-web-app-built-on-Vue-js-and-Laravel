@@ -610,7 +610,8 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <el-dialog v-model="exportDialogVisible" :title="exportFormat === 'pdf' ? 'Export PDF' : 'Export Excel'" width="520px"
+            <el-dialog v-model="exportDialogVisible" :title="exportFormat === 'pdf' ? 'Export PDF' : 'Export Excel'"
+                width="min(520px, calc(100vw - 32px))"
                 :close-on-click-modal="!exporting" :close-on-press-escape="!exporting">
                 <p class="mb-3 text-sm text-gray-600 dark:text-[var(--el-text-color-secondary)]">
                     Choose the columns to include in your {{ exportFormat === 'pdf' ? 'PDF report' : 'Excel file' }}.
@@ -618,7 +619,7 @@ onBeforeUnmount(() => {
                 <el-checkbox :model-value="allExportColumnsSelected" :indeterminate="exportColumnsIndeterminate"
                     @change="toggleAllExportColumns">Select all</el-checkbox>
                 <el-checkbox-group v-model="selectedExportColumns"
-                    class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    class="export-column-options mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <el-checkbox v-for="column in selectableExportColumns" :key="column.prop"
                         :label="column.prop">{{ column.label }}</el-checkbox>
                 </el-checkbox-group>
@@ -645,5 +646,17 @@ onBeforeUnmount(() => {
     padding: 0 !important;
     overflow: visible !important;
     text-overflow: clip !important;
+}
+
+.export-column-options :deep(.el-checkbox) {
+    min-width: 0;
+    height: auto;
+    align-items: flex-start;
+}
+
+.export-column-options :deep(.el-checkbox__label) {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 </style>
