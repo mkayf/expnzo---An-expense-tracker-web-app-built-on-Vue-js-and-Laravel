@@ -11,8 +11,16 @@ php artisan view:cache
 
 php artisan migrate --force
 
+# queue worker
 (while true; do
     runuser -u www-data -- php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    sleep 2
+done) &
+
+
+# schedule worker
+(while true; do
+    runuser -u www-data -- php artisan schedule:work
     sleep 2
 done) &
 
