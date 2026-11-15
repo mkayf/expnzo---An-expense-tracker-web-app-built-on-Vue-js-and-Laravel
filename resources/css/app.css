@@ -90,7 +90,7 @@ html.dark {
     --primary-color: var(--primary-green);
     --green-hover: #29755a;
     --green-active: #246b52;
-    --button-text: #ffffff;
+    --button-text: #ffffff; 
     --secondary-gray: #9aa8a0;
     --bg-light-gray: #222b27;
     --text-charcoal: #d5ddd9;

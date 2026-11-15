@@ -40,11 +40,11 @@ const registerUser = async (formData) => {
 </script>
 
 <template>
-    <div class="bg-[var(--app-surface)] p-6 rounded-2xl shadow-xl w-full max-w-80 dark:border dark:border-[var(--el-border-color)]">
+    <div class="register-card bg-[var(--app-surface)] p-6 rounded-2xl shadow-xl w-full max-w-80 dark:border dark:border-[var(--el-border-color)]">
         <img :src="themeStore.isDark ? darkLogo : lightLogo" alt="Expnzo"
-            class="h-[40px] w-[160px] object-contain mx-auto mb-2" />
+            class="register-logo h-[40px] w-[160px] object-contain mx-auto mb-2" />
         <Form class="auth-form" @submit="registerUser" :validation-schema="registerSchema">
-            <h2 class="text-xl mb-4 text-center">Create account</h2>
+            <h2 class="register-heading text-xl mb-4 text-center">Create account</h2>
 
             <Field name="name" v-slot="{ field, errorMessage, handleChange }">
                 <el-form-item label="Name" label-position="top" :error="errorMessage">
@@ -91,18 +91,21 @@ const registerUser = async (formData) => {
                 </el-form-item>
             </Field>
 
-            <div class="flex justify-end mb-3">
+            <div class="register-account-switch flex justify-end mb-3">
                 <small>
                     Already have an account?
                     <RouterLink to="/auth/login" class="text-[var(--primary-green)]">Login</RouterLink>
                 </small>
             </div>
 
-            <el-form-item class="mb-3">
+            <el-form-item class="register-submit-item mb-3">
                 <SubmitButton :is-loading="loading" text="Create" classes="w-full" />
             </el-form-item>
 
             <GoogleAuthButton />
+            <div class="register-home-link mt-3 text-center">
+                <RouterLink to="/" class="text-sm text-[var(--primary-green)]">Back to home</RouterLink>
+            </div>
         </Form>
     </div>
 </template>
@@ -125,5 +128,33 @@ const registerUser = async (formData) => {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+}
+
+@media (max-height: 680px) {
+    .register-card {
+        padding: 0.75rem 1rem;
+    }
+
+    .register-logo {
+        height: 32px;
+        width: 128px;
+        margin-bottom: 2px;
+    }
+
+    .register-heading {
+        margin-bottom: 8px;
+    }
+
+    .register-account-switch {
+        margin-bottom: 2px;
+    }
+
+    .auth-form :deep(.register-submit-item) {
+        margin-bottom: 8px;
+    }
+
+    .register-home-link {
+        margin-top: 2px;
+    }
 }
 </style>

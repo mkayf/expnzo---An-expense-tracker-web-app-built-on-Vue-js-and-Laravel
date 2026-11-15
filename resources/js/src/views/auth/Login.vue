@@ -100,6 +100,9 @@ onMounted(() => {
             </el-form-item>
 
             <GoogleAuthButton />
+            <div class="mt-3 text-center">
+                <RouterLink to="/" class="text-sm text-[var(--primary-green)]">Back to home</RouterLink>
+            </div>
         </Form>
     </div>
 </template>
