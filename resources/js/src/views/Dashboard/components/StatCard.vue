@@ -103,6 +103,28 @@ const trendTextClass = computed(() => {
     }
 })
 
+const chartAmounts = computed(() => {
+    const raw = (props.data?.chart_data?.amounts ?? []).map((v) => Number(v) || 0);
+    // single point par sparkline sirf dot dikhata hai, isliye flat line banane ke liye duplicate karo
+    return raw.length === 1 ? [raw[0], raw[0]] : raw;
+});
+
+const chartDates = computed(() => {
+    const raw = props.data?.chart_data?.dates ?? [];
+    return raw.length === 1 ? [raw[0], raw[0]] : raw;
+});
+
+const hasChartData = computed(() => {
+    if (props.type === 'balance') {
+        return (Number(props.data?.chart_data?.total_incomes) || 0) + (Number(props.data?.chart_data?.total_expense) || 0) > 0;
+    }
+    if (props.type === 'budget') {
+        return (Number(props.data?.chart_data?.remaining_budget) || 0) + (Number(props.data?.chart_data?.used_budget) || 0) > 0;
+    }
+    // income / expense (area sparkline)
+    return chartAmounts.value.length >= 2 && chartAmounts.value.some((v) => v > 0);
+});
+
 const chartConfig = computed(() => {
     if (props.type === 'balance' || props.type === 'budget') {
         return {
@@ -142,7 +164,7 @@ const chartConfig = computed(() => {
     return {
         options: withChartTheme({
             xaxis: {
-                categories: props.data?.chart_data?.dates,
+                categories: chartDates.value,
             },
             zoom: {
                 enabled: false,
@@ -152,6 +174,10 @@ const chartConfig = computed(() => {
                 sparkline: {
                     enabled: true
                 }
+            },
+            markers: {
+                size: 0,
+                hover: { size: 0 }
             },
             colors: ['var(--el-color-primary)'],
             stroke: {
@@ -178,7 +204,7 @@ const chartConfig = computed(() => {
         series: [
             {
                 name: props.type === "income" ? 'Daily Income' : 'Daily Expense',
-                data: props.data?.chart_data?.amounts,
+                data: chartAmounts.value,
             },
         ]
     }
@@ -217,8 +243,18 @@ const chartConfig = computed(() => {
                 </div>
             </div>
             <div class="flex flex-col items-end justify-end h-[70px]">
-                <VueApexCharts width="50" height="70" :options="chartConfig.options" :series="chartConfig.series">
+                <VueApexCharts v-if="hasChartData" width="50" height="70" :options="chartConfig.options"
+                    :series="chartConfig.series">
                 </VueApexCharts>
+
+                <!-- empty state placeholder -->
+                <div v-else class="flex h-[70px] w-[50px] items-center justify-center" aria-hidden="true">
+                    <!-- donut types: khali ring -->
+                    <span v-if="type === 'balance' || type === 'budget'"
+                        class="h-[46px] w-[46px] rounded-full border-[6px] border-[var(--el-border-color)]"></span>
+                    <!-- income / expense: flat dashed line -->
+                    <span v-else class="w-full border-t-2 border-dashed border-[var(--el-border-color)]"></span>
+                </div>
             </div>
         </div>
     </div>
