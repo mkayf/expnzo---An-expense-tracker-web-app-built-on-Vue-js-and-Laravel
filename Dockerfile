@@ -27,6 +27,8 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+RUN printf "upload_max_filesize=10M\npost_max_size=12M\n" > /usr/local/etc/php/conf.d/uploads.ini
+
 WORKDIR /var/www/html
 COPY . .
 

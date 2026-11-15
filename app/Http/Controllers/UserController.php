@@ -12,7 +12,7 @@ class UserController extends Controller
     public function uploadAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $disk = config('filesystems.avatar_disk');

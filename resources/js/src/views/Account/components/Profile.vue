@@ -1,11 +1,13 @@
 <script setup>
+import axios from "axios";
 import VueAvatarUpload from "@pkhadson/vue-avatar-upload";
 import "@pkhadson/vue-avatar-upload/lib/style.css";
 import Avatar from "../../../components/ui/Avatar.vue";
 import useAuthStore from "../../../stores/auth";
 import { CameraIcon, TrashIcon } from "@heroicons/vue/24/outline";
-import { handleError, onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { getCookie } from "../../../utils/helpers";
+import handleError from "../../../utils/handleError";
 import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import "element-plus/es/components/message/style/css";
 import "element-plus/es/components/message-box/style/css";
@@ -53,6 +55,51 @@ const uploadHeaders = {
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest",
 };
+
+// Load a file into an HTMLImageElement (fallback for browsers without resize options)
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
+// Resize and compress an image file before uploading
+async function compressImage(file, maxWidth = 512, quality = 0.85) {
+    let source;
+    let width;
+    let height;
+
+    try {
+        source = await createImageBitmap(file, {
+            resizeWidth: maxWidth,
+            resizeQuality: "medium",
+        });
+        width = source.width;
+        height = source.height;
+    } catch {
+        source = await loadImage(file);
+        const scale = Math.min(1, maxWidth / source.naturalWidth);
+        width = Math.round(source.naturalWidth * scale);
+        height = Math.round(source.naturalHeight * scale);
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d").drawImage(source, 0, 0, width, height);
+
+    const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality),
+    );
+    return new File([blob], "avatar.jpg", { type: "image/jpeg" });
+}
 
 const startLoading = (text = 'Loading') => {
     loadingInstance = ElLoading.service({
@@ -121,6 +168,27 @@ const handleUploadSuccess = (res) => {
         type: "success",
         message: response.message || "Profile updated successfully.",
     });
+};
+
+const uploadAvatar = async (selectedFile, close) => {
+    try {
+        const smallFile = await compressImage(selectedFile);
+        const formData = new FormData();
+        formData.append("avatar", smallFile);
+
+        const response = await axios.post(uploadURL, formData, {
+            headers: uploadHeaders,
+        });
+        handleUploadSuccess(JSON.stringify(response.data));
+        close?.();
+    } catch (error) {
+        avatarUploadLoading.value = false;
+        const message =
+            error.response?.data?.errors?.avatar?.[0] ||
+            error.response?.data?.message ||
+            "Failed to upload profile. Please try again";
+        ElMessage.error(message);
+    }
 };
 
 const handleUploadError = (error) => {
@@ -211,6 +279,7 @@ const saveProfile = async (formData) => {
                         :showPreview="false"
                         :avatar="authStore.user?.avatar"
                         :on-befoure-upload="beforeAvatarUpload"
+                        :on-custom-request="uploadAvatar"
                         :class="{ 'avatar-uploading': avatarUploadLoading }"
                         @input="markAvatarSelected"
                         @close="closeAvatarModal"
