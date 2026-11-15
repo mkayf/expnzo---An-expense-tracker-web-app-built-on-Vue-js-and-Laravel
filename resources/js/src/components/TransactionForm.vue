@@ -254,7 +254,7 @@ const saveTransaction = async (formData, { resetForm }) => {
     }
 
 }
-    
+
 const handleShowTransaction = async () => {
     try {
         showTransactionLoader.value = true;
@@ -274,7 +274,7 @@ const handleShowTransaction = async () => {
         }
     } catch (e) {
         handleError(e);
-    } finally{
+    } finally {
         showTransactionLoader.value = false;
     }
 }
@@ -338,7 +338,8 @@ watch(() => props.editId, (val) => {
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
                                         <span class="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
-                                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
+                                            <span
+                                                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
                                                 :class="field.value === 'expense'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
@@ -359,7 +360,8 @@ watch(() => props.editId, (val) => {
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
                                         <span class="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
-                                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
+                                            <span
+                                                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
                                                 :class="field.value === 'income'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
@@ -404,7 +406,7 @@ watch(() => props.editId, (val) => {
                                 </template>
                                 <el-date-picker class="!w-full [&_.el-input__wrapper]:w-full" :model-value="field.value"
                                     @update:model-value="handleChange" type="date" placeholder="Pick a day"
-                                    :shortcuts="shortcuts" value-format="YYYY-MM-DD"
+                                    :shortcuts="shortcuts" value-format="YYYY-MM-DD" :editable="false" :clearable="true"
                                     popper-class="transaction-date-picker-popper" />
                             </el-form-item>
                         </Field>
@@ -445,14 +447,9 @@ watch(() => props.editId, (val) => {
                                 </el-skeleton>
                                 <div v-else class="category-picker">
                                     <div class="category-scroll-container">
-                                        <div
-                                            ref="categoryListRef"
-                                            class="category-scroll-area"
-                                            role="region"
-                                            aria-label="Available categories"
-                                            tabindex="0"
-                                            @scroll="handleCategoryListScroll"
-                                        >
+                                        <div ref="categoryListRef" class="category-scroll-area" role="region"
+                                            aria-label="Available categories" tabindex="0"
+                                            @scroll="handleCategoryListScroll">
                                             <div class="flex flex-wrap content-start items-center gap-2">
                                                 <el-check-tag type="primary" :checked="field.value === category.id"
                                                     @change="handleChange(field.value === category.id ? null : category.id)"
@@ -462,22 +459,19 @@ watch(() => props.editId, (val) => {
                                                 </el-check-tag>
                                             </div>
                                         </div>
-                                        <div v-if="hasScrollableCategories" class="category-scroll-track" aria-hidden="true">
-                                            <span
-                                                class="category-scroll-thumb"
-                                                :style="{
-                                                    height: `${categoryScrollThumbHeight}%`,
-                                                    top: `${categoryScrollThumbTop}%`,
-                                                }"
-                                            />
+                                        <div v-if="hasScrollableCategories" class="category-scroll-track"
+                                            aria-hidden="true">
+                                            <span class="category-scroll-thumb" :style="{
+                                                height: `${categoryScrollThumbHeight}%`,
+                                                top: `${categoryScrollThumbTop}%`,
+                                            }" />
                                         </div>
                                     </div>
                                     <div class="category-picker-actions">
                                         <div v-if="newCategoryInputVisible" class="flex flex-wrap items-center gap-2">
-                                            <el-input ref="newCategoryInputRef" v-model="newCategoryVal"
-                                                class="w-36" size="small" placeholder="Category name"
-                                                @keyup.enter="handleNewCategory"
-                                                :disabled="newCategoryInputLoader" />
+                                            <el-input ref="newCategoryInputRef" v-model="newCategoryVal" class="w-36"
+                                                size="small" placeholder="Category name"
+                                                @keyup.enter="handleNewCategory" :disabled="newCategoryInputLoader" />
                                             <div class="flex items-center">
                                                 <el-button plain type="primary" size="small" :icon="Check" circle
                                                     @click="handleNewCategory" :disabled="newCategoryInputLoader" />
@@ -558,7 +552,6 @@ watch(() => props.editId, (val) => {
     gap: 8px;
     margin-top: 8px;
 }
-
 </style>
 
 <style>
