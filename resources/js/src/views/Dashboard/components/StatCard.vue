@@ -121,9 +121,11 @@ const hasChartData = computed(() => {
     if (props.type === 'budget') {
         return (Number(props.data?.chart_data?.remaining_budget) || 0) + (Number(props.data?.chart_data?.used_budget) || 0) > 0;
     }
-    // income / expense (area sparkline)
-    return chartAmounts.value.length >= 2 && chartAmounts.value.some((v) => v > 0);
+    const rawAmounts = props.data?.chart_data?.amounts ?? [];
+    return rawAmounts.length >= 2 && rawAmounts.some((v) => Number(v) > 0);
 });
+
+const isSinglePoint = computed(() => (props.data?.chart_data?.amounts ?? []).length === 1);
 
 const chartConfig = computed(() => {
     if (props.type === 'balance' || props.type === 'budget') {
@@ -184,9 +186,9 @@ const chartConfig = computed(() => {
                 width: 2,
                 curve: 'smooth'
             },
-            fill: {
-                type: 'gradient'
-            },
+            fill: isSinglePoint.value
+                ? { type: 'solid', opacity: 0 }
+                : { type: 'gradient' },
             tooltip: {
                 fixed: {
                     enabled: true,
@@ -231,7 +233,7 @@ const chartConfig = computed(() => {
                     <div>
                         <span class="text-md font-medium text-slate-700 dark:text-[var(--el-text-color-regular)]">{{
                             userCurrency ?? ""
-                        }}</span>
+                            }}</span>
                         <span class="ml-1 text-2xl font-semibold">
                             {{ formatAmount(props.data?.amount, userCurrencyIso) }}</span>
                     </div>
