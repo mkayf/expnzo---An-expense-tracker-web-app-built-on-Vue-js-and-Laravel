@@ -15,6 +15,7 @@ const props = defineProps({
 const date = ref(new Date());
 const calendarData = ref([]);
 const calendarLoading = ref(true);
+let calendarRequestId = 0;
 const dayDialogVisible = ref(false);
 const selectedDay = ref('');
 const dayTransactions = ref([]);
@@ -158,23 +159,30 @@ const openDayTransactions = (day) => {
     fetchDayTransactions();
 };
 
-const fetchSpendingCalendar = async () => {
+const fetchSpendingCalendar = async (month = calendarMonth.value) => {
+    const requestId = ++calendarRequestId;
     calendarLoading.value = true;
     try {
-        const response = await getSpendingCalendar(calendarMonth.value);
+        const response = await getSpendingCalendar(month);
+        if (requestId !== calendarRequestId || month !== calendarMonth.value) return;
+
         if (response.data?.success) {
             calendarData.value = response.data?.data ?? [];
         }
     } catch (e) {
-        handleError(e);
+        if (requestId === calendarRequestId) {
+            handleError(e);
+        }
     } finally {
-        calendarLoading.value = false;
+        if (requestId === calendarRequestId) {
+            calendarLoading.value = false;
+        }
     }
 };
 
 watch(calendarMonth, (val) => {
     if (val) {
-        fetchSpendingCalendar();
+        fetchSpendingCalendar(val);
     }
 }, { immediate: true });
 
