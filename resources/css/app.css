@@ -529,3 +529,111 @@ html.dark .apexcharts-gridline {
         max-height: calc(100dvh - 32px);
     }
 }
+
+.transaction-dialog .transaction-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.transaction-dialog .transaction-form-actions > .el-button {
+    margin-left: 0;
+}
+
+.transaction-dialog .transaction-type-option {
+    position: relative;
+}
+
+.transaction-dialog .transaction-type-option .el-radio__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.transaction-dialog .transaction-type-option .el-radio__label {
+    padding-left: 0;
+}
+
+.transaction-dialog .transaction-type-option:focus-within {
+    outline: 2px solid var(--el-color-primary);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+    .transaction-dialog {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh;
+        max-height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0;
+    }
+
+    .transaction-dialog .el-dialog__header {
+        padding: 16px 16px 0;
+    }
+
+    .transaction-dialog .el-dialog__body {
+        min-height: 0;
+        flex: 0 1 auto;
+        padding: 16px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .transaction-dialog .el-dialog__body::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .transaction-dialog .el-dialog__body {
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    .transaction-dialog .el-dialog__header {
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    .transaction-dialog .transaction-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .transaction-dialog .transaction-form-actions > .el-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .transaction-date-picker-popper {
+        max-width: calc(100vw - 16px);
+    }
+
+    .transaction-date-picker-popper .el-date-picker {
+        box-sizing: border-box;
+        width: min(322px, calc(100vw - 16px)) !important;
+    }
+
+    .transaction-date-picker-popper .el-date-picker .el-picker-panel__content {
+        width: calc(100% - 30px);
+    }
+}
+
+@supports (height: 100dvh) {
+    @media (max-width: 1024px) {
+        .transaction-dialog {
+            height: 100dvh;
+            max-height: 100dvh !important;
+        }
+    }
+}

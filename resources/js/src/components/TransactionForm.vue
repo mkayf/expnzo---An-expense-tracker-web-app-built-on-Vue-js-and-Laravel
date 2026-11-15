@@ -222,10 +222,6 @@ const handleNewCategory = async () => {
 
 }
 
-const handleFormSubmit = () => {
-    formRef.value?.$el?.requestSubmit();
-}
-
 const saveTransaction = async (formData, { resetForm }) => {
     try {
         if (!formData) return;
@@ -313,7 +309,7 @@ watch(() => props.editId, (val) => {
 </script>
 
 <template>
-    <el-dialog v-model="dialogVisible" align-center :width="700">
+    <el-dialog v-model="dialogVisible" align-center width="min(700px, calc(100vw - 24px))" class="transaction-dialog">
         <template #header>
             <h2 class="text-md sm:text-lg font-semibold" v-if="!editId">Add Transaction</h2>
             <h2 class="text-md sm:text-lg font-semibold" v-else>Edit Transaction</h2>
@@ -323,26 +319,26 @@ watch(() => props.editId, (val) => {
         <div v-loading="showTransactionLoader">
             <Form ref="formRef" @submit="saveTransaction" :validation-schema="transactionSchema"
                 :initial-values="initialValues" v-slot="{ resetForm }">
-                <el-row :gutter="20">
+                <el-row :gutter="8">
                     <el-col :span="24">
                         <Field name="type" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-5 sm:!mb-8">
                                 <template #label>
-                                    <span class="inline-flex items-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 text-xs">
                                         <ArrowsRightLeftIcon class="h-3.5 w-3.5" />
                                         Transaction type
                                     </span>
                                 </template>
                                 <el-radio-group :model-value="field.value" @update:model-value="handleChange"
                                     @change="debouncedTransactionTypeChanged(field.value)"
-                                    class="!grid w-full grid-cols-2 gap-3">
+                                    class="!grid w-full grid-cols-2 gap-2 sm:gap-3">
                                     <el-radio value="expense"
-                                        class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
+                                        class="transaction-type-option !m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border !px-2 py-2.5 sm:!px-3"
                                         :class="field.value === 'expense'
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
-                                        <span class="flex min-w-0 items-center gap-2.5">
-                                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                        <span class="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
+                                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
                                                 :class="field.value === 'expense'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
@@ -350,20 +346,20 @@ watch(() => props.editId, (val) => {
                                             </span>
                                             <span class="min-w-0 leading-tight">
                                                 <span
-                                                    class="block text-sm font-semibold text-(--text-charcoal)">Expense</span>
+                                                    class="block text-xs font-semibold text-(--text-charcoal) sm:text-sm">Expense</span>
                                                 <span
-                                                    class="block text-[11px] font-normal text-(--secondary-gray)">Money
+                                                    class="block text-[10px] font-normal text-(--secondary-gray) sm:text-[11px]">Money
                                                     out</span>
                                             </span>
                                         </span>
                                     </el-radio>
                                     <el-radio value="income"
-                                        class="!m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border px-3 py-2.5"
+                                        class="transaction-type-option !m-0 !mr-0 !flex !h-auto !w-full !items-center !whitespace-normal rounded-lg border !px-2 py-2.5 sm:!px-3"
                                         :class="field.value === 'income'
                                             ? '!border-(--primary-green) bg-(--el-color-primary-light-9)'
                                             : '!border-gray-200 bg-white hover:!border-gray-300 dark:!border-[var(--el-border-color)] dark:bg-[var(--app-surface)] dark:hover:!border-[var(--el-color-primary)]'">
-                                        <span class="flex min-w-0 items-center gap-2.5">
-                                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                                        <span class="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
+                                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md sm:h-8 sm:w-8"
                                                 :class="field.value === 'income'
                                                     ? 'bg-(--primary-green) text-white'
                                                     : 'bg-(--bg-light-gray) text-(--secondary-gray)'">
@@ -371,9 +367,9 @@ watch(() => props.editId, (val) => {
                                             </span>
                                             <span class="min-w-0 leading-tight">
                                                 <span
-                                                    class="block text-sm font-semibold text-(--text-charcoal)">Income</span>
+                                                    class="block text-xs font-semibold text-(--text-charcoal) sm:text-sm">Income</span>
                                                 <span
-                                                    class="block text-[11px] font-normal text-(--secondary-gray)">Money
+                                                    class="block text-[10px] font-normal text-(--secondary-gray) sm:text-[11px]">Money
                                                     in</span>
                                             </span>
                                         </span>
@@ -384,9 +380,9 @@ watch(() => props.editId, (val) => {
                     </el-col>
                     <el-col :xs="24" :sm="12">
                         <Field name="amount" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-5 sm:!mb-8">
                                 <template #label>
-                                    <span class="inline-flex items-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 text-xs">
                                         <BanknotesIcon class="h-3.5 w-3.5" />
                                         Amount
                                     </span>
@@ -399,24 +395,25 @@ watch(() => props.editId, (val) => {
                     </el-col>
                     <el-col :xs="24" :sm="12">
                         <Field name="transaction_date" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-5 sm:!mb-8">
                                 <template #label>
-                                    <span class="inline-flex items-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 text-xs">
                                         <CalendarDaysIcon class="h-3.5 w-3.5" />
                                         Date
                                     </span>
                                 </template>
                                 <el-date-picker class="!w-full [&_.el-input__wrapper]:w-full" :model-value="field.value"
                                     @update:model-value="handleChange" type="date" placeholder="Pick a day"
-                                    :shortcuts="shortcuts" value-format="YYYY-MM-DD" />
+                                    :shortcuts="shortcuts" value-format="YYYY-MM-DD"
+                                    popper-class="transaction-date-picker-popper" />
                             </el-form-item>
                         </Field>
                     </el-col>
                     <el-col :span="24">
                         <Field name="note" v-slot="{ field, errorMessage, handleChange }">
-                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-5 sm:!mb-8">
                                 <template #label>
-                                    <span class="inline-flex items-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 text-xs">
                                         <PencilSquareIcon class="h-3.5 w-3.5" />
                                         Note
                                     </span>
@@ -428,9 +425,9 @@ watch(() => props.editId, (val) => {
                     </el-col>
                     <el-col :span="24">
                         <Field name="category_id" v-slot="{ field, handleChange, errorMessage }">
-                            <el-form-item label-position="top" :error="errorMessage" class="!mb-8">
+                            <el-form-item label-position="top" :error="errorMessage" class="!mb-5 sm:!mb-8">
                                 <template #label>
-                                    <span class="inline-flex items-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 text-xs">
                                         <TagIcon class="h-3.5 w-3.5" />
                                         Categories
                                     </span>
@@ -491,23 +488,18 @@ watch(() => props.editId, (val) => {
                                         <el-button v-else size="small" @click="showNewCategoryInput">
                                             + New
                                         </el-button>
-                                        <span v-if="hasScrollableCategories" class="category-scroll-hint">
-                                            Scroll to see more
-                                        </span>
                                     </div>
                                 </div>
                             </el-form-item>
                         </Field>
                     </el-col>
                 </el-row>
+                <div class="transaction-form-actions">
+                    <el-button native-type="button" @click="closeDialog">Cancel</el-button>
+                    <SubmitButton :text="editId ? 'Update' : 'Save'" :is-loading="saveTransactionLoader" />
+                </div>
             </Form>
         </div>
-        <template #footer>
-            <div>
-                <el-button @click="closeDialog">Cancel</el-button>
-                <SubmitButton :text="editId ? 'Update' : 'Save'" @click="handleFormSubmit" :is-loading="saveTransactionLoader" />
-            </div>
-        </template>
     </el-dialog>
 </template>
 
@@ -567,8 +559,80 @@ watch(() => props.editId, (val) => {
     margin-top: 8px;
 }
 
-.category-scroll-hint {
-    color: var(--el-text-color-secondary);
-    font-size: 11px;
+</style>
+
+<style>
+@media (max-width: 640px) {
+    .transaction-date-picker-popper.el-popper {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        inset: 50% auto auto 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: min(340px, calc(100vw - 24px)) !important;
+        max-height: calc(100dvh - 24px) !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+    }
+
+    .transaction-date-picker-popper .el-popper__arrow {
+        display: none !important;
+    }
+
+    .transaction-date-picker-popper .el-picker-panel,
+    .transaction-date-picker-popper .el-date-picker,
+    .transaction-date-picker-popper .el-date-picker.has-sidebar {
+        width: 100% !important;
+    }
+
+    /* shortcuts: sidebar -> horizontal row on top */
+    .transaction-date-picker-popper .el-picker-panel__sidebar {
+        position: static !important;
+        display: flex;
+        gap: 6px;
+        width: 100% !important;
+        padding: 8px !important;
+        box-sizing: border-box;
+        overflow-x: auto;
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--el-border-color-lighter);
+    }
+
+    .transaction-date-picker-popper .el-picker-panel__shortcut {
+        width: auto !important;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 4px 12px !important;
+        border-radius: 9999px;
+        border: 1px solid var(--el-border-color-lighter);
+        line-height: 20px;
+    }
+
+    .transaction-date-picker-popper .el-picker-panel__body {
+        margin-left: 0 !important;
+        min-width: 0 !important;
+    }
+
+    .transaction-date-picker-popper .el-date-picker__header {
+        margin: 8px 12px !important;
+    }
+
+    .transaction-date-picker-popper .el-picker-panel__content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 8px 8px;
+        box-sizing: border-box;
+    }
+
+    .transaction-date-picker-popper .el-date-table {
+        width: 100%;
+    }
+
+    .transaction-date-picker-popper .el-date-table th {
+        white-space: nowrap;
+        padding: 4px 0;
+    }
 }
 </style>
