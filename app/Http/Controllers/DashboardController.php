@@ -130,7 +130,7 @@ class DashboardController extends Controller
     public function getSpendingCalendarData(Request $request)
     {
 
-        if ($request->filled($request->query('month'))) {
+        if ($request->filled('month')) {
             $validated = $request->validate([
                 'month' => ['date', 'date_format:Y-m']
             ]);
